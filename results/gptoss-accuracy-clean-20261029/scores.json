@@ -1,0 +1,20 @@
+{
+  "effort": "low",
+  "server_command": "PYTHONPATH=/home/devbali/latency-test/fairinf-sglang-4e84427ab/python:/home/devbali/latency-test/fairinf-latency-sweep/vm CUDA_VISIBLE_DEVICES=0 /home/devbali/latency-test/venv/bin/python -m sglang.launch_server --reasoning-parser gpt-oss --model-path /home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --port 30000 --disable-piecewise-cuda-graph",
+  "benchmarks": {
+    "mmlu": {
+      "questions": 2000,
+      "score": 68.0,
+      "openai": 80.4,
+      "lowest_pass": 75.4,
+      "passed": false
+    },
+    "gpqa": {
+      "questions": 198,
+      "score": 33.3,
+      "openai": 56.8,
+      "lowest_pass": 46.24,
+      "passed": false
+    }
+  }
+}

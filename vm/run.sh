@@ -13,6 +13,6 @@ export PYTHONPATH=$SIDE:$LT/fairinf-sglang-4e84427ab/python
 export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 
 # Leave --attention-backend unset: SGLang picks triton for gpt-oss on A100.
-python runner.py --model-path "$MODEL" --dtype bfloat16 --mem-fraction-static 0.7 \
+python src/runner.py --model-path "$MODEL" --dtype bfloat16 --mem-fraction-static 0.7 \
     --sampling-backend pytorch --disable-piecewise-cuda-graph \
     --batches "$1" --out "$2" "${@:3}"

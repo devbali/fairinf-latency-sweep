@@ -8,7 +8,7 @@ The latency sweep of 2026-10-28, and the models fitted to it.
 Every number in this file comes from running, in the repo root:
 
 ```bash
-python compare_fits.py results/gptoss-clean-20261028/results.jsonl
+python src/compare_fits.py results/gptoss-clean-20261028/results.jsonl
 ```
 
 ## The run
@@ -21,13 +21,13 @@ python compare_fits.py results/gptoss-clean-20261028/results.jsonl
 | packages | torch 2.11.0+cu130, sglang-kernel 0.4.2.post1, flashinfer 0.6.8.post1, triton 3.6.0, transformers 5.6.0, installed unmodified by `vm/fresh_venv.sh` |
 | flags | `--dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --disable-piecewise-cuda-graph` |
 | kernels | SGLang's defaults for gpt-oss on A100: Triton attention, `triton_kernel` MoE |
-| batches | `batches.py`: 618 prefill, 565 decode and 448 hybrid. Each ran once as a warmup, then 3 times. |
+| batches | the first 618 prefill, 565 decode and 448 hybrid batches of `src/batches.json`. Each ran once as a warmup, then 3 times. |
 
 A batch's latency is the median of its 3 samples, in ms.
 
 ## The models
 
-The variables are the same as in `fit.py`:
+The variables:
 
 | | prefill | decode | hybrid |
 |---|---|---|---|
@@ -73,9 +73,8 @@ decode:           T = f + sum_k delta_k * (N - k)+       k = 2, 4, 8, ..., 128; 
 ```
 
 - **Floor F.** Prefill and hybrid steps run without CUDA graphs. Below about 2k
-  tokens, the CPU launching kernels sets the step time. As in `fit.py`, f is
-  fitted to the steps above the floor and F to the rest, alternating until no
-  step changes side.
+  tokens, the CPU launching kernels sets the step time. The fit alternates:
+  f on the steps above the floor, F on the rest, until no step changes side.
 - **Bends.** Decode runs as CUDA graphs and has no floor, but each added
   request costs less as the batch grows. The hinge terms let the slope in N
   change at each power of two. The selected decode model keeps three of them.
@@ -85,29 +84,27 @@ Every model is linear in its coefficients and fitted by least squares.
 ## Accuracy
 
 All errors here are held out: each batch is predicted by a model fitted without
-it, using 5-fold cross-validation with `fit.py`'s folds. Error is
-|predicted - measured| / measured. R^2 is dominated by the largest steps, so
-the relative errors are the better guide.
+it, using 5-fold cross-validation. Error is |predicted - measured| / measured.
+R^2 is dominated by the largest steps, so the relative errors are the better
+guide.
 
-| | linear | degree 2 | degree 2 + sum l^2 | selected | fit.py's model |
-|---|---|---|---|---|---|
-| prefill parameters | 5 | 11 | 12 | 7 | 8 |
-| prefill held-out R^2 | 0.9716 | 0.9982 | 0.9988 | 0.9988 | 0.9988 |
-| prefill mean error | 6.2% | 1.6% | 1.3% | 1.3% | 1.3% |
-| prefill max error | 29.4% | 9.0% | 6.8% | 7.2% | 7.3% |
-| decode parameters | 11 | 17 | 18 | 9 | 11 |
-| decode held-out R^2 | 0.9841 | 0.9855 | 0.9863 | 0.9857 | 0.9841 |
-| decode mean error | 2.9% | 2.7% | 2.7% | 2.7% | 2.9% |
-| decode max error | 22.0% | 21.9% | 21.9% | 21.0% | 22.0% |
-| hybrid parameters | 8 | 29 | 30 | 12 | 13 |
-| hybrid held-out R^2 | 0.7148 | 0.9990 | 0.9990 | 0.9991 | 0.9991 |
-| hybrid mean error | 43.8% | 2.3% | 2.2% | 2.0% | 2.1% |
-| hybrid max error | 463.5% | 32.2% | 28.6% | 13.9% | 14.3% |
+| | linear | degree 2 | degree 2 + sum l^2 | selected |
+|---|---|---|---|---|
+| prefill parameters | 5 | 11 | 12 | 7 |
+| prefill held-out R^2 | 0.9716 | 0.9982 | 0.9988 | 0.9988 |
+| prefill mean error | 6.2% | 1.6% | 1.3% | 1.3% |
+| prefill max error | 29.4% | 9.0% | 6.8% | 7.2% |
+| decode parameters | 11 | 17 | 18 | 9 |
+| decode held-out R^2 | 0.9841 | 0.9855 | 0.9863 | 0.9857 |
+| decode mean error | 2.9% | 2.7% | 2.7% | 2.7% |
+| decode max error | 22.0% | 21.9% | 21.9% | 21.0% |
+| hybrid parameters | 8 | 29 | 30 | 12 |
+| hybrid held-out R^2 | 0.7148 | 0.9990 | 0.9990 | 0.9991 |
+| hybrid mean error | 43.8% | 2.3% | 2.2% | 2.0% |
+| hybrid max error | 463.5% | 32.2% | 28.6% | 13.9% |
 
-`fit.py`'s model is the one the repo's `fit.py` fits, for reference; for
-decode it's the linear one. A batch's 3 samples spread by 0.5% (prefill), 2.8%
-(decode) and 0.3% (hybrid), median. An error near that level is measurement
-noise.
+A batch's 3 samples spread by 0.5% (prefill), 2.8% (decode) and 0.3%
+(hybrid), median. An error near that level is measurement noise.
 
 The first three polynomials alone, without the floor (prefill, hybrid) or the
 bends (decode):
@@ -242,8 +239,6 @@ window as a mask inside the same loop (lines 468-473).
     M_p*N_d and M_p*S_d. So did every training fold. Of the other 17
     second-order terms it keeps two, S_p*N_d and N_d^2. They matter least of
     the terms it keeps, and the folds disagree about them.
-  - `fit.py`'s model, derived from the kernel by hand, is nearly the same. For
-    prefill the selected terms are `fit.py`'s minus M.
 - **sum l^2 earns its place.** Dropping it from the selected model raises the
   held-out mean error from 1.3% to 1.9% for prefill, and from 2.0% to 2.2% for
   hybrid.
@@ -288,7 +283,6 @@ So S*M is in ms per token^2.
 | degree 2 | 11 | 0.9984 | 0.9982 | 4.8 ms | 1.6% | 1.3% | 3.4% | 9.0% |
 | degree 2 + sum l^2 | 12 | 0.9989 | 0.9988 | 3.8 ms | 1.3% | 1.1% | 2.8% | 6.8% |
 | selected | 7 | 0.9989 | 0.9988 | 3.8 ms | 1.3% | 1.0% | 2.8% | 7.2% |
-| fit.py's model | 8 | 0.9989 | 0.9988 | 3.8 ms | 1.3% | 1.1% | 2.8% | 7.3% |
 
 With the terms also chosen inside each training fold, the selected model's
 held-out error is mean 1.3%, median 1.0%, p90 2.8%, max 7.2%. All five folds
@@ -426,7 +420,6 @@ In the linear model that is 1.6 ms per request up to 2 requests, 1.2 ms up to
 | degree 2 | 29 | 0.9993 | 0.9990 | 13.6 ms | 2.3% | 1.6% | 4.9% | 32.2% |
 | degree 2 + sum l^2 | 30 | 0.9993 | 0.9990 | 13.1 ms | 2.2% | 1.5% | 4.7% | 28.6% |
 | selected | 12 | 0.9992 | 0.9991 | 12.4 ms | 2.0% | 1.4% | 4.0% | 13.9% |
-| fit.py's model | 13 | 0.9992 | 0.9991 | 12.7 ms | 2.1% | 1.6% | 4.3% | 14.3% |
 
 Held-out error by the prefill part's prompts (mean, max):
 
@@ -436,7 +429,6 @@ Held-out error by the prefill part's prompts (mean, max):
 | degree 2 | 2.6%, 32.2% | 4.3%, 12.0% | 2.1%, 19.5% |
 | degree 2 + sum l^2 | 2.5%, 28.6% | 4.1%, 11.4% | 2.0%, 15.1% |
 | selected | 2.2%, 8.7% | 3.2%, 10.4% | 1.9%, 13.9% |
-| fit.py's model | 2.1%, 9.4% | 3.2%, 7.9% | 2.0%, 14.3% |
 
 With the terms also chosen inside each training fold, the selected model's
 held-out error is mean 2.1%, median 1.4%, p90 4.4%, max 16.1%. The folds chose

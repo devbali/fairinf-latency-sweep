@@ -10,15 +10,20 @@ The current target is **gpt-oss-20b in BF16 on one A100 80GB**, running the
 FairInference fork of SGLang pinned to commit `4e84427ab`
 (`matteo/fairbatching`).
 
-| file | what it does |
+| path | what it does |
 |---|---|
-| `runner.py` | Loads SGLang's `ModelRunner` once, then times every batch in `--batches`: 1 warmup run, then 3 samples. |
-| `batches.py` | The batch plan: `PREFILL_BATCHES`, `DECODE_BATCHES` and `HYBRID_BATCHES`. |
-| `fit.py` | Fits the piecewise-linear models below and reports R² and errors, in-sample and cross-validated. |
-| `compare_fits.py` | Compares linear, degree-2 and degree-2 + sum l^2 regressions, plus the terms that matter picked by backward elimination, and prints markdown tables. |
-| `sanity_batches.py` | A short plan of 88 batches from `batches.py`, 1.5 minutes of timing, for checking that a VM matches the latest run. |
-| `compare_runs.py` | Compares a run with a reference run batch by batch, and with `fit.py`'s model, and compares the setup lines of their logs. |
-| `vm/` | Setup and run scripts for the A100 VM. |
+| `sanity_latency.py` | Given the command that starts an SGLang server, runs `src/sanity_batches.json` in its place and prints how the setup and times differ from the reference run, `results/gptoss-sanity-cuda-graphs-20261029`. |
+| `sanity_accuracy.py` | Given the same command, starts that server, asks it the GPQA Diamond questions with OpenAI's own gpt-oss eval code, and checks the score against OpenAI's published one. |
+| `src/runner.py` | Loads SGLang's `ModelRunner` once, then times every batch in `--batches`: 1 warmup run, then 3 samples. |
+| `src/batches.json` | The batch plan, every batch written out: `prefill`, `decode` and `hybrid` lists. |
+| `src/generate_batches.py` | Writes both plans, `src/batches.json` and `src/sanity_batches.json`, from the designs and seeded random draws below. |
+| `src/compare_fits.py` | Fits the four models below: linear, degree-2 and degree-2 + sum l^2 regressions, and the terms that matter picked by backward elimination. Prints their accuracy and coefficients as markdown tables. |
+| `src/fit.py` | Helpers the scripts share: loading results, least squares with the CPU floor, cross-validation and the bootstrap. |
+| `src/sanity_batches.json` | A short plan of 88 batches from `src/batches.json`, for `sanity_latency.py`. |
+| `src/compare_runs.py` | Compares a run with a reference run batch by batch, and compares the setup lines of their logs. |
+| `src/server_command.py` | Reads the server command the sanity checks take, and runs something else in the server's place. |
+| `vm/` | Setup and run scripts for the A100 VM. `vm/README.md` lists the exact setup, server command and commands used on it. |
+| `results/` | One directory per run: its samples, its log, and a README on what it shows. |
 
 ## What one step is
 
@@ -44,9 +49,9 @@ each request is filled with random tokens.
 A time is host wall clock from batch preparation through sampling, with the
 GPU synced before and after. Each batch runs once as a warmup, then 3 more
 times as samples. The 3 samples usually agree within a few percent: the median
-spread is 0.6% for prefill, 2.9% for decode and 0.3% for hybrid.
+spread is 0.5% for prefill, 2.8% for decode and 0.3% for hybrid.
 
-## The models to fit
+## The models
 
 | | N | S | M |
 |---|---|---|---|
@@ -54,35 +59,46 @@ spread is 0.6% for prefill, 2.9% for decode and 0.3% for hybrid.
 | decode | requests, padded to the CUDA-graph size | total context tokens | longest context |
 | hybrid | `N_p`, `N_d` | `S_p`, `S_d` | `M_p`, `M_d` |
 
-`_p` is the prefill part of a hybrid step and `_d` the decode part. `Σl²` is
-the sum of squared prompt lengths, and `(x)+` means `max(0, x)`.
+`_p` is the prefill part of a hybrid step and `_d` the decode part. sum l^2 is
+the sum of the squared prompt lengths, and `(x)+` means `max(0, x)`.
+
+`src/compare_fits.py` fits four regressions, each with a polynomial part f:
 
 ```
-prefill:  T = max(F_p, c + α·S + β·M + γ·N + η_N·N·M + η_S·S·M + η_Q·Σl²)
-
-decode:   T = c + α·S + β·M + γ·N + Σ_k δ_k·(N − k)+        k = 2, 4, 8, …, 128
-
-hybrid:   T = max(F_h, c + α_p·S_p + β_p·M_p + γ_p·N_p
-                         + η_N·N_p·M_p + η_S·S_p·M_p + η_Q·Σl_p²
-                         + α_d·S_d + β_d·M_d + γ_d·N_d
-                         + θ_N·N_d·M_p + θ_S·S_d·M_p)
+linear               f = c + a*N + b*S + d*M
+degree 2             f = linear + every square and product of N, S and M
+degree 2 + sum l^2   f = degree 2 + q * sum l^2
+selected             f = the terms of degree 2 + sum l^2 that matter most
 ```
 
-Each model is linear in its coefficients, so least squares fits it, and
-piecewise linear where the hardware changes regime.
+All four wrap f the same way:
 
-**Prefill and hybrid have a floor.** These steps run without CUDA graphs.
-Below about 1k tokens the CPU launching kernels is the bottleneck, and a step
-takes 67-74 ms whatever its size. The model takes the larger of the floor F
-and the GPU time. `fit.py` fits the two pieces by alternating: the linear part
-on the steps above the floor, the floor on the rest, until no step changes
-side.
+```
+prefill, hybrid:  T = max(F, f)
+decode:           T = f + sum_k delta_k * (N - k)+        k = 2, 4, 8, ..., 128
+```
+
+- **Hybrid steps** use all six variables, so their degree-2 polynomial has 21
+  squares and products. Their sum l^2 is over the prefill part's prompts.
+- **The selected model** comes from backward elimination. Starting from
+  degree 2 + sum l^2, it drops one term at a time, each time the one whose
+  removal leaves the lowest held-out error. Of the models along the way, it
+  keeps the smallest whose error is within one standard error of the best
+  one's.
+- **Every model is linear in its coefficients,** so least squares fits it.
+
+**Prefill and hybrid have a floor without CUDA graphs.** Run eagerly, below
+about 1k tokens the CPU launching kernels is the bottleneck, and a step takes
+67-74 ms whatever its size. The models take the larger of the floor F and the
+GPU time f. The fit alternates: f on the steps above the floor, F on the rest,
+until no step changes side. With piecewise CUDA graphs there is no floor: the
+fits put F at 0, and a 16-token prompt takes about 19 ms.
 
 **Decode bends with batch size.** Decode runs as CUDA graphs and has no floor.
-Each of the first few requests adds a lot (1.6 ms each up to 2 requests, 1.2 ms
-up to 4), most likely because each new token pulls in more of gpt-oss's 32
-experts. After that each request adds 0.03-0.15 ms. A breakpoint at every
-power of two lets the slope change at each doubling.
+Each of the first few requests adds a lot, most likely because each new token
+pulls in more of gpt-oss's 32 experts. In the linear model, a request adds
+1.6 ms up to 2 requests and 1.2 ms up to 4, then 0.03-0.15 ms. A breakpoint at
+every power of two lets the slope change at each doubling.
 
 **The attention terms come from SGLang's Triton extend-attention kernel,**
 which gpt-oss must use on A100:
@@ -93,14 +109,16 @@ which gpt-oss must use on A100:
   token does the same work with every row masked; the kernel has no early
   exit.
 
-So a prompt of l tokens costs about `l·M − l²/2` key reads, which sum to
-`S·M − Σl²/2` over the step, plus a fixed cost per block, `N·M`. The fit
-agrees: η_Q comes out at −0.46·η_S for prefill and −0.51·η_S for hybrid, close
-to the −½ this predicts.
+So a prompt of l tokens costs about `l*M - l^2/2` key reads, which sum to
+`S*M - sum l^2 / 2` over the step, plus a fixed cost per block, `N*M`. N*M and
+S*M are in the degree-2 polynomial, but sum l^2 is not, and no polynomial in
+N, S and M can express it. Hence the extra term. The selected model agrees:
+its sum l^2 coefficient comes out at -0.45 times its S*M one for prefill, and
+-0.52 times for hybrid, close to the -1/2 this predicts.
 
 In a hybrid step each decode is a 1-token prompt with a long cached context.
 It also gets `ceil(M_p / BLOCK_M)` blocks, each looping over that whole
-context, hence θ_N·N_d·M_p and θ_S·S_d·M_p. If the prefill and decode parts
+context, hence the N_d*M_p and S_d*M_p terms. If the prefill and decode parts
 just added up, these cross terms would be zero. Measured on gpt-oss:
 
 | step | time |
@@ -109,52 +127,61 @@ just added up, these cross terms would be zero. Measured on gpt-oss:
 | + 64 decodes with 1 token of context | 316 ms |
 | + 64 decodes with 512 tokens of context | 444 ms |
 
-## Checking the fit
+## Fitting the models
 
 ```bash
-python fit.py results/<run>/results.jsonl
+python src/compare_fits.py results/<run>/results.jsonl
 ```
 
-For each phase, `fit.py` fits least squares on the median of each batch's
-samples. It prints:
-- **the coefficients**, in ms per unit, each with a 95% interval from 200
-  bootstrap refits. An interval that spans zero marks a term the data can't
-  pin down.
-- **R², adjusted R², RMSE, MAE and relative error** on the batches it was
-  fitted on.
-- **the same on held-out batches** from 5-fold cross-validation: each batch is
-  predicted by a model fitted without it. This is the number to judge a model
-  by.
+For each phase, `src/compare_fits.py` fits every model by least squares on the
+median of each batch's samples. It prints markdown tables of:
+- **accuracy:** R^2 on the batches each model was fitted on, then R^2, RMSE
+  and relative error on held-out batches from 5-fold cross-validation. Each
+  held-out batch is predicted by a model fitted without it. This is the number
+  to judge a model by.
 - **the noise:** how far each batch's 3 samples spread. An error near that
   level is measurement noise, not model error.
-- **the held-out error by batch size**, in quartiles of tokens per step, or
-  requests for decode.
+- **the elimination path** that picks the selected model, and the same
+  selection repeated inside each training fold (nested cross-validation), to
+  check that picking the terms didn't overfit.
+- **every coefficient,** in ms per unit, with a 95% interval from 200
+  bootstrap refits for the selected model. An interval that spans zero marks a
+  term the data can't pin down.
 
-R² is dominated by the largest steps. Hybrid steps range from 84 ms to 3.6 s,
+R^2 is dominated by the largest steps. Hybrid steps range from 69 ms to 3.6 s,
 so a hybrid model that misses small steps by 30% still scores 0.996. Relative
 error is the better guide.
 
-The latest run (`results/gptoss-clean-20261028/`), on held-out batches:
+Mean error on held-out batches, in the two full runs:
 
-| phase | batches | parameters | R² | RMSE | mean error | p90 | max | sample noise (median) |
-|---|---|---|---|---|---|---|---|---|
-| prefill | 618 | 8 | 0.9988 | 3.8 ms | 1.3% | 2.8% | 7.3% | 0.5% |
-| decode | 565 | 11 | 0.9841 | 0.76 ms | 2.9% | 6.1% | 22.0% | 2.8% |
-| hybrid | 448 | 13 | 0.9991 | 12.7 ms | 2.1% | 4.3% | 14.3% | 0.3% |
+| run | phase | batches | linear | degree 2 | degree 2 + sum l^2 | selected | sample noise (median) |
+|---|---|---|---|---|---|---|---|
+| no CUDA graphs, `results/gptoss-clean-20261028` | prefill | 618 | 6.2% | 1.6% | 1.3% | 1.3% | 0.5% |
+| | decode | 565 | 2.9% | 2.7% | 2.7% | 2.7% | 2.8% |
+| | hybrid | 448 | 43.8% | 2.3% | 2.2% | 2.0% | 0.3% |
+| CUDA graphs, `results/gptoss-cuda-graphs-20261029` | prefill | 2,122 | 11.1% | 2.8% | 2.7% | 2.7% | 0.4% |
+| | decode | 1,985 | 2.9% | 2.7% | 2.6% | 2.6% | 2.9% |
+| | hybrid | 1,357 | 56.9% | 3.2% | 3.1% | 3.0% | 0.2% |
 
-`compare_fits.py` fits linear and full degree-2 polynomial regressions to the
-same batches, with and without the sum l^2 term, and picks the terms that
-matter by backward elimination. Its results, every coefficient, and where the
-sum l^2 term comes from are in that run's
-[README](results/gptoss-clean-20261028/README.md).
+- **Without CUDA graphs,** the selected models have 7, 9 and 12 parameters,
+  against 12, 18 and 30 for degree 2 + sum l^2. Every coefficient, the full
+  accuracy tables, and where the sum l^2 term comes from are in that run's
+  [README](results/gptoss-clean-20261028/README.md).
+- **With CUDA graphs,** the errors come from the smallest steps and from hybrid
+  steps with a tiny prompt and many decodes, which the floor used to hide. That
+  run's [README](results/gptoss-cuda-graphs-20261029/README.md) has the
+  details, and how a padded token count helps the prefill model.
 
 ## Planning batches
 
-The plan in `batches.py` follows three rules.
+`src/batches.json` lists every batch of the plan. `src/generate_batches.py`
+writes it from the designs below and seeded random draws. The plan follows
+three rules.
 
 **1. Vary S, M and N independently.**
-- In uniform batches S = N·M, so a fit on them alone cannot separate α from β.
-  The attention terms tie up the same way: N·M = S and Σl² = S·M.
+- In uniform batches S = N*M, so a fit on them alone cannot separate the S
+  term from the M term. The attention terms tie up the same way: N*M = S and
+  sum l^2 = S*M.
 - Skewed batches (one long request plus short ones) move M at nearly fixed S.
 - Decode needs batches in every power-of-two range of N, one per piece of its
   model. Drawing N log-uniformly covers them.
@@ -181,20 +208,37 @@ a structured design with a larger seeded random sample.
 
 | phase | design | batches |
 |---|---|---|
-| prefill | uniform: N ∈ {1, …, 64} × L ∈ {16, …, 8192}, N·L ≤ 8,192 | 49 |
-| | skewed: one long request (512–6,144) + N − 1 short ones (16, 64 or 256), N ∈ {2, …, 32} | 69 |
-| | random: total 16–8,192, N ≤ 64 | 500 |
-| decode | uniform: N ∈ {1, …, 256} × context ∈ {64, 256, 1k, 4k, 16k, 64k}, within the KV limit | 42 |
-| | skewed: one long context (8k–96k) + N − 1 short ones, N ∈ {8, 32, 128, 256} | 23 |
-| | random: total 32–300k, N ≤ 256, contexts up to 128k | 500 |
-| hybrid | 6 prefill parts × 8 decode parts, each part also timed on its own | 48 |
+| prefill | uniform: N in {1, 2, 4, ..., 64} x L in {16, 32, ..., 8192}, N*L <= 8,192 | 49 |
+| | skewed: one long prompt (512-6,144) + N - 1 short ones (16, 64 or 256), N in {2, 4, ..., 32} | 69 |
+| | random: total 16-8,192, N <= 64 | 500 |
+| | one prompt: every 16 tokens up to 256, every 32 up to 1,024, every 128 up to 8,192 | 86 |
+| | uniform, denser: N in {1, 2, 3, 4, 6, 8, ..., 48, 64} x L in {16, 24, 32, 48, ..., 6,144, 8,192} | 89 |
+| | skewed, denser: one long prompt (256-6,144) + N - 1 short ones (16-128), N in {2, 3, 4, 6, ..., 64} | 330 |
+| | random, more of the same | 999 |
+| decode | uniform: N in {1, 2, 4, ..., 256} x context in {64, 256, 1k, 4k, 16k, 64k}, within the KV limit | 42 |
+| | skewed: one long context (8k-96k) + N - 1 short ones, N in {8, 32, 128, 256} | 23 |
+| | random: total 32-300k, N <= 256, contexts up to 128k | 500 |
+| | uniform, denser: every N up to 16, then 20, 24, 28, 32, 40, ..., 224, 256 x every power of two from 64 to 128k | 221 |
+| | skewed, denser: one long context (8k-128k) + N - 1 short ones (64-4k), N in {2, 4, ..., 256} | 199 |
+| | random, more of the same | 1,000 |
+| hybrid | 6 prefill parts x 8 decode parts, each part also timed on its own | 48 |
 | | random: decode part up to 64k context tokens, prefill part fills the rest of the budget | 400 |
+| | 13 prefill parts x 27 decode parts of up to 64k context tokens | 309 |
+| | random, more of the same | 600 |
 
-That makes 1,631 batches, each run 4 times: about 30 minutes on one A100.
-- Hybrid steps take the most time, because of the attention interaction above.
-  For that reason random hybrids keep their decode part to 64k context tokens.
-- To change the plan, edit the lists or counts (`N_RANDOM`). Any list can be
-  left out, and `--batches` can point at another file.
+That makes 5,464 batches, each run 4 times: about 80 minutes on one A100 at
+the clean run's step times. With CUDA graphs, timing them took 64 minutes
+(`results/gptoss-cuda-graphs-20261029`).
+- **The plan of `results/gptoss-clean-20261028` comes first:** in each phase,
+  the rows down to the first random one, drawn exactly as then. So a new run
+  compares with that one batch by batch. A batch already in an earlier row is
+  left out of later ones.
+- **Hybrid steps take the most time,** because of the attention interaction
+  above. For that reason the newer hybrid designs keep their decode part to
+  64k context tokens.
+- **To change the plan,** edit `src/generate_batches.py` and run
+  `python src/generate_batches.py`. `--batches` can also point at another
+  file, such as `src/sanity_batches.json`.
 
 ## How SGLang builds hybrid steps
 
@@ -237,27 +281,31 @@ time.
 
 The VM is `fairinf-matteo-fork-1xa100-eu1` in europe-west4-a: a spot A100
 80GB at about $3.10/hr. Keep one VM running at a time, and stop it when idle.
+`vm/README.md` has, in one place, what is installed where on it, the server
+command every run used, and the exact commands of the sweep and both checks.
 
 ```bash
 gcloud compute instances start fairinf-matteo-fork-1xa100-eu1 --zone europe-west4-a
 gcloud compute instances stop fairinf-matteo-fork-1xa100-eu1 --zone europe-west4-a --discard-local-ssd=true
 
 # copy the repo over
-gcloud compute scp --recurse --zone europe-west4-a runner.py batches.py sanity_batches.py vm \
+gcloud compute scp --recurse --zone europe-west4-a src vm \
     devbali@fairinf-matteo-fork-1xa100-eu1:~/latency-test/fairinf-latency-sweep/
 ```
 
 On the VM, from `~/latency-test/fairinf-latency-sweep`:
 
 ```bash
-nohup bash vm/run_clean.sh batches.py results.jsonl > run.log 2>&1 &   # ~30 min; survives SSH drops
+nohup bash vm/run_clean.sh src/batches.json results.jsonl > run.log 2>&1 &   # ~80 min; survives SSH drops
 ```
 
-`vm/run_clean.sh` runs `runner.py` with the flags of the latest run:
-`--dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch
---disable-piecewise-cuda-graph`. Flags added after the output file go to
-SGLang and override these. It needs three things under `~/latency-test`, all
-in place on eu1:
+`vm/run_clean.sh` runs `src/runner.py` with the flags of
+`results/gptoss-clean-20261028`: `--dtype bfloat16 --mem-fraction-static 0.7
+--sampling-backend pytorch --disable-piecewise-cuda-graph`. Flags added after
+the output file go to SGLang and override these. With `PIECEWISE=inductor` in
+front, prefill and hybrid steps run as piecewise CUDA graphs instead; the
+script says why that takes torch inductor. It needs three things under
+`~/latency-test`, all in place on eu1:
 - **SGLang at `4e84427ab`**, unpacked from the VM's own fairinf-sglang repo
   (step 1 of `vm/setup.sh` below).
 - **A fresh venv** with the fork's own package pins, installed unmodified by
@@ -273,29 +321,147 @@ It appends one JSON line per sample to `results.jsonl`:
 - `sample`: 0, 1 or 2
 - `latency_s`
 
-Copy `results.jsonl` and `run.log` back into `results/<run>/` and run `fit.py`
-on it.
+Copy `results.jsonl` and `run.log` back into `results/<run>/` and run
+`src/compare_fits.py` on it.
 
-### Checking a VM against the latest run
+### Checking a system's latency
 
-`sanity_batches.py` is a short sweep for checking that a VM runs with the same
-setup the latency models were fitted on. Its 88 batches are all in
-`batches.py`: 20 prefill, 20 decode and 48 hybrid, covering the CPU floor, the
-attention terms, decode from 1 to 256 requests, and the hybrid design. Timing
-them takes about 1.5 minutes, after about 2 minutes of loading the model.
+`sanity_latency.py` checks that a system runs SGLang with the setup the latency
+models were fitted on. Give it the command that starts the SGLang server
+there. It runs `src/runner.py` in the server's place, with the same
+environment, Python and flags:
 
 ```bash
-nohup bash vm/run_clean.sh sanity_batches.py results.jsonl > run.log 2>&1 &   # on the VM
-python compare_runs.py results/gptoss-clean-20261028/results.jsonl results/<run>/results.jsonl
+python sanity_latency.py "TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=... python3 -m sglang.launch_server \
+    --model-path lmsys/gpt-oss-20b-bf16 --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch \
+    --piecewise-cuda-graph-compiler inductor"
 ```
 
-`compare_runs.py` compares each batch's median time with the latest run's and
-with `fit.py`'s model. When `run.log` sits next to each `results.jsonl`, it
-also compares the setup lines of the two logs: package versions, GPU, MoE
-kernel, KV cache and CUDA-graph sizes. On a matching setup the setup lines
-agree and the times differ by about the sample noise.
-`results/gptoss-sanity-check-20261029/` is this check on eu1: the setup lines
-matched, and the times differed by 0.1-0.5% on average in each phase.
+It times the 88 batches of `src/sanity_batches.json`, all also in
+`src/batches.json`: 20 prefill, 20 decode and 48 hybrid. They cover the
+smallest steps, the attention terms, decode from 1 to 256 requests, and the
+hybrid design. Then it compares them with the reference run,
+`results/gptoss-sanity-cuda-graphs-20261029`: the same batches on eu1, with
+piecewise CUDA graphs as above (`PIECEWISE=inductor` in `vm/run_clean.sh`). It
+prints:
+- the setup lines of the two run logs that differ: package versions, GPU, MoE
+  kernel, KV cache and CUDA-graph sizes;
+- every batch's time in both runs, with `!` on differences beyond the sample
+  noise;
+- a verdict, also given as the exit code: 0 if the run matches, 1 if not.
+
+The run matches if the setup lines do and no phase's times differ. A phase
+differs if its batches are more than 5% slower or faster on average, or if
+more than 10% of them differ by more than noise. A setup difference moves
+many batches; a single small step can be off by chance. An identical rerun on
+eu1 had one 10 ms decode step 9% slow
+(`results/gptoss-sanity-latency-eu1-20261029`).
+
+The 5% leaves room for drift. Runs of the same setup on eu1 differ by at most
+1.2% on average in any phase. Added to the noise of those runs, a shift of up
+to 3% in one phase always passes, and one of 6% or more always fails. Setup
+differences are larger: prefill without CUDA graphs is 53% slower.
+
+Notes on running it:
+- **The command** may carry environment variables, `nohup` and a trailing
+  redirect or `&`, as the FairInference launch scripts do.
+- **Server-only flags** such as `--port` are accepted and change nothing.
+- **`--dry-run`** prints what would run.
+- **Output:** the run's `results.jsonl` and `run.log` go to a new directory
+  under `results/`.
+- **Requirements:** it needs this repo, with the reference run, and numpy.
+
+By hand, the same check is `vm/run_clean.sh` on the plan, then
+`src/compare_runs.py`, which prints the comparison as markdown:
+
+```bash
+PIECEWISE=inductor nohup bash vm/run_clean.sh src/sanity_batches.json results.jsonl > run.log 2>&1 &   # on the VM
+python src/compare_runs.py results/gptoss-sanity-cuda-graphs-20261029/results.jsonl results/<run>/results.jsonl
+```
+
+`results/gptoss-sanity-check-20261029/` is the earlier check of the setup
+without CUDA graphs, against `results/gptoss-clean-20261028`.
+
+### Checking accuracy on a system
+
+`sanity_accuracy.py` checks that a system's SGLang setup computes the right
+answers, not only that it runs at the right speed. It takes the same server
+command as `sanity_latency.py`, but starts that server for real. Then it asks
+the server the 198 GPQA Diamond questions with OpenAI's own eval code for
+gpt-oss: `gpt_oss.evals` from
+[github.com/openai/gpt-oss](https://github.com/openai/gpt-oss), which OpenAI's
+[guide to verifying gpt-oss implementations](https://developers.openai.com/cookbook/articles/gpt-oss/verifying-implementations)
+runs.
+
+```bash
+python sanity_accuracy.py "PYTHONPATH=... python3 -m sglang.launch_server --model-path lmsys/gpt-oss-20b-bf16 \
+    --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --port 30000"
+```
+
+The eval's prompt, answer grading and client run unchanged, with their
+settings: temperature 1, up to 131,072 tokens per answer, every question in
+flight at once. Only the number of attempts differs. OpenAI's script, `python
+-m gpt_oss.evals --eval gpqa`, asks each question 8 times; the check asks once
+by default, and `--attempts 8` matches the script. The score is compared with
+OpenAI's for gpt-oss-20b, from the model card
+([arXiv 2508.10925](https://arxiv.org/abs/2508.10925), Table 3, GPQA Diamond
+without tools): 56.8% at low reasoning effort, 66.0% at medium and 71.5% at
+high. `--effort` picks one; low is the default.
+
+- **The score passes** if it is at most max(5 points, 3 standard errors) below
+  OpenAI's, with the standard error over the 198 questions: 46.2% at low
+  effort. A broken setup scores near chance, 25%.
+- **One attempt per question is enough.** Drawing one answer per question from
+  the 8-attempt run below, 20,000 times over, gives 53.5% to 63.1% (1st to 95th
+  percentile), and never below 46.2%.
+- **It takes about 6 minutes** on eu1: 5 to start the server with CUDA
+  graphs, under 1 for the questions.
+- **Two flags are added** to a command that lacks them. Neither changes how
+  the model runs.
+  - `--reasoning-parser gpt-oss` keeps the model's reasoning out of the
+    response's content, where the eval looks for the answer.
+  - `--allow-auto-truncate` is needed because the eval asks for 131,072 new
+    tokens, the model's whole context. Without it this fork rejects every such
+    request (`tokenizer_manager.py`, `_validate_one_request`), and the eval
+    scores each rejection as a wrong answer. With it, SGLang lowers max_tokens
+    to what fits after the prompt.
+- **The eval's code** is a checkout of github.com/openai/gpt-oss: `--gpt-oss
+  DIR`, or by default a clone at commit `2770201` (main on 2026-10-29) in
+  `~/.cache/sanity-accuracy/`.
+- **The eval's packages:** the eval runs with the Python that runs the check,
+  or `--python`. It needs gpt-oss's eval packages: openai, pandas, numpy,
+  jinja2, tqdm and blobfile. A venv of their own keeps them apart from the
+  server's:
+
+  ```bash
+  python3 -m venv evals-venv && evals-venv/bin/pip install openai pandas numpy jinja2 tqdm blobfile
+  evals-venv/bin/python sanity_accuracy.py "..."
+  ```
+- **A gpt-oss server on this fork** also needs the cache policy described
+  under "Serving gpt-oss on this fork" below.
+- **Output:** a new directory under `results/` holds the server's log, the
+  eval's output, every question, answer and grade (`gpqa-*-answers.json.gz`)
+  and `scores.json`. The exit code is 0 if the score passes, 1 if it is too
+  low, and 2 if the check could not run.
+
+On eu1, with the CUDA-graph setup at low effort, both runs matched OpenAI's
+56.8%:
+
+| run | attempts per question | score |
+|---|---|---|
+| `results/gptoss-sanity-accuracy-eu1-20261029` | 1 | 54.5% |
+| `results/gptoss-openai-evals-cuda-graphs-20261029` | 8 | 59.0% |
+
+Before this, the check ran SGLang's eval script, `sglang.test.run_eval`, on the
+same server command. It scored GPQA Diamond 36.4% with CUDA graphs and 33.3%
+without, and MMLU 68.4% and 68.0%, against OpenAI's 56.8% and 80.4%
+(`results/gptoss-accuracy-cuda-graphs-20261029`,
+`results/gptoss-accuracy-clean-20261029`). Since OpenAI's code gets OpenAI's
+score from the same server, that script, not the setup, was off. Its GPQA
+prompt and grading differ from OpenAI's: it asks for a last line `Answer:
+$LETTER` and counts only the first `Answer: X` in the response, while
+OpenAI's grader accepts the letter in many forms. Which of the two caused the
+gap was not checked.
 
 ### The older hooks-venv setup
 
@@ -338,14 +504,18 @@ on `PYTHONPATH`.
 
 ## Known effects on this stack
 
-- **Prefill and hybrid steps have a CPU floor.** Below about 1k tokens they
-  take 67-74 ms whatever their size; the fitted floor is 70 ms for prefill and
-  71 ms for hybrid.
-  - The overhead is Python plus kernel launches. Piecewise CUDA graphs would
-    cut it, but they are off (`--disable-piecewise-cuda-graph`): on A100 the
-    fork sends RMSNorm through FlashInfer's kernel (`layernorm.py:261`), which
-    torch's compiler can't trace. In `hooks-venv` they can't work either, as
-    torch 2.5.1's compiler can't trace `ForwardMode.is_extend()`.
+- **Without CUDA graphs, prefill and hybrid steps have a CPU floor.** Below
+  about 1k tokens they take 67-74 ms whatever their size; the fitted floor is
+  70 ms for prefill and 71 ms for hybrid.
+  - The overhead is Python plus kernel launches. Piecewise CUDA graphs remove
+    it, with flags only (`PIECEWISE=inductor` in `vm/run_clean.sh`). The
+    default eager compiler can't trace the fork's RMSNorm, FlashInfer's kernel
+    (`layernorm.py:261`), so they need `--piecewise-cuda-graph-compiler
+    inductor`, which runs it as torch code, and `TORCHINDUCTOR_FORCE_DISABLE_CACHES=1`.
+    In `hooks-venv` they can't work at all, as torch 2.5.1's compiler can't
+    trace `ForwardMode.is_extend()`.
+  - With them, steps of 1k tokens or more run 3-4% slower, mostly because a
+    step is padded up to the next of the 58 captured token counts.
   - Most of gpt-oss's overhead is its MoE path, about 8 Triton launches per
     layer. Llama's floor is 41–48 ms.
   - Decode uses regular CUDA graphs and doesn't pay this.
@@ -355,7 +525,7 @@ on `PYTHONPATH`.
   has one, and every block of that request loops over it as well. That adds a
   prefix·M term these runs don't measure.
 - **Decode times step at the CUDA-graph sizes.** A batch of 100 runs as 104;
-  `fit.py` uses the padded size.
+  the models use the padded size.
 - **Why gpt-oss in BF16:**
   - The hooks venv's `sgl_kernel` is a stub on A100. Its MoE routing,
     alignment and INT8/FP8 GEMM kernels all return empty tensors. That ruled

@@ -1,0 +1,10 @@
+ChatCompletionSampler initialized with self.system_message=None self.temperature=1.0 self.max_tokens=16384 self.reasoning_effort='low' self.extra_body=None
+  0%|          | 0/2000 [00:00<?, ?it/s]  0%|          | 1/2000 [00:07<4:01:53,  7.26s/it]  0%|          | 2/2000 [00:18<5:22:10,  9.68s/it]  0%|          | 6/2000 [00:53<5:00:14,  9.03s/it]  2%|▏         | 34/2000 [00:56<36:53,  1.13s/it]   3%|▎         | 51/2000 [01:18<38:29,  1.18s/it]  9%|▊         | 172/2000 [01:40<11:10,  2.72it/s] 18%|█▊        | 351/2000 [01:46<04:16,  6.43it/s] 18%|█▊        | 351/2000 [02:00<04:16,  6.43it/s] 19%|█▉        | 376/2000 [02:26<08:35,  3.15it/s] 26%|██▌       | 517/2000 [02:34<04:50,  5.11it/s] 79%|███████▉  | 1575/2000 [02:40<00:15, 27.12it/s]100%|██████████| 2000/2000 [02:40<00:00, 12.45it/s]
+Total latency: 160.704 s
+Score: 0.680
+Output throughput: 2226.798 token/s
+[METRIC] mmlu_score=0.6805 labels={"model": "/home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb", "eval": "mmlu"}
+[METRIC] mmlu_latency=160.70429143 labels={"model": "/home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb", "eval": "mmlu"}
+Writing report to /tmp/mmlu__home_devbali_.cache_huggingface_hub_models--lmsys--gpt-oss-20b-bf16_snapshots_8de8d3dfa4da071323322a4a3049612203a3b1eb.html
+{'other': np.float64(0.7006237006237006), 'other:std': np.float64(0.45798485864496846), 'score:std': np.float64(0.4662829076858812), 'stem': np.float64(0.6783216783216783), 'stem:std': np.float64(0.4671203046759367), 'humanities': np.float64(0.6587183308494784), 'humanities:std': np.float64(0.4741397383180991), 'social_sciences': np.float64(0.6945107398568019), 'social_sciences:std': np.float64(0.4606143420263415), 'score': np.float64(0.6805), 'latency': 160.70429143, 'output_throughput': 2226.798032682754}
+Writing results to /tmp/mmlu__home_devbali_.cache_huggingface_hub_models--lmsys--gpt-oss-20b-bf16_snapshots_8de8d3dfa4da071323322a4a3049612203a3b1eb.json

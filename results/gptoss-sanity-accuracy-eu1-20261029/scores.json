@@ -1,0 +1,15 @@
+{
+  "server_command": "TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=/home/devbali/latency-test/fairinf-sglang-4e84427ab/python:/home/devbali/latency-test/fairinf-latency-sweep/vm CUDA_VISIBLE_DEVICES=0 /home/devbali/latency-test/venv/bin/python -m sglang.launch_server --reasoning-parser gpt-oss --allow-auto-truncate --model-path /home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --port 30000 --piecewise-cuda-graph-compiler inductor",
+  "model": "/home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb",
+  "gpt_oss_commit": "277020131d524f06bed5f66b694a92ed7f6e5224",
+  "effort": "low",
+  "questions": 198,
+  "attempts": 1,
+  "score": 54.55,
+  "openai": 56.8,
+  "lowest_pass": 46.24,
+  "passed": true,
+  "rejected_requests": 0,
+  "retries": 0,
+  "eval_minutes": 0.7
+}

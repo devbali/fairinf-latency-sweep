@@ -2,11 +2,15 @@
 degree-2 polynomial, the degree-2 polynomial plus the attention term sum l^2,
 and the terms of that last model that matter most.
 
-All four are polynomials in N, S and M as in fit.py (hybrid: the _p and _d
-versions of each). Prefill and hybrid are fitted as max(floor, polynomial) and
-decode keeps fit.py's bends in its padded batch size, so the models differ only
-in their polynomial terms. fit.py's own model is included for reference, and
-the first three are also fitted alone, with no floor and no bends.
+All four are polynomials in N, S and M: a step's requests, its total tokens
+(prompt tokens for prefill, context tokens for decode) and its longest request.
+A hybrid step has a _p and a _d version of each, for its prefill and decode
+parts. Each batch's latency is the median of its samples. Prefill and hybrid
+steps are fitted as max(floor, polynomial), because the CPU launching kernels
+sets the time of small ones. Decode steps run as CUDA graphs, so their N is
+padded to the graph's batch size, and their time bends at each power of two in
+N. The models differ only in their polynomial terms. The first three are also
+fitted alone, with no floor and no bends.
 
 The fourth model comes from backward elimination. Starting from degree 2 +
 sum l^2, it repeatedly drops the term whose removal leaves the lowest held-out
@@ -16,27 +20,27 @@ whole selection inside each training fold (nested cross-validation) checks
 that choosing the terms didn't overfit.
 
 Prints markdown: accuracy in-sample and on held-out batches (5-fold
-cross-validation with fit.py's folds), the elimination path, and every
-coefficient in ms per unit, with bootstrap 95% intervals for the selected model.
+cross-validation), the elimination path, and every coefficient in ms per unit,
+with bootstrap 95% intervals for the selected model.
 
-Usage: python compare_fits.py RESULTS.jsonl [MORE.jsonl ...]
+Usage: python src/compare_fits.py RESULTS.jsonl [MORE.jsonl ...]
 """
 
 import itertools
 import json
-import random
 import sys
 from collections import defaultdict
 
 import numpy as np
 
+from fit import bootstrap, errors, fit, folds, held_out, load, predict, r2
+
+# Decode batches run as CUDA graphs, padded up to these sizes.
 GRAPH_BS = [1, 2, 4, 8, 12, 16, 24] + list(range(32, 257, 8))
+# Decode time is piecewise linear in the padded batch size, bending at each power of two.
 DECODE_KNOTS = [2, 4, 8, 16, 32, 64, 128]
-FOLDS = 5
-BOOTSTRAP = 200
 MODELS = ["linear", "degree 2", "degree 2 + sum l^2"]
 SELECTED = "selected"
-REFERENCE = "fit.py's model"
 
 
 def variables(phase, batch):
@@ -54,73 +58,16 @@ def variables(phase, batch):
 def terms(phase, batch, model, bends):
     v, l2 = variables(phase, batch)
     t = {"const": 1.0} | v
-    l2_name = "sum l_p^2" if phase == "hybrid" else "sum l^2"
-    if model == REFERENCE and phase == "prefill":
-        t |= {"N*M": v["N"] * v["M"], "S*M": v["S"] * v["M"], l2_name: l2}
-    elif model == REFERENCE and phase == "hybrid":
-        t |= {"N_p*M_p": v["N_p"] * v["M_p"], "S_p*M_p": v["S_p"] * v["M_p"], l2_name: l2,
-              "N_d*M_p": v["N_d"] * v["M_p"], "S_d*M_p": v["S_d"] * v["M_p"]}
-    elif model in MODELS[1:]:
+    if model in MODELS[1:]:
         # The same terms, in the same order, as scikit-learn's PolynomialFeatures(degree=2).
         for a, b in itertools.combinations_with_replacement(list(v), 2):
             t[f"{a}^2" if a == b else f"{a}*{b}"] = v[a] * v[b]
         if model == MODELS[2]:
-            t[l2_name] = l2
+            t["sum l_p^2" if phase == "hybrid" else "sum l^2"] = l2
     if bends:
         for knot in DECODE_KNOTS:
             t[f"(N-{knot})+"] = max(0, v["N"] - knot)
     return t
-
-
-def lstsq(X, y):
-    scale = np.abs(X).max(axis=0)
-    scale[scale == 0] = 1
-    return np.linalg.lstsq(X / scale, y, rcond=None)[0] / scale
-
-
-def fit(X, y, floor):
-    """Least squares for T = max(floor, X @ w), fitted as in fit.py. Returns (floor, w)."""
-    if not floor:
-        return 0.0, lstsq(X, y)
-    above = y > 1.2 * y.min()
-    for _ in range(50):
-        w = lstsq(X[above], y[above])
-        f = y[~above].mean() if not above.all() else 0.0
-        if ((X @ w > f) == above).all():
-            break
-        above = X @ w > f
-    return f, w
-
-
-def predict(model, X):
-    floor, w = model
-    return np.maximum(floor, X @ w)
-
-
-def r2(y, pred):
-    return 1 - ((y - pred) ** 2).sum() / ((y - y.mean()) ** 2).sum()
-
-
-def errors(pred, y):
-    """Relative error of each prediction, in percent."""
-    return 100 * np.abs(pred - y) / y
-
-
-def folds(n):
-    """fit.py's 5-fold split, as (training, held-out) index lists."""
-    order = list(range(n))
-    random.Random(0).shuffle(order)
-    for fold in range(FOLDS):
-        test = order[fold::FOLDS]
-        held = set(test)
-        yield [i for i in order if i not in held], test
-
-
-def held_out(X, y, floor):
-    pred = np.empty_like(y)
-    for train, test in folds(len(y)):
-        pred[test] = predict(fit(X[train], y[train], floor), X[test])
-    return pred
 
 
 def columns(names, kept):
@@ -161,23 +108,7 @@ def nested(names, X, y, floor):
     return errors(pred, y), chosen
 
 
-def bootstrap(X, y, floor):
-    """Floor and coefficients refitted on resamples of the batches, one row per resample."""
-    rng = np.random.default_rng(0)
-    boot = []
-    for _ in range(BOOTSTRAP):
-        i = rng.integers(0, len(y), len(y))
-        f, w = fit(X[i], y[i], floor)
-        boot.append(np.r_[f, w])
-    return np.array(boot)
-
-
-samples = defaultdict(list)
-for path in sys.argv[1:]:
-    for line in open(path):
-        row = json.loads(line)
-        samples[row["phase"], json.dumps(row["batch"])].append(row["latency_s"])
-
+samples = load(sys.argv[1:])
 header = "| model | params | R^2 | held-out R^2 | held-out RMSE | mean error | median | p90 | max |\n" + "|---" * 9 + "|"
 summary, plain = defaultdict(dict), defaultdict(dict)  # (phase, statistic) -> {model: value}
 for phase in ("prefill", "decode", "hybrid"):
@@ -190,7 +121,7 @@ for phase in ("prefill", "decode", "hybrid"):
     floor, bends = phase != "decode", phase == "decode"
     print(f"\n## {phase}: {len(y)} batches, samples spread by {100 * np.median(spread):.1f}% (median)")
 
-    order = MODELS + [SELECTED] + ([REFERENCE] if phase != "decode" else [])  # fit.py's decode model is the linear one
+    order = MODELS + [SELECTED]
     models = {}  # name -> (term names, X)
     for name in order:
         if name != SELECTED:
@@ -273,25 +204,23 @@ for phase in ("prefill", "decode", "hybrid"):
 
     coef = {name: ({"floor F": fitted[name][0]} if floor else {}) | dict(zip(models[name][0], fitted[name][1]))
             for name in order}
-    shown = MODELS + [SELECTED]
-    print(f"\nCoefficients in ms per unit.\n\n| term | {' | '.join(shown)} |\n" + "|---" * (len(shown) + 1) + "|")
+    print(f"\nCoefficients in ms per unit.\n\n| term | {' | '.join(order)} |\n" + "|---" * (len(order) + 1) + "|")
     for term in (["floor F"] if floor else []) + names:
         print(f"| {term} | " + " | ".join(f"{coef[name][term]:.4g}" if term in coef[name] else ""
-                                          for name in shown) + " |")
+                                          for name in order) + " |")
 
     if phase != "decode":
         sm, l2 = ("S_p*M_p", "sum l_p^2") if phase == "hybrid" else ("S*M", "sum l^2")
         ratio = boot[:, 1 + selected_names.index(l2)] / boot[:, 1 + selected_names.index(sm)]
         print(f"\n{l2} / {sm}: {coef[SELECTED][l2] / coef[SELECTED][sm]:.3f} in the {SELECTED} model "
               f"(95% interval [{np.percentile(ratio, 2.5):.3f}, {np.percentile(ratio, 97.5):.3f}]), "
-              f"{coef[MODELS[2]][l2] / coef[MODELS[2]][sm]:.3f} in {MODELS[2]}, "
-              f"{coef[REFERENCE][l2] / coef[REFERENCE][sm]:.3f} in {REFERENCE}")
+              f"{coef[MODELS[2]][l2] / coef[MODELS[2]][sm]:.3f} in {MODELS[2]}")
 
-shown = MODELS + [SELECTED, REFERENCE]
+shown = MODELS + [SELECTED]
 print("\n## Summary, held out, with the floor and bends\n\n| | " + " | ".join(shown) + " |\n"
       + "|---" * (len(shown) + 1) + "|")
 for (phase, stat), values in summary.items():
-    print(f"| {phase} {stat} | " + " | ".join(values.get(name, values[MODELS[0]]) for name in shown) + " |")
+    print(f"| {phase} {stat} | " + " | ".join(values[name] for name in shown) + " |")
 print("\n## Summary, held out, the polynomial alone\n\n| | " + " | ".join(MODELS) + " |\n"
       + "|---" * (len(MODELS) + 1) + "|")
 for (phase, stat), values in plain.items():

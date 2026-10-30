@@ -2,14 +2,14 @@
 
 Same low-level path as `python -m sglang.bench_one_batch`: no server,
 scheduler or radix cache, just batches built by hand and run through
-SGLang's ModelRunner on one GPU. The batches to time come from a separate
-file (batches.py by default).
+SGLang's ModelRunner on one GPU. The batches to time come from a JSON plan
+(batches.json by default).
 """
 
 import argparse
 import json
 import logging
-import runpy
+import os
 import time
 import uuid
 
@@ -171,21 +171,22 @@ if __name__ == "__main__":
     ServerArgs.add_cli_args(parser)
     parser.add_argument(
         "--batches",
-        default="batches.py",
-        help="Python file defining PREFILL_BATCHES, DECODE_BATCHES and/or HYBRID_BATCHES",
+        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "batches.json"),
+        help='JSON plan with "prefill", "decode" and/or "hybrid" lists of batches',
     )
     parser.add_argument(
         "--out", default="results.jsonl", help="appends one JSON line per sample"
     )
     args = parser.parse_args()
-    config = runpy.run_path(args.batches)
+    with open(args.batches) as f:
+        plan = json.load(f)
     phases = [
-        ("prefill", time_prefill, config.get("PREFILL_BATCHES", [])),
-        ("decode", time_decode, config.get("DECODE_BATCHES", [])),
+        ("prefill", time_prefill, plan.get("prefill", [])),
+        ("decode", time_decode, plan.get("decode", [])),
         (
             "hybrid",
             lambda model_runner, batch: time_hybrid(model_runner, *batch),
-            config.get("HYBRID_BATCHES", []),
+            plan.get("hybrid", []),
         ),
     ]
 

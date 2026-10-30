@@ -1,0 +1,10 @@
+ChatCompletionSampler initialized with self.system_message=None self.temperature=1.0 self.max_tokens=16384 self.reasoning_effort='low' self.extra_body=None
+  0%|          | 0/198 [00:00<?, ?it/s]  1%|          | 1/198 [00:25<1:23:56, 25.56s/it]  4%|▍         | 8/198 [00:29<09:02,  2.85s/it]    8%|▊         | 16/198 [00:32<04:13,  1.39s/it]  9%|▊         | 17/198 [00:36<04:42,  1.56s/it] 12%|█▏        | 24/198 [00:37<02:36,  1.11it/s] 23%|██▎       | 45/198 [00:38<00:50,  3.01it/s] 40%|████      | 80/198 [00:39<00:17,  6.82it/s] 42%|████▏     | 83/198 [00:41<00:18,  6.23it/s] 58%|█████▊    | 115/198 [00:41<00:07, 10.85it/s] 67%|██████▋   | 133/198 [00:42<00:05, 12.30it/s] 88%|████████▊ | 174/198 [00:48<00:02,  9.58it/s]100%|██████████| 198/198 [00:48<00:00,  4.11it/s]
+Total latency: 48.204 s
+Score: 0.364
+Output throughput: 2511.929 token/s
+[METRIC] gpqa_score=0.36363636363636365 labels={"model": "/home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb", "eval": "gpqa"}
+[METRIC] gpqa_latency=48.20358474700015 labels={"model": "/home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb", "eval": "gpqa"}
+Writing report to /tmp/gpqa__home_devbali_.cache_huggingface_hub_models--lmsys--gpt-oss-20b-bf16_snapshots_8de8d3dfa4da071323322a4a3049612203a3b1eb.html
+{'chars': np.float64(949.0505050505051), 'chars:std': np.float64(518.3059989623417), 'score:std': np.float64(0.48104569292083466), 'score': np.float64(0.36363636363636365), 'latency': 48.20358474700015, 'output_throughput': 2511.9293644968056}
+Writing results to /tmp/gpqa__home_devbali_.cache_huggingface_hub_models--lmsys--gpt-oss-20b-bf16_snapshots_8de8d3dfa4da071323322a4a3049612203a3b1eb.json
