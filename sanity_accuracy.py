@@ -3,9 +3,11 @@ r"""Check that SGLang on a system serves gpt-oss-20b at its published accuracy.
 Pass the command that starts the SGLang server there, as one string, as for
 sanity_latency.py:
 
-    python sanity_accuracy.py "PYTHONPATH=/path/to/fairinf-sglang/python python3 -m sglang.launch_server \
-        --model-path lmsys/gpt-oss-20b-bf16 --dtype bfloat16 --mem-fraction-static 0.7 \
-        --sampling-backend pytorch --port 30000"
+    python sanity_accuracy.py "TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 \
+        PYTHONPATH=/path/to/fairinf-sglang/python:/path/to/fairinf-latency-sweep/vm \
+        python3 -m sglang.launch_server --model-path lmsys/gpt-oss-20b-bf16 --dtype bfloat16 \
+        --mem-fraction-static 0.7 --sampling-backend pytorch --piecewise-cuda-graph-compiler inductor \
+        --scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --port 30000"
 
 This starts that server, asks it the 198 GPQA Diamond questions with OpenAI's
 own eval code for gpt-oss, and stops it. That code is gpt_oss.evals from

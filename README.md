@@ -293,19 +293,20 @@ gcloud compute scp --recurse --zone europe-west4-a src vm \
     devbali@fairinf-matteo-fork-1xa100-eu1:~/latency-test/fairinf-latency-sweep/
 ```
 
-On the VM, from `~/latency-test/fairinf-latency-sweep`:
+On the VM, from `~/latency-test/fairinf-latency-sweep`, the latest sweep
+(`results/gptoss-cuda-graphs-20261029`) ran:
 
 ```bash
-nohup bash vm/run_clean.sh src/batches.json results.jsonl > run.log 2>&1 &   # ~80 min; survives SSH drops
+PIECEWISE=inductor nohup bash vm/run_clean.sh src/batches.json results.jsonl > run.log 2>&1 &   # ~70 min; survives SSH drops
 ```
 
-`vm/run_clean.sh` runs `src/runner.py` with the flags of
-`results/gptoss-clean-20261028`: `--dtype bfloat16 --mem-fraction-static 0.7
---sampling-backend pytorch --disable-piecewise-cuda-graph`. Flags added after
-the output file go to SGLang and override these. With `PIECEWISE=inductor` in
-front, prefill and hybrid steps run as piecewise CUDA graphs instead; the
-script says why that takes torch inductor. It needs three things under
-`~/latency-test`, all in place on eu1:
+`vm/run_clean.sh` runs `src/runner.py` with `--dtype bfloat16
+--mem-fraction-static 0.7 --sampling-backend pytorch`. `PIECEWISE=inductor`
+runs prefill and hybrid steps as piecewise CUDA graphs; the script says why
+that takes torch inductor. Without it, the script passes
+`--disable-piecewise-cuda-graph`, the setup of `results/gptoss-clean-20261028`.
+Flags added after the output file go to SGLang and override these. It needs
+three things under `~/latency-test`, all in place on eu1:
 - **SGLang at `4e84427ab`**, unpacked from the VM's own fairinf-sglang repo
   (step 1 of `vm/setup.sh` below).
 - **A fresh venv** with the fork's own package pins, installed unmodified by
@@ -329,13 +330,20 @@ Copy `results.jsonl` and `run.log` back into `results/<run>/` and run
 `sanity_latency.py` checks that a system runs SGLang with the setup the latency
 models were fitted on. Give it the command that starts the SGLang server
 there. It runs `src/runner.py` in the server's place, with the same
-environment, Python and flags:
+environment, Python and flags. With the reference run's setup, that is:
 
 ```bash
-python sanity_latency.py "TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=... python3 -m sglang.launch_server \
-    --model-path lmsys/gpt-oss-20b-bf16 --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch \
-    --piecewise-cuda-graph-compiler inductor"
+SERVER="TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 \
+PYTHONPATH=/path/to/fairinf-sglang/python:/path/to/fairinf-latency-sweep/vm \
+python3 -m sglang.launch_server --model-path lmsys/gpt-oss-20b-bf16 --dtype bfloat16 \
+--mem-fraction-static 0.7 --sampling-backend pytorch --piecewise-cuda-graph-compiler inductor \
+--scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --port 30000"
+
+python sanity_latency.py "$SERVER"
 ```
+
+`sanity_accuracy.py` below takes the same command. `vm/README.md` explains
+each part of it.
 
 It times the 88 batches of `src/sanity_batches.json`, all also in
 `src/batches.json`: 20 prefill, 20 decode and 48 hybrid. They cover the
@@ -394,8 +402,7 @@ gpt-oss: `gpt_oss.evals` from
 runs.
 
 ```bash
-python sanity_accuracy.py "PYTHONPATH=... python3 -m sglang.launch_server --model-path lmsys/gpt-oss-20b-bf16 \
-    --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --port 30000"
+python sanity_accuracy.py "$SERVER"   # SERVER as for sanity_latency.py above
 ```
 
 The eval's prompt, answer grading and client run unchanged, with their
@@ -435,10 +442,12 @@ high. `--effort` picks one; low is the default.
 
   ```bash
   python3 -m venv evals-venv && evals-venv/bin/pip install openai pandas numpy jinja2 tqdm blobfile
-  evals-venv/bin/python sanity_accuracy.py "..."
+  evals-venv/bin/python sanity_accuracy.py "$SERVER"
   ```
-- **A gpt-oss server on this fork** also needs the cache policy described
-  under "Serving gpt-oss on this fork" below.
+- **A gpt-oss server on this fork** needs the cache policy in the command,
+  `--scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy` with `vm/`
+  on `PYTHONPATH`; see "Serving gpt-oss on this fork" below.
+  `sanity_latency.py` accepts it too, and it changes nothing there.
 - **Output:** a new directory under `results/` holds the server's log, the
   eval's output, every question, answer and grade (`gpqa-*-answers.json.gz`)
   and `scores.json`. The exit code is 0 if the score passes, 1 if it is too

@@ -2,10 +2,11 @@ r"""Check that a system runs SGLang with the setup the latency models were fitte
 
 Pass the command that starts the SGLang server on that system, as one string:
 
-    python sanity_latency.py "TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=/path/to/fairinf-sglang/python \
+    python sanity_latency.py "TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 \
+        PYTHONPATH=/path/to/fairinf-sglang/python:/path/to/fairinf-latency-sweep/vm \
         python3 -m sglang.launch_server --model-path lmsys/gpt-oss-20b-bf16 --dtype bfloat16 \
         --mem-fraction-static 0.7 --sampling-backend pytorch --piecewise-cuda-graph-compiler inductor \
-        --port 30000"
+        --scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --port 30000"
 
 The command then starts src/runner.py instead of the server, with the same
 environment, Python and SGLang flags, and times the batches of
