@@ -1,11 +1,14 @@
 #!/bin/bash
-# Time MODEL on GPU 0 with SGLang pinned to fairinf-sglang 4e84427ab, in the
+# Time MODEL with SGLang from the fairinf-sglang source tree FORK, in the
 # fresh venv from fresh_venv.sh: the fork's own package pins and the real
-# sgl_kernel, with no side directory. MODEL defaults to gpt-oss-20b (BF16), and
-# with no extra flags this is the setup of results/gptoss-clean-20261028.
+# sgl_kernel, with no side directory. MODEL defaults to gpt-oss-20b (BF16) and
+# FORK to fairinf-sglang 4e84427ab; with those and no extra flags this is the
+# setup of results/gptoss-clean-20261028. It runs on GPU 0, or with --tp N on
+# the GPUs CUDA_VISIBLE_DEVICES lists.
 #
 # Usage (on the VM, from the repo root):
-#   [PIECEWISE=off|inductor] bash vm/run_clean.sh BATCHES_FILE OUT_FILE [extra SGLang flags]
+#   [PIECEWISE=off|inductor] [MODEL=...] [FORK=...] [CUDA_VISIBLE_DEVICES=...] \
+#       bash vm/run_clean.sh BATCHES_FILE OUT_FILE [extra SGLang flags]
 #
 # PIECEWISE picks how prefill and hybrid steps run (decode always runs as CUDA
 # graphs):
@@ -31,8 +34,8 @@ case ${PIECEWISE:-off} in
 esac
 cd "$(dirname "$0")/.."
 export PATH=$LT/venv/bin:$PATH
-export PYTHONPATH=$LT/fairinf-sglang-4e84427ab/python
-export CUDA_VISIBLE_DEVICES=0
+export PYTHONPATH=${FORK:-$LT/fairinf-sglang-4e84427ab}/python
+export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
 
 python src/versions.py  # the setup lines src/compare_runs.py compares
 

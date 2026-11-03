@@ -2,14 +2,22 @@
 
 Same low-level path as `python -m sglang.bench_one_batch`: no server,
 scheduler or radix cache, just batches built by hand and run through
-SGLang's ModelRunner on one GPU. The batches to time come from a JSON plan
+SGLang's ModelRunner. The batches to time come from a JSON plan
 (batches.json by default).
+
+With tensor parallelism (--tp N), it runs as bench_one_batch does: one
+process per TP rank, each with its own ModelRunner on its own GPU, all timing
+the same batches in step. Rank 0 records the times; a step's collectives make
+every rank wait for the slowest, as on a server.
 """
 
 import argparse
 import json
 import logging
+import multiprocessing
+import multiprocessing.connection
 import os
+import sys
 import time
 import uuid
 
@@ -26,26 +34,28 @@ from sglang.srt.model_executor.model_runner import ModelRunner
 from sglang.srt.sampling.sampling_params import SamplingParams
 from sglang.srt.server_args import PortArgs, ServerArgs
 from sglang.srt.speculative.spec_info import SpeculativeAlgorithm
+from sglang.srt.utils import kill_process_tree
+from sglang.srt.utils.common import maybe_reindex_device_id
 
 WARMUP_RUNS = 1  # per batch, not recorded
 SAMPLES = 3  # per batch
+SEED = 0  # of the random prompt tokens, the same on every TP rank
 
 
-def load_model(server_args):
-    """Load the weights, allocate the KV cache and capture CUDA graphs on GPU 0."""
-    _set_envs_and_config(server_args)
+def load_model(server_args, port_args, gpu_id, tp_rank):
+    """Load TP rank tp_rank's weights, allocate its KV cache and capture CUDA graphs on gpu_id."""
     initialize_moe_config(server_args)  # MoE layers read their kernel choices from it
     return ModelRunner(
         model_config=ModelConfig.from_server_args(server_args),
         mem_fraction_static=server_args.mem_fraction_static,
-        gpu_id=0,
-        tp_rank=0,
-        tp_size=1,
-        moe_ep_rank=0,
-        moe_ep_size=1,
+        gpu_id=gpu_id,
+        tp_rank=tp_rank,
+        tp_size=server_args.tp_size,
+        moe_ep_rank=tp_rank // (server_args.tp_size // server_args.ep_size),
+        moe_ep_size=server_args.ep_size,
         pp_rank=0,
         pp_size=1,
-        nccl_port=PortArgs.init_new(server_args).nccl_port,
+        nccl_port=port_args.nccl_port,
         server_args=server_args,
     )
 
@@ -166,6 +176,75 @@ def time_hybrid(model_runner, prefill_lens, decode_lens):
     return time.perf_counter() - start
 
 
+def time_plan(server_args, port_args, plan, out_path, gpu_id=0, tp_rank=0):
+    """Times every batch of plan on one TP rank. Rank 0 appends the samples to out_path."""
+    # Only rank 0 logs the setup; every rank's errors still show
+    logging.basicConfig(format="%(message)s")  # a rank's own process starts unconfigured
+    logging.getLogger().setLevel(logging.INFO if tp_rank == 0 else logging.WARNING)
+    model_runner = load_model(server_args, port_args, gpu_id, tp_rank)
+    # The fork logs a warning on every request-slot allocation (POOL_ALLOC in
+    # mem_cache/memory_pool.py). Silence it so the I/O stays out of the timings.
+    logging.getLogger().setLevel(logging.ERROR)
+    np.random.seed(SEED)  # every rank builds the same batches
+
+    phases = [
+        ("prefill", time_prefill, plan.get("prefill", [])),
+        ("decode", time_decode, plan.get("decode", [])),
+        (
+            "hybrid",
+            lambda model_runner, batch: time_hybrid(model_runner, *batch),
+            plan.get("hybrid", []),
+        ),
+    ]
+    with open(out_path, "a") if tp_rank == 0 else open(os.devnull, "w") as out:
+        for phase, time_fn, batches in phases:
+            for i, batch in enumerate(batches):
+                for _ in range(WARMUP_RUNS):
+                    time_fn(model_runner, batch)
+                for sample in range(SAMPLES):
+                    latency_s = time_fn(model_runner, batch)
+                    if tp_rank:
+                        continue
+                    row = {
+                        "phase": phase,
+                        "batch": batch,
+                        "sample": sample,
+                        "latency_s": latency_s,
+                    }
+                    print(json.dumps(row), file=out, flush=True)
+                    print(
+                        f"{phase} {i + 1}/{len(batches)} sample {sample + 1}/{SAMPLES}: "
+                        f"{latency_s * 1e3:.2f} ms"
+                    )
+
+
+def run_ranks(server_args, port_args, plan, out_path):
+    """Runs time_plan in one process per TP rank, as bench_one_batch does. Returns the exit code."""
+    workers = []
+    for tp_rank in range(server_args.tp_size):
+        with maybe_reindex_device_id(tp_rank) as gpu_id:
+            worker = multiprocessing.Process(
+                target=time_plan,
+                args=(server_args, port_args, plan, out_path, gpu_id, tp_rank),
+                name=f"TP{tp_rank}",
+            )
+            worker.start()
+            workers.append(worker)
+    try:
+        while workers:
+            # A rank that fails leaves the others waiting in a collective, so stop them all
+            ready = multiprocessing.connection.wait([worker.sentinel for worker in workers])
+            for worker in [worker for worker in workers if worker.sentinel in ready]:
+                worker.join()
+                workers.remove(worker)
+                if worker.exitcode:
+                    print(f"{worker.name} exited with code {worker.exitcode}", file=sys.stderr)
+                    return 1
+        return 0
+    finally:
+        kill_process_tree(os.getpid(), include_parent=False)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     ServerArgs.add_cli_args(parser)
@@ -180,37 +259,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     with open(args.batches) as f:
         plan = json.load(f)
-    phases = [
-        ("prefill", time_prefill, plan.get("prefill", [])),
-        ("decode", time_decode, plan.get("decode", [])),
-        (
-            "hybrid",
-            lambda model_runner, batch: time_hybrid(model_runner, *batch),
-            plan.get("hybrid", []),
-        ),
-    ]
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    model_runner = load_model(ServerArgs.from_cli_args(args))
-    # The fork logs a warning on every request-slot allocation (POOL_ALLOC in
-    # mem_cache/memory_pool.py). Silence it so the I/O stays out of the timings.
-    logging.getLogger().setLevel(logging.ERROR)
-
-    with open(args.out, "a") as out:
-        for phase, time_fn, batches in phases:
-            for i, batch in enumerate(batches):
-                for _ in range(WARMUP_RUNS):
-                    time_fn(model_runner, batch)
-                for sample in range(SAMPLES):
-                    latency_s = time_fn(model_runner, batch)
-                    row = {
-                        "phase": phase,
-                        "batch": batch,
-                        "sample": sample,
-                        "latency_s": latency_s,
-                    }
-                    print(json.dumps(row), file=out, flush=True)
-                    print(
-                        f"{phase} {i + 1}/{len(batches)} sample {sample + 1}/{SAMPLES}: "
-                        f"{latency_s * 1e3:.2f} ms"
-                    )
+    server_args = ServerArgs.from_cli_args(args)
+    _set_envs_and_config(server_args)
+    port_args = PortArgs.init_new(server_args)
+    if server_args.tp_size == 1:
+        time_plan(server_args, port_args, plan, args.out)
+    else:
+        sys.exit(run_ranks(server_args, port_args, plan, args.out))

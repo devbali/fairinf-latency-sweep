@@ -6,24 +6,32 @@ by hand. It fits latency models in the style of FairInference's linear ones
 piecewise linear where the hardware changes regime, and checks how well they
 predict batches they were not fitted on.
 
-The current target is **gpt-oss-20b in BF16 on one A100 80GB**, running the
-FairInference fork of SGLang pinned to commit `4e84427ab`
-(`matteo/fairbatching`).
+The models cover **gpt-oss-20b in BF16 on one A100 80GB** and **gpt-oss-120b
+on four, with tensor parallelism**, plus the **KV cache transfer of PD
+disaggregation**. They run the FairInference fork of SGLang: commit
+`4e84427ab` (`matteo/fairbatching`) for 20b, and main (`99f39f2b5`) for 120b
+and PD. The two differ only in retraction code, which nothing timed here
+calls. `results/README.md` lists every model.
 
 | path | what it does |
 |---|---|
 | `sanity_latency.py` | Given the command that starts an SGLang server, runs `src/sanity_batches.json` in its place and prints how the setup and times differ from the reference run, `results/gptoss-sanity-cuda-graphs-20261029`. |
 | `sanity_accuracy.py` | Given the same command, starts that server, asks it the GPQA Diamond questions with OpenAI's own gpt-oss eval code, and checks the score against OpenAI's published one. |
-| `src/runner.py` | Loads SGLang's `ModelRunner` once, then times every batch in `--batches`: 1 warmup run, then 3 samples. |
+| `sanity_pd.py` | Given the commands that start a PD prefill server and a PD decode server, runs `src/pd_sanity_batches.json` through them and prints how the setup, the KV cache sizes and the transfer times differ from the reference run, `results/gptoss-pd-sanity-nixl-20261103`. |
+| `src/runner.py` | Loads SGLang's `ModelRunner` once, then times every batch in `--batches`: 1 warmup run, then 3 samples. With `--tp N` it runs one process per GPU, as `sglang.bench_one_batch` does. |
 | `src/batches.json` | The batch plan, every batch written out: `prefill`, `decode` and `hybrid` lists. |
 | `src/generate_batches.py` | Writes both plans, `src/batches.json` and `src/sanity_batches.json`, from the designs and seeded random draws below. |
-| `src/compare_fits.py` | Fits the four models below: linear, degree-2 and degree-2 + sum l^2 regressions, and the terms that matter picked by backward elimination. Prints their accuracy and coefficients as markdown tables. |
+| `src/compare_fits.py` | Fits the four models below: linear, degree-2 and degree-2 + sum l^2 regressions, and the terms that matter picked by backward elimination. Prints their accuracy and coefficients as markdown tables. Given `pd_runner.py` results, it fits the same four to the KV transfer time of each prefill step. |
 | `src/fit.py` | Helpers the scripts share: loading results, least squares with the CPU floor, cross-validation and the bootstrap. |
 | `src/sanity_batches.json` | A short plan of 88 batches from `src/batches.json`, for `sanity_latency.py`. |
 | `src/compare_runs.py` | Compares a run with a reference run batch by batch, and compares the setup lines of their logs. |
 | `src/server_command.py` | Reads the server command the sanity checks take, and runs something else in the server's place. |
+| `src/pd_runner.py` | Given the commands that start a PD prefill server and a PD decode server, starts both, sends them the batches of `src/pd_batches.json`, and records when each request's prefill ended, its KV cache reached the decode server and it joined a decode step. |
+| `src/pd_batches.json` | The PD plan: batches of prompts sent together, and bursts. Written by `src/generate_batches.py`. |
+| `src/pd_sanity_batches.json` | A short PD plan of 20 batches and 1 burst from `src/pd_batches.json`, for `sanity_pd.py`. |
+| `src/pd_fits.py` | Describes a PD run from `pd_runner.py` results: how SGLang split the batches into prefill steps, the bootstrap, what one request's transfer carries and takes, the decode server's pickup, and the bursts. |
 | `vm/` | Setup and run scripts for the A100 VM. `vm/README.md` lists the exact setup, server command and commands used on it. |
-| `results/` | One directory per run: its samples, its log, and a README on what it shows. |
+| `results/` | One directory per run: its samples, its log, and a README on what it shows. `results/README.md` lists every model fitted on them. |
 
 ## What one step is
 
@@ -76,7 +84,11 @@ All four wrap f the same way:
 ```
 prefill, hybrid:  T = max(F, f)
 decode:           T = f + sum_k delta_k * (N - k)+        k = 2, 4, 8, ..., 128
+transfer:         T = f
 ```
+
+Transfer is the KV cache transfer of a prefill step under PD disaggregation,
+described below, with the step's N, S and M.
 
 - **Hybrid steps** use all six variables, so their degree-2 polynomial has 21
   squares and products. Their sum l^2 is over the prefill part's prompts.
@@ -152,16 +164,19 @@ R^2 is dominated by the largest steps. Hybrid steps range from 69 ms to 3.6 s,
 so a hybrid model that misses small steps by 30% still scores 0.996. Relative
 error is the better guide.
 
-Mean error on held-out batches, in the two full runs:
+Mean error on held-out batches, in the three full runs:
 
 | run | phase | batches | linear | degree 2 | degree 2 + sum l^2 | selected | sample noise (median) |
 |---|---|---|---|---|---|---|---|
-| no CUDA graphs, `results/gptoss-clean-20261028` | prefill | 618 | 6.2% | 1.6% | 1.3% | 1.3% | 0.5% |
+| 20b, no CUDA graphs, `results/gptoss-clean-20261028` | prefill | 618 | 6.2% | 1.6% | 1.3% | 1.3% | 0.5% |
 | | decode | 565 | 2.9% | 2.7% | 2.7% | 2.7% | 2.8% |
 | | hybrid | 448 | 43.8% | 2.3% | 2.2% | 2.0% | 0.3% |
-| CUDA graphs, `results/gptoss-cuda-graphs-20261029` | prefill | 2,122 | 11.1% | 2.8% | 2.7% | 2.7% | 0.4% |
+| 20b, CUDA graphs, `results/gptoss-cuda-graphs-20261029` | prefill | 2,122 | 11.1% | 2.8% | 2.7% | 2.7% | 0.4% |
 | | decode | 1,985 | 2.9% | 2.7% | 2.6% | 2.6% | 2.9% |
 | | hybrid | 1,357 | 56.9% | 3.2% | 3.1% | 3.0% | 0.2% |
+| 120b on four GPUs (`--tp 4`), CUDA graphs, `results/gptoss-120b-tp4-20261103` | prefill | 2,122 | 5.8% | 4.6% | 4.6% | 4.6% | 0.4% |
+| | decode | 1,985 | 3.8% | 3.4% | 3.4% | 3.4% | 2.8% |
+| | hybrid | 1,357 | 37.7% | 4.2% | 4.1% | 4.1% | 0.3% |
 
 - **Without CUDA graphs,** the selected models have 7, 9 and 12 parameters,
   against 12, 18 and 30 for degree 2 + sum l^2. Every coefficient, the full
@@ -171,6 +186,13 @@ Mean error on held-out batches, in the two full runs:
   steps with a tiny prompt and many decodes, which the floor used to hide. That
   run's [README](results/gptoss-cuda-graphs-20261029/README.md) has the
   details, and how a padded token count helps the prefill model.
+- **gpt-oss-120b on four GPUs** ran the same plan with tensor parallelism.
+  Large steps take 0.55-0.63 times as long as 20b's on one GPU; the smallest
+  cost the same, about 20 ms. The selection again keeps every attention-kernel
+  term, with sum l^2 at -0.56 (prefill) and -0.55 (hybrid) times S*M. The
+  errors are higher, most of all on the smallest prefill steps. Its
+  [README](results/gptoss-120b-tp4-20261103/README.md) has the details.
+- **Every coefficient of every model** is in [results/README.md](results/README.md).
 
 ## Planning batches
 
@@ -277,12 +299,112 @@ While the 64 decoders were being admitted, the steps carried 2,047, 2,027 and
 2,007 new tokens with 1, 21 and 41 requests running. That is 2,048 − N_d every
 time.
 
+## The KV transfer of PD disaggregation
+
+With PD disaggregation, a prefill server computes each prompt's KV cache and
+sends it to a decode server, which generates from there. `src/pd_runner.py`
+runs SGLang's PD on one machine and records, for every request, when its
+prefill step ended, when its KV cache reached the decode server, and when it
+joined a decode step.
+
+```bash
+python src/pd_runner.py --prefill "PREFILL SERVER COMMAND" --decode "DECODE SERVER COMMAND"
+python src/compare_fits.py results/<run>/results.jsonl   # the transfer model
+python src/pd_fits.py results/<run>/results.jsonl        # what goes around it
+```
+
+The model comes from `results/gptoss-pd-nixl-20261103`: gpt-oss-20b on two
+A100s of one VM joined by NVLink, the prefill server on one and the decode
+server on the other, with NIXL copying the KV cache from GPU to GPU
+(`vm/README.md` has the commands). The fork's default transfer backend,
+mooncake, falls back to TCP on that VM, which has no RDMA cards. It broke
+after 2.8 minutes, when its TCP connections used up the VM's ports
+(`results/gptoss-pd-mooncake-tcp-20261103`).
+
+**A prefill step's transfer time T** runs from the step's first result to the
+last of its requests' KV caches reaching the decode server. `src/compare_fits.py`
+fits it with the same four regressions as step latency, in the step's N, S
+and M, with no floor and no bends. The 1,720 steps of the plan's batches come
+in 938 sets of prompt lengths, which the cross-validation holds out whole:
+
+| held out | linear | degree 2 | degree 2 + sum l^2 | selected |
+|---|---|---|---|---|
+| parameters | 4 | 10 | 11 | 4 |
+| R^2 | 0.9739 | 0.9729 | 0.9731 | 0.9739 |
+| RMSE | 7.9 ms | 8.1 ms | 8.1 ms | 7.9 ms |
+| mean error | 28.6% | 28.9% | 28.6% | 28.6% |
+
+- **Backward elimination keeps the linear model:** T = 7.92 + 2.111 N +
+  0.00079 S - 0.00100 M ms.
+- **N sets it, not S.** For each request of a step, the prefill scheduler
+  builds and posts its transfer before the next one's, about 2.1 ms each.
+  Moving the bytes costs little: a request alone reaches the decode server
+  3.6 ms (16 tokens) to 5.6 ms (8,192 tokens, 195 MB) after its step ends. A
+  full 8,192-token step adds at most 6.5 ms through S.
+- **The relative error comes from steps of one prompt.** They take 4-6 ms and
+  the model gives them about 10; steps of several prompts are off by 17-19%
+  on average.
+
+**Beyond the transfer, PD delays prefill.**
+- **Bootstrap:** a prompt can be prefilled only once the decode server has
+  said where its KV goes. Prompts that arrive together mostly run as two
+  prefill steps about 80 ms apart.
+- **Prefill runs eagerly:** PD mode turns piecewise CUDA graphs off.
+
+**Under load the transfer kept up.** In bursts of 8 to 512 prompts, NIXL
+drained the KV cache at least as fast as prefill produced it. A 195 MB
+transfer posted while the next prefill step computed, though, often waited
+for that step: about 480 ms. The run's README has the details and every
+table.
+
+### Checking a system's PD transfer
+
+`sanity_pd.py` checks that a system runs PD with the setup the transfer model
+was fitted on. Give it the commands that start the prefill and the decode
+server there, as `pd_runner.py` takes them; `vm/README.md` has ours.
+
+```bash
+python sanity_pd.py "$PREFILL" "$DECODE"
+```
+
+It runs `pd_runner.py` with them on `src/pd_sanity_batches.json`, about 2
+minutes of sending after both servers start: one prompt alone from 16 to
+8,192 tokens, 2 to 256 short prompts, the budget split into 2 to 8 prompts,
+two long prompts with short ones, and one burst of 64 prompts of 1,024
+tokens. Then it compares the run with the same plan sent on the 4xA100 VM
+over NVLink, `results/gptoss-pd-sanity-nixl-20261103`. It prints:
+- the setup lines that differ: package versions, the transfer packages and
+  backend, the GPUs and how they are linked, RDMA devices, and the servers'
+  KV cache and CUDA-graph sizes;
+- the KV cache one prompt of each length carries, which has to be the same;
+- each batch's transfer delay in both runs: from a request's prefill result
+  to its KV cache reaching the decode server, the mean over the batch,
+  median of its samples, with `!` on differences of more than 20% and twice
+  the noise;
+- whether the transfer kept up with prefill in the burst;
+- a verdict, also given as the exit code: 0 if the run matches, 1 if not, 2
+  if it could not run.
+
+The run matches if the setup lines and the KV sizes do, every request got
+both answers, the delays are within 15% of the reference's on average with
+at most 20% of the batches marked, and the transfer keeps up in the burst.
+These delays are noisier than step times, as SGLang splits most batches into
+two prefill steps at a point that varies. Three runs of the setup on the
+same VM differ by up to 8% on average, and 15% is about twice that. The
+fork's default, mooncake over TCP, is 1.2 to 30 times slower on these
+batches.
+
+The check against the reference, right after it on the same VM with the same
+commands, matched: `results/gptoss-sanity-pd-4xa100-20261103`.
+
 ## Running on the A100 VM
 
 The VM is `fairinf-matteo-fork-1xa100-eu1` in europe-west4-a: a spot A100
-80GB at about $3.10/hr. Keep one VM running at a time, and stop it when idle.
-`vm/README.md` has, in one place, what is installed where on it, the server
-command every run used, and the exact commands of the sweep and both checks.
+80GB at about $3.10/hr. The PD runs and gpt-oss-120b ran on
+`fairinf-matteo-fork-4xa100`, four A100s joined by NVLink. Keep one VM running
+at a time, and stop it when idle. `vm/README.md` has, in one place, what is
+installed where on them, the server command every run used, and the exact
+commands of the sweeps and the checks.
 
 ```bash
 gcloud compute instances start fairinf-matteo-fork-1xa100-eu1 --zone europe-west4-a

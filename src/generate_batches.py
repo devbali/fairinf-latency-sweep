@@ -2,6 +2,10 @@
 
 - batches.json: the full plan, from the designs and seeded random draws below.
 - sanity_batches.json: 88 batches of the full plan, for sanity_latency.py.
+- pd_batches.json: the plan pd_runner.py sends through a prefill and a decode
+  server, to time the KV cache transfer between them.
+- pd_sanity_batches.json: 20 batches and 1 burst of the PD plan, for
+  sanity_pd.py.
 
 The plans list every batch as data, so they never change behind anyone's back.
 To change one, edit this file and rerun it:
@@ -31,6 +35,9 @@ HYBRID_DECODE_TOKENS = 65_536  # hybrid attention cost grows with M_p * S_d; kee
 # Random batches per phase: those of results/gptoss-clean-20261028, then more.
 N_RANDOM = {"prefill": 500, "decode": 500, "hybrid": 400}
 N_MORE_RANDOM = {"prefill": 1000, "decode": 1000, "hybrid": 600}
+N_PD_RANDOM = 200  # random batches of the PD plan
+BURST_TOKENS = 65_536  # prompt tokens per burst of the PD plan: 8 full prefill steps
+MAX_BURST = 512  # requests per burst of the PD plan
 HERE = os.path.dirname(os.path.abspath(__file__))
 rng = random.Random(0)
 
@@ -171,6 +178,41 @@ PREFILL += [random_prefill() for _ in range(N_MORE_RANDOM["prefill"])]
 DECODE += [random_decode() for _ in range(N_MORE_RANDOM["decode"])]
 HYBRID += [random_hybrid() for _ in range(N_MORE_RANDOM["hybrid"])]
 
+# The PD plan. A batch is prompts sent together, and its requests transfer
+# their KV caches one after another, so the designs vary the number of
+# requests N, their total length S and the longest one M independently, as the
+# prefill designs do:
+# - batches, sent one at a time so each batch's transfers run alone: one prompt
+#   at every half octave from 16 to 8,192 tokens, and three longer than one
+#   prefill step, which go in chunks; the uniform and skewed designs of the
+#   prefill plan; 128 and 256 short prompts, the most requests per token; and
+#   random batches drawn like the prefill plan's, after all of its draws.
+# - bursts: more prompts of one length than one prefill step holds, so the
+#   prefill and the transfer run at once and the slower of the two sets the
+#   pace. That pace is how much load saturates the transfer.
+PD_BATCHES = [[length] for length in sorted({*powers_of_two(16, BUDGET), *(3 * 2**k for k in range(3, 12))})]
+PD_BATCHES += [[12288], [16384], [32768]]
+PD_BATCHES += uniform((1, 2, 4, 8, 16, 32, 64), powers_of_two(16, BUDGET), prefill_fits)
+PD_BATCHES += uniform((128, 256), (16, 32), prefill_fits)
+PD_BATCHES += skewed((2, 4, 8, 16, 32), (512, 1024, 2048, 4096, 6144), (16, 64, 256), prefill_fits)
+PD_BATCHES += [random_prefill() for _ in range(N_PD_RANDOM)]
+PD_BURSTS = [[length] * min(MAX_BURST, BURST_TOKENS // length) for length in powers_of_two(16, BUDGET)]
+
+# The PD sanity plan: about 2 minutes of sending after the servers start.
+# - one prompt alone, 16 to 8,192 tokens: what moving the bytes costs;
+# - 2 to 256 short prompts, and the budget split into 2 to 8 prompts: the cost
+#   per request of a step;
+# - a long prompt with short ones;
+# - one burst of 64 prompts of 1,024 tokens, where the transfer has to keep up
+#   with prefill.
+PD_SANITY = {
+    "batches": [[length] for length in (16, 128, 512, 1024, 2048, 4096, 8192)]
+    + [[128] * n for n in (2, 4, 8, 16, 32, 64)]
+    + [[16] * 128, [16] * 256, [1024] * 8, [2048] * 4, [4096] * 2]
+    + [[6144] + [16] * 31, [2048] + [256] * 15],
+    "bursts": [[1024] * 64],
+}
+
 # The sanity plan: a short sweep, about 1.5 minutes of timing after the model
 # loads, that covers each regime the models describe:
 # - prefill: one prompt from the CPU floor up to the full budget, the budget
@@ -230,6 +272,27 @@ if __name__ == "__main__":
         "models describe, about 1.5 minutes of timing on one A100. Written by generate_batches.py.",
         SANITY,
     )
+    pd_plan = {"batches": unique(PD_BATCHES), "bursts": unique(PD_BURSTS)}
+    for phase, batches in PD_SANITY.items():
+        assert all(batch in pd_plan[phase] for batch in batches), f"a PD sanity {phase} batch is not in the PD plan"
+    write(
+        os.path.join(HERE, "pd_batches.json"),
+        "The plan pd_runner.py sends through a prefill and a decode server. Each batch lists one prompt "
+        "length per request; its prompts are sent together. Batches go one at a time, so each one's KV "
+        "transfers run alone. Bursts hold more prompts of one length than one prefill step, so prefill and "
+        "transfer run at once. Written by generate_batches.py, which explains the design.",
+        pd_plan,
+    )
+    write(
+        os.path.join(HERE, "pd_sanity_batches.json"),
+        "The short plan sanity_pd.py sends through a prefill and a decode server: batches and a burst of "
+        "pd_batches.json that cover what the PD transfer model describes, about 2 minutes of sending. Written "
+        "by generate_batches.py.",
+        PD_SANITY,
+    )
     for phase, batches in plan.items():
         print(f"{phase}: {len(batches):,} batches, the first {OLD[phase]} from results/gptoss-clean-20261028; "
               f"{len(SANITY[phase])} in the sanity plan")
+    for phase, batches in pd_plan.items():
+        print(f"PD {phase}: {len(batches):,}, {sum(map(len, batches)):,} requests; "
+              f"{len(PD_SANITY[phase])} in the PD sanity plan")

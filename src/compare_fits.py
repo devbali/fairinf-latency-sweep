@@ -1,16 +1,22 @@
-"""Compare four regressions for step latency on runner.py results: linear, a full
+"""Compare four regressions for step latency on runner.py results, and for the
+KV transfer time of PD disaggregation on pd_runner.py results: linear, a full
 degree-2 polynomial, the degree-2 polynomial plus the attention term sum l^2,
 and the terms of that last model that matter most.
 
 All four are polynomials in N, S and M: a step's requests, its total tokens
-(prompt tokens for prefill, context tokens for decode) and its longest request.
-A hybrid step has a _p and a _d version of each, for its prefill and decode
-parts. Each batch's latency is the median of its samples. Prefill and hybrid
-steps are fitted as max(floor, polynomial), because the CPU launching kernels
-sets the time of small ones. Decode steps run as CUDA graphs, so their N is
-padded to the graph's batch size, and their time bends at each power of two in
-N. The models differ only in their polynomial terms. The first three are also
-fitted alone, with no floor and no bends.
+(prompt tokens for prefill and transfer, context tokens for decode) and its
+longest request. A hybrid step has a _p and a _d version of each, for its
+prefill and decode parts. Each batch's latency is the median of its samples.
+Prefill and hybrid steps are fitted as max(floor, polynomial), because the CPU
+launching kernels sets the time of small ones. Decode steps run as CUDA graphs,
+so their N is padded to the graph's batch size, and their time bends at each
+power of two in N. The models differ only in their polynomial terms. The first
+three are also fitted alone, with no floor and no bends.
+
+A transfer "batch" is one prefill step of a PD run: its time runs from the
+step's first result to the last of its requests' KV caches reaching the decode
+server (see pd_fits.py), and every step of the same prompt lengths counts as a
+sample of one batch. It is fitted as the polynomial alone.
 
 The fourth model comes from backward elimination. Starting from degree 2 +
 sum l^2, it repeatedly drops the term whose removal leaves the lowest held-out
@@ -34,6 +40,7 @@ from collections import defaultdict
 import numpy as np
 
 from fit import bootstrap, errors, fit, folds, held_out, load, predict, r2
+from pd_fits import is_pd, transfer_samples
 
 # Decode batches run as CUDA graphs, padded up to these sizes.
 GRAPH_BS = [1, 2, 4, 8, 12, 16, 24] + list(range(32, 257, 8))
@@ -108,17 +115,22 @@ def nested(names, X, y, floor):
     return errors(pred, y), chosen
 
 
-samples = load(sys.argv[1:])
+samples = load([path for path in sys.argv[1:] if not is_pd(path)])
+for path in filter(is_pd, sys.argv[1:]):
+    for key, values in transfer_samples(path).items():
+        samples[key] += values
 header = "| model | params | R^2 | held-out R^2 | held-out RMSE | mean error | median | p90 | max |\n" + "|---" * 9 + "|"
 summary, plain = defaultdict(dict), defaultdict(dict)  # (phase, statistic) -> {model: value}
-for phase in ("prefill", "decode", "hybrid"):
+for phase in ("prefill", "decode", "hybrid", "transfer"):
     keys = sorted(key for key in samples if key[0] == phase)
     if not keys:
         continue
     batches = [json.loads(batch) for _, batch in keys]
     y = np.array([np.median(samples[key]) for key in keys]) * 1e3  # ms
-    spread = np.array([np.ptp(samples[key]) / np.median(samples[key]) for key in keys])
-    floor, bends = phase != "decode", phase == "decode"
+    # A transfer batch can have one sample: every step of the same prompt lengths is one
+    spread = np.array([np.ptp(samples[key]) / np.median(samples[key]) for key in keys if len(samples[key]) > 1])
+    floor, bends = phase in ("prefill", "hybrid"), phase == "decode"
+    wrapper = "the floor" if floor else "the bends" if bends else "neither floor nor bends"
     print(f"\n## {phase}: {len(y)} batches, samples spread by {100 * np.median(spread):.1f}% (median)")
 
     order = MODELS + [SELECTED]
@@ -133,7 +145,7 @@ for phase in ("prefill", "decode", "hybrid"):
     fitted = {name: fit(models[name][1], y, floor) for name in order}
     pred = {name: held_out(models[name][1], y, floor) for name in order}
 
-    print(f"\nWith the {'floor' if floor else 'bends'}; errors are on held-out batches.\n\n{header}")
+    print(f"\nWith {wrapper}; errors are on held-out batches.\n\n{header}")
     for name in order:
         X_model = models[name][1]
         err = errors(pred[name], y)
@@ -157,7 +169,7 @@ for phase in ("prefill", "decode", "hybrid"):
 
     if phase != "decode":
         # With one prompt, sum l^2 = S^2 = M^2; with equal prompts it is S*M.
-        prompts = [batch if phase == "prefill" else batch[0] for batch in batches]
+        prompts = [batch[0] if phase == "hybrid" else batch for batch in batches]
         kinds = np.array(["one prompt" if len(p) == 1 else "equal prompts" if len(set(p)) == 1
                           else "unequal prompts" for p in prompts])
         groups = ["one prompt", "equal prompts", "unequal prompts"]
@@ -168,17 +180,18 @@ for phase in ("prefill", "decode", "hybrid"):
             print(f"| {name} | " + " | ".join(f"{err[kinds == k].mean():.1f}%, {err[kinds == k].max():.1f}%"
                                               for k in groups) + " |")
 
-    print(f"\nThe polynomial alone, without the {'floor' if floor else 'bends'}.\n\n{header}")
-    for name in MODELS:
-        X_plain = np.array([list(terms(phase, batch, name, False).values()) for batch in batches], dtype=float)
-        p = held_out(X_plain, y, False)
-        err = errors(p, y)
-        print(f"| {name} | {X_plain.shape[1]} | {r2(y, predict(fit(X_plain, y, False), X_plain)):.4f} "
-              f"| {r2(y, p):.4f} | {np.sqrt(((p - y) ** 2).mean()):.1f} ms | {err.mean():.1f}% "
-              f"| {np.median(err):.1f}% | {np.percentile(err, 90):.1f}% | {err.max():.1f}% |")
-        plain[phase, "held-out R^2"][name] = f"{r2(y, p):.4f}"
-        plain[phase, "mean error"][name] = f"{err.mean():.1f}%"
-        plain[phase, "max error"][name] = f"{err.max():.1f}%"
+    if floor or bends:
+        print(f"\nThe polynomial alone, without {wrapper}.\n\n{header}")
+        for name in MODELS:
+            X_plain = np.array([list(terms(phase, batch, name, False).values()) for batch in batches], dtype=float)
+            p = held_out(X_plain, y, False)
+            err = errors(p, y)
+            print(f"| {name} | {X_plain.shape[1]} | {r2(y, predict(fit(X_plain, y, False), X_plain)):.4f} "
+                  f"| {r2(y, p):.4f} | {np.sqrt(((p - y) ** 2).mean()):.1f} ms | {err.mean():.1f}% "
+                  f"| {np.median(err):.1f}% | {np.percentile(err, 90):.1f}% | {err.max():.1f}% |")
+            plain[phase, "held-out R^2"][name] = f"{r2(y, p):.4f}"
+            plain[phase, "mean error"][name] = f"{err.mean():.1f}%"
+            plain[phase, "max error"][name] = f"{err.max():.1f}%"
 
     best = min(err.mean() for _, _, err in path)
     print(f"\nBackward elimination from {MODELS[2]}: held-out error after each drop. The {SELECTED} model "
@@ -209,7 +222,7 @@ for phase in ("prefill", "decode", "hybrid"):
         print(f"| {term} | " + " | ".join(f"{coef[name][term]:.4g}" if term in coef[name] else ""
                                           for name in order) + " |")
 
-    if phase != "decode":
+    if floor:
         sm, l2 = ("S_p*M_p", "sum l_p^2") if phase == "hybrid" else ("S*M", "sum l^2")
         ratio = boot[:, 1 + selected_names.index(l2)] / boot[:, 1 + selected_names.index(sm)]
         print(f"\n{l2} / {sm}: {coef[SELECTED][l2] / coef[SELECTED][sm]:.3f} in the {SELECTED} model "
@@ -217,11 +230,12 @@ for phase in ("prefill", "decode", "hybrid"):
               f"{coef[MODELS[2]][l2] / coef[MODELS[2]][sm]:.3f} in {MODELS[2]}")
 
 shown = MODELS + [SELECTED]
-print("\n## Summary, held out, with the floor and bends\n\n| | " + " | ".join(shown) + " |\n"
+print("\n## Summary, held out, with the floor and bends (transfer has neither)\n\n| | " + " | ".join(shown) + " |\n"
       + "|---" * (len(shown) + 1) + "|")
 for (phase, stat), values in summary.items():
     print(f"| {phase} {stat} | " + " | ".join(values[name] for name in shown) + " |")
-print("\n## Summary, held out, the polynomial alone\n\n| | " + " | ".join(MODELS) + " |\n"
-      + "|---" * (len(MODELS) + 1) + "|")
-for (phase, stat), values in plain.items():
-    print(f"| {phase} {stat} | " + " | ".join(values[name] for name in MODELS) + " |")
+if plain:
+    print("\n## Summary, held out, the polynomial alone\n\n| | " + " | ".join(MODELS) + " |\n"
+          + "|---" * (len(MODELS) + 1) + "|")
+    for (phase, stat), values in plain.items():
+        print(f"| {phase} {stat} | " + " | ".join(values[name] for name in MODELS) + " |")

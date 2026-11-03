@@ -1,7 +1,8 @@
 # Running on eu1
 
-These are the exact setup and commands behind the runs in `results/`, for the
-one VM they all used. They only work as written on that VM.
+These are the exact setup and commands behind the runs in `results/`. All but
+the PD runs and the gpt-oss-120b run used eu1; those, at the end, used a
+4xA100 VM. They only work as written on those VMs.
 
 | | |
 |---|---|
@@ -131,6 +132,122 @@ your machine:
 gcloud compute scp --recurse --zone europe-west4-a \
     devbali@fairinf-matteo-fork-1xa100-eu1:~/latency-test/fairinf-latency-sweep/results/<dir> results/
 ```
+
+## PD disaggregation on the 4xA100 VM
+
+`src/pd_runner.py` needs two GPUs, so its runs used another VM:
+
+| | |
+|---|---|
+| VM | `fairinf-matteo-fork-4xa100`, project `delta-fair-inference`, zone `europe-west4-a`, user `devbali` |
+| GPUs | four A100-SXM4-80GB, spot (a2-ultragpu-4g); every pair joined by NVLink (NV12); driver 580.178.04. No RDMA network cards |
+| SGLang | fairinf-sglang main at `99f39f2b5`, as source in `~/latency-test/fairinf-sglang-99f39f2b5/python` |
+| venv | `~/latency-test/venv`, built by `bash vm/fresh_venv.sh` as on eu1, plus `mooncake-transfer-engine-cuda13==0.3.10.post2`, the version the fork's CI installs for CUDA 13 (`scripts/ci/cuda/ci_install_dependency.sh`), and NIXL: `nixl-cu13==1.0.1`, then `nixl==1.0.1` with `--no-deps` |
+| system | Ubuntu's `libibverbs1`, installed with apt: mooncake's engine links to it even when it moves data over TCP |
+| model | `lmsys/gpt-oss-20b-bf16` at the same snapshot as eu1 |
+
+The VM was made from the same disk snapshot as eu1, with a 200 GB disk. To
+fit the venv and the model, `~/.cache/pip` (27 GB) and the Llama-3-8B
+checkpoint (15 GB) were deleted from it; about 7 GB is left.
+
+The two servers are the gpt-oss server command above, one per GPU, with PD
+mode and a port added.
+
+**`results/gptoss-pd-mooncake-tcp-20261103`: the fork's defaults.** Everything
+else about PD is SGLang's default: the mooncake backend, its queues and
+threads, the bootstrap port 8998. With no RDMA cards, mooncake moves the KV
+cache over TCP through host memory (its log: "Found 0 HCAs", then
+"TcpTransport: listen on port ..."). The run broke 2.8 minutes into the plan,
+when the VM ran out of ports for mooncake's TCP connections; the run's README
+explains why.
+
+```bash
+ENVS="TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=$LT/fairinf-sglang-99f39f2b5/python:$LT/fairinf-latency-sweep/vm"
+FLAGS="--model-path $MODEL --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch \
+--scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --piecewise-cuda-graph-compiler inductor"
+PREFILL="$ENVS CUDA_VISIBLE_DEVICES=0 $LT/venv/bin/python -m sglang.launch_server $FLAGS --disaggregation-mode prefill --port 30000"
+DECODE="$ENVS CUDA_VISIBLE_DEVICES=1 $LT/venv/bin/python -m sglang.launch_server $FLAGS --disaggregation-mode decode --port 30001"
+
+$LT/venv/bin/python src/pd_runner.py --prefill "$PREFILL" --decode "$DECODE" --out results/gptoss-pd-mooncake-tcp-20261103
+```
+
+**`results/gptoss-pd-nixl-20261103`: NVLink.** The same servers with
+`--disaggregation-transfer-backend nixl`, laid out as the fork's single-node PD
+recipe (`docs/advanced_features/pd_disaggregation.md`): every GPU visible, and
+the decode server on `--base-gpu-id 1`. UCX can only copy from one GPU to
+another over NVLink if the process sees both. NIXL's backend is SGLang's
+default for it, UCX. The whole plan took 18 minutes.
+
+```bash
+$LT/venv/bin/python -m pip download --no-deps nixl-cu13==1.0.1 nixl==1.0.1 -d $LT/nixl-wheels   # checked: no file overlaps the venv
+$LT/venv/bin/uv pip install --python $LT/venv/bin/python nixl-cu13==1.0.1
+$LT/venv/bin/uv pip install --python $LT/venv/bin/python --no-deps nixl==1.0.1   # its nixl-cu12 dependency ships the same nixl_ep files
+
+FLAGS="$FLAGS --disaggregation-transfer-backend nixl"
+PREFILL="$ENVS $LT/venv/bin/python -m sglang.launch_server $FLAGS --disaggregation-mode prefill --port 30000"
+DECODE="$ENVS $LT/venv/bin/python -m sglang.launch_server $FLAGS --disaggregation-mode decode --port 30001 --base-gpu-id 1"
+
+$LT/venv/bin/python src/pd_runner.py --prefill "$PREFILL" --decode "$DECODE" --out results/gptoss-pd-nixl-20261103
+```
+
+**`results/gptoss-pd-sanity-nixl-20261103`: the PD check's reference.** The
+same two servers on the short plan:
+
+```bash
+$LT/venv/bin/python src/pd_runner.py --prefill "$PREFILL" --decode "$DECODE" --plan src/pd_sanity_batches.json \
+    --out results/gptoss-pd-sanity-nixl-20261103
+```
+
+**`results/gptoss-sanity-pd-4xa100-20261103`: the PD check against it,**
+right after, with the same commands:
+
+```bash
+$LT/venv/bin/python sanity_pd.py "$PREFILL" "$DECODE" --out results/gptoss-sanity-pd-4xa100-20261103
+```
+
+PD mode turns piecewise CUDA graphs off (`server_args.py`, "13. PD
+disaggregation"), so prefill runs eagerly and the inductor flag does nothing.
+`pd_runner.py` adds `--enable-metrics`, `--skip-tokenizer-init` and
+`--enable-request-time-stats-logging` to both commands, for its timings; its
+docstring says why. Both servers start in about 2 to 3 minutes.
+
+## gpt-oss-120b with tensor parallelism on the 4xA100 VM
+
+`results/gptoss-120b-tp4-20261103` is the full sweep, `src/batches.json`, on
+gpt-oss-120b over the VM's four GPUs with `--tp 4`: the setup of
+`results/gptoss-cuda-graphs-20261029` otherwise.
+
+| | |
+|---|---|
+| model | `lmsys/gpt-oss-120b-bf16` at revision `3609e677162887e2926a347645d481475d393746`, 119 GB. Its experts are stored as FP8 E5M2, which holds gpt-oss's MXFP4 values exactly, and everything else as BF16. SGLang loads all of it as BF16: 54.6 GB per GPU. |
+| where | a RAM disk, `/mnt/ram`, as the boot disk has 6 GB free. It is gone after every stop, so the model has to be downloaded again after each start, in about 3 minutes. |
+| SGLang | fork main `99f39f2b5`, the PD runs' |
+| memory | `--mem-fraction-static 0.819`, SGLang's own default for 4 GPUs of 80 GB. The KV cache then holds 469,904 sliding-window tokens, more than the plan's largest batch needs (299,180); 0.7 would leave room for about 70k. |
+
+On the VM, from `~/latency-test/fairinf-latency-sweep`:
+
+```bash
+sudo mkdir -p /mnt/ram && sudo mount -t tmpfs -o size=150g,mode=1777 tmpfs /mnt/ram
+HF_HOME=/mnt/ram/hf-home HF_XET_CHUNK_CACHE_SIZE_BYTES=0 HF_XET_HIGH_PERFORMANCE=1 \
+    $LT/venv/bin/hf download lmsys/gpt-oss-120b-bf16 --revision 3609e677162887e2926a347645d481475d393746 \
+    --local-dir /mnt/ram/gpt-oss-120b-bf16
+
+MODEL=/mnt/ram/gpt-oss-120b-bf16 FORK=$LT/fairinf-sglang-99f39f2b5 CUDA_VISIBLE_DEVICES=0,1,2,3 PIECEWISE=inductor \
+    nohup bash vm/run_clean.sh src/batches.json results.jsonl --tp 4 --mem-fraction-static 0.819 > run.log 2>&1 &
+```
+
+- **Not `/dev/shm`:** systemd-logind deletes a user's files there when the
+  user's last session closes (`RemoveIPC=yes`, the default), and it deleted
+  the first download.
+- **`HF_HOME` in the RAM disk** keeps Hugging Face's caches off the boot disk.
+- **`--tp 4`** makes `src/runner.py` run one process per GPU, as
+  `sglang.bench_one_batch` does. They all time the same batches, and rank 0
+  records the times.
+- **Other defaults change with 4 GPUs:** decode CUDA graphs go up to 512
+  requests instead of 256, and the plan's decode batches, up to 256, are
+  padded to the same sizes as before.
+- **Startup takes about 11 minutes:** 2 to load the weights, 1.5 to capture
+  the decode graphs, and 6.5 to compile and capture the piecewise graphs.
 
 ## Leave alone
 
