@@ -162,7 +162,15 @@ def time_hybrid(model_runner, prefill_lens, decode_lens):
     by mix_with_running (ForwardMode.MIXED), so every decode request becomes a
     one-token extend on top of its context. As in time_decode, the decode
     requests' KV cache is allocated but never filled.
+
+    With one part empty the scheduler mixes nothing: with no running batch it
+    runs a prefill step, with no new prompts a decode step (as a CUDA graph).
+    So an empty part times that step instead.
     """
+    if not decode_lens:
+        return time_prefill(model_runner, prefill_lens)
+    if not prefill_lens:
+        return time_decode(model_runner, decode_lens)
     clear_kv_cache(model_runner)
     running = decode_batch(model_runner, decode_lens)
     batch = fake_batch(model_runner, prefill_lens)

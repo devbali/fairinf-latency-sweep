@@ -1,0 +1,139 @@
+prefill command: SGLANG_LOG_MS=1 TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=/home/devbali/latency-test/fairinf-sglang-99f39f2b5/python:/home/devbali/latency-test/fairinf-latency-sweep/vm /home/devbali/latency-test/venv/bin/python -m sglang.launch_server --enable-metrics --skip-tokenizer-init --enable-request-time-stats-logging --model-path /home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --piecewise-cuda-graph-compiler inductor --disaggregation-transfer-backend nixl --page-size 16 --disaggregation-mode prefill --port 30000
+decode command: SGLANG_LOG_MS=1 TORCHINDUCTOR_FORCE_DISABLE_CACHES=1 PYTHONPATH=/home/devbali/latency-test/fairinf-sglang-99f39f2b5/python:/home/devbali/latency-test/fairinf-latency-sweep/vm /home/devbali/latency-test/venv/bin/python -m sglang.launch_server --enable-metrics --skip-tokenizer-init --enable-request-time-stats-logging --model-path /home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb --dtype bfloat16 --mem-fraction-static 0.7 --sampling-backend pytorch --scheduling-policy-path noop_cache_policy.NoOpWithCachePolicy --piecewise-cuda-graph-compiler inductor --disaggregation-transfer-backend nixl --page-size 16 --disaggregation-mode decode --port 30001 --base-gpu-id 1 --decode-log-interval 1
+cpus: 48
+== versions
+sglang       0.0.0.dev0, source 1ca6ce4405d3
+sgl_kernel   0.4.2.post1
+flashinfer   0.6.8.post1
+transformers 5.6.0
+torch        2.11.0+cu130 cuda 13.0
+gpu          NVIDIA A100-SXM4-80GB
+== transfer packages
+mooncake-transfer-engine-cuda13  0.3.10.post2
+nixl                             1.0.1
+nixl-cu13                        1.0.1
+== gpus
+index, name, pci.bus_id, driver_version, memory.total [MiB]
+0, NVIDIA A100-SXM4-80GB, 00000000:00:05.0, 580.178.04, 81920 MiB
+1, NVIDIA A100-SXM4-80GB, 00000000:00:06.0, 580.178.04, 81920 MiB
+2, NVIDIA A100-SXM4-80GB, 00000000:00:07.0, 580.178.04, 81920 MiB
+3, NVIDIA A100-SXM4-80GB, 00000000:00:08.0, 580.178.04, 81920 MiB
+== gpu links
+	[4mGPU0	GPU1	GPU2	GPU3	CPU Affinity	NUMA Affinity	GPU NUMA ID[0m
+GPU0	 X 	NV12	NV12	NV12	0-47	0		N/A
+GPU1	NV12	 X 	NV12	NV12	0-47	0		N/A
+GPU2	NV12	NV12	 X 	NV12	0-47	0		N/A
+GPU3	NV12	NV12	NV12	 X 	0-47	0		N/A
+
+Legend:
+
+  X    = Self
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+  PIX  = Connection traversing at most a single PCIe bridge
+  NV#  = Connection traversing a bonded set of # NVLinks
+== rdma devices
+none
+== nvlink data counters before the run
+GPU 0: NVIDIA A100-SXM4-80GB (UUID: GPU-161207ed-3493-43c7-6cfb-6f722578ec4c)
+	 Link 0: Data Tx: 0 KiB
+	 Link 0: Data Rx: 0 KiB
+	 Link 1: Data Tx: 0 KiB
+	 Link 1: Data Rx: 0 KiB
+	 Link 2: Data Tx: 0 KiB
+	 Link 2: Data Rx: 0 KiB
+	 Link 3: Data Tx: 0 KiB
+	 Link 3: Data Rx: 0 KiB
+	 Link 4: Data Tx: 0 KiB
+	 Link 4: Data Rx: 0 KiB
+	 Link 5: Data Tx: 0 KiB
+	 Link 5: Data Rx: 0 KiB
+	 Link 6: Data Tx: 0 KiB
+	 Link 6: Data Rx: 0 KiB
+	 Link 7: Data Tx: 0 KiB
+	 Link 7: Data Rx: 0 KiB
+	 Link 8: Data Tx: 0 KiB
+	 Link 8: Data Rx: 0 KiB
+	 Link 9: Data Tx: 0 KiB
+	 Link 9: Data Rx: 0 KiB
+	 Link 10: Data Tx: 0 KiB
+	 Link 10: Data Rx: 0 KiB
+	 Link 11: Data Tx: 0 KiB
+	 Link 11: Data Rx: 0 KiB
+GPU 1: NVIDIA A100-SXM4-80GB (UUID: GPU-a15cd3b6-3b52-5546-2dc7-089b885339cd)
+	 Link 0: Data Tx: 0 KiB
+	 Link 0: Data Rx: 0 KiB
+	 Link 1: Data Tx: 0 KiB
+	 Link 1: Data Rx: 0 KiB
+	 Link 2: Data Tx: 0 KiB
+	 Link 2: Data Rx: 0 KiB
+	 Link 3: Data Tx: 0 KiB
+	 Link 3: Data Rx: 0 KiB
+	 Link 4: Data Tx: 0 KiB
+	 Link 4: Data Rx: 0 KiB
+	 Link 5: Data Tx: 0 KiB
+	 Link 5: Data Rx: 0 KiB
+	 Link 6: Data Tx: 0 KiB
+	 Link 6: Data Rx: 0 KiB
+	 Link 7: Data Tx: 0 KiB
+	 Link 7: Data Rx: 0 KiB
+	 Link 8: Data Tx: 0 KiB
+	 Link 8: Data Rx: 0 KiB
+	 Link 9: Data Tx: 0 KiB
+	 Link 9: Data Rx: 0 KiB
+	 Link 10: Data Tx: 0 KiB
+	 Link 10: Data Rx: 0 KiB
+	 Link 11: Data Tx: 0 KiB
+	 Link 11: Data Rx: 0 KiB
+GPU 2: NVIDIA A100-SXM4-80GB (UUID: GPU-3d4c71f2-a68e-f4a4-5309-827b6b7e9295)
+	 Link 0: Data Tx: 0 KiB
+	 Link 0: Data Rx: 0 KiB
+	 Link 1: Data Tx: 0 KiB
+	 Link 1: Data Rx: 0 KiB
+	 Link 2: Data Tx: 0 KiB
+	 Link 2: Data Rx: 0 KiB
+	 Link 3: Data Tx: 0 KiB
+	 Link 3: Data Rx: 0 KiB
+	 Link 4: Data Tx: 0 KiB
+	 Link 4: Data Rx: 0 KiB
+	 Link 5: Data Tx: 0 KiB
+	 Link 5: Data Rx: 0 KiB
+	 Link 6: Data Tx: 0 KiB
+	 Link 6: Data Rx: 0 KiB
+	 Link 7: Data Tx: 0 KiB
+	 Link 7: Data Rx: 0 KiB
+	 Link 8: Data Tx: 0 KiB
+	 Link 8: Data Rx: 0 KiB
+	 Link 9: Data Tx: 0 KiB
+	 Link 9: Data Rx: 0 KiB
+	 Link 10: Data Tx: 0 KiB
+	 Link 10: Data Rx: 0 KiB
+	 Link 11: Data Tx: 0 KiB
+	 Link 11: Data Rx: 0 KiB
+GPU 3: NVIDIA A100-SXM4-80GB (UUID: GPU-e3c08fad-311c-9d88-52bc-99d18cd72d78)
+	 Link 0: Data Tx: 0 KiB
+	 Link 0: Data Rx: 0 KiB
+	 Link 1: Data Tx: 0 KiB
+	 Link 1: Data Rx: 0 KiB
+	 Link 2: Data Tx: 0 KiB
+	 Link 2: Data Rx: 0 KiB
+	 Link 3: Data Tx: 0 KiB
+	 Link 3: Data Rx: 0 KiB
+	 Link 4: Data Tx: 0 KiB
+	 Link 4: Data Rx: 0 KiB
+	 Link 5: Data Tx: 0 KiB
+	 Link 5: Data Rx: 0 KiB
+	 Link 6: Data Tx: 0 KiB
+	 Link 6: Data Rx: 0 KiB
+	 Link 7: Data Tx: 0 KiB
+	 Link 7: Data Rx: 0 KiB
+	 Link 8: Data Tx: 0 KiB
+	 Link 8: Data Rx: 0 KiB
+	 Link 9: Data Tx: 0 KiB
+	 Link 9: Data Rx: 0 KiB
+	 Link 10: Data Tx: 0 KiB
+	 Link 10: Data Rx: 0 KiB
+	 Link 11: Data Tx: 0 KiB
+	 Link 11: Data Rx: 0 KiB

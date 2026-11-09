@@ -21,7 +21,7 @@ calls. `results/README.md` lists every model.
 | `src/runner.py` | Loads SGLang's `ModelRunner` once, then times every batch in `--batches`: 1 warmup run, then 3 samples. With `--tp N` it runs one process per GPU, as `sglang.bench_one_batch` does. |
 | `src/batches.json` | The batch plan, every batch written out: `prefill`, `decode` and `hybrid` lists. |
 | `src/generate_batches.py` | Writes both plans, `src/batches.json` and `src/sanity_batches.json`, from the designs and seeded random draws below. |
-| `src/compare_fits.py` | Fits the four models below: linear, degree-2 and degree-2 + sum l^2 regressions, and the terms that matter picked by backward elimination. Prints their accuracy and coefficients as markdown tables. Given `pd_runner.py` results, it fits the same four to the KV transfer time of each prefill step. |
+| `src/compare_fits.py` | Fits the four models below: linear, degree-2 and degree-2 + sum l^2 regressions, and the terms that matter picked by backward elimination, plus a random forest and gradient boosted trees (scikit-learn) for comparison. Prints their accuracy and coefficients as markdown tables. Given `pd_runner.py` results, it fits the same models to the KV transfer time of each prefill step. |
 | `src/fit.py` | Helpers the scripts share: loading results, least squares with the CPU floor, cross-validation and the bootstrap. |
 | `src/sanity_batches.json` | A short plan of 88 batches from `src/batches.json`, for `sanity_latency.py`. |
 | `src/compare_runs.py` | Compares a run with a reference run batch by batch, and compares the setup lines of their logs. |
@@ -30,6 +30,10 @@ calls. `results/README.md` lists every model.
 | `src/pd_batches.json` | The PD plan: batches of prompts sent together, and bursts. Written by `src/generate_batches.py`. |
 | `src/pd_sanity_batches.json` | A short PD plan of 20 batches and 1 burst from `src/pd_batches.json`, for `sanity_pd.py`. |
 | `src/pd_fits.py` | Describes a PD run from `pd_runner.py` results: how SGLang split the batches into prefill steps, the bootstrap, what one request's transfer carries and takes, the decode server's pickup, and the bursts. |
+| `src/pd_load.py` | Given the same two commands, sends probe batches while background loads keep the prefill server, the decode server, both or neither busy, or overfill a capped decode cache. It can run a profiler such as py-spy on both schedulers meanwhile. |
+| `src/pd_load.json` | Its plan: the probe batches, the loads and the scenarios. Written by `src/generate_batches.py`. |
+| `src/pd_load_report.py` | Reports on a `pd_load.py` run: the probes' transfer time by scenario and state, the waits and retractions under memory pressure, and what each scheduler did according to the profiles. |
+| `src/pd_transfer/` | The PD transfer model of `results/pd-transfer-model`: which decode batch a request's KV joins after its prefill, with each posting model. `run.sh RUN_DIR WORK_DIR` runs it on a `pd_load.py` run. |
 | `vm/` | Setup and run scripts for the A100 VM. `vm/README.md` lists the exact setup, server command and commands used on it. |
 | `results/` | One directory per run: its samples, its log, and a README on what it shows. `results/README.md` lists every model fitted on them. |
 
@@ -90,6 +94,33 @@ transfer:         T = f
 Transfer is the KV cache transfer of a prefill step under PD disaggregation,
 described below, with the step's N, S and M.
 
+Two scikit-learn tree models are fitted alongside, for comparison: a random
+forest and gradient boosted trees (`HistGradientBoostingRegressor`). Each
+takes the step's N, S, M and sum l^2 (both parts' for a hybrid step), uses
+scikit-learn's default settings with a fixed seed, and has no floor or bends.
+They are scored on the same held-out folds. Trees have no coefficients, and
+cannot predict a time beyond the range they were fitted on.
+
+Held-out mean error:
+
+| run, phase | linear | degree 2 | degree 2 + sum l^2 | selected | random forest | gradient boosting |
+|---|---|---|---|---|---|---|
+| 20b CUDA graphs, prefill | 11.1% | 2.8% | 2.7% | 2.7% | 3.2% | 2.7% |
+| 20b CUDA graphs, decode | 2.9% | 2.7% | 2.6% | 2.6% | 2.8% | 2.7% |
+| 20b CUDA graphs, hybrid | 56.9% | 3.2% | 3.1% | 3.0% | 7.5% | 7.8% |
+| 120b TP 4, prefill | 5.8% | 4.6% | 4.6% | 4.6% | 2.8% | 2.7% |
+| 120b TP 4, decode | 3.8% | 3.4% | 3.4% | 3.4% | 3.0% | 2.9% |
+| 120b TP 4, hybrid | 37.7% | 4.2% | 4.1% | 4.1% | 6.2% | 6.2% |
+| PD transfer (NIXL) | 28.6% | 28.9% | 28.6% | 28.6% | 22.8% | 24.1% |
+
+The trees about tie the regressions on prefill and decode, and do better on
+120b prefill. They are clearly worse on hybrid steps, whose time depends on
+products such as M_p x N_d that a regression has as terms. For the PD
+transfer, see `results/pd-transfer-model/README.md`: scored on which decode
+batch a request's KV joins, with cut prompts counted at their last chunk, the
+selected regression puts 78.0% in the predicted batch and 88.6% in the
+predicted or next one (random forest 77.1% and 88.2%).
+
 - **Hybrid steps** use all six variables, so their degree-2 polynomial has 21
   squares and products. Their sum l^2 is over the prefill part's prompts.
 - **The selected model** comes from backward elimination. Starting from
@@ -142,6 +173,7 @@ just added up, these cross terms would be zero. Measured on gpt-oss:
 ## Fitting the models
 
 ```bash
+pip install numpy scikit-learn   # scikit-learn for the two tree models
 python src/compare_fits.py results/<run>/results.jsonl
 ```
 
@@ -356,6 +388,41 @@ drained the KV cache at least as fast as prefill produced it. A 195 MB
 transfer posted while the next prefill step computed, though, often waited
 for that step: about 480 ms. The run's README has the details and every
 table.
+
+### What else the transfer time depends on
+
+`src/pd_load.py` sends probe batches while loads keep one server or both busy
+(`results/gptoss-pd-load-nixl-20261103`), or overfill a capped decode cache
+(`results/gptoss-pd-pressure-nixl-20261103`):
+
+```bash
+python src/pd_load.py --prefill "PREFILL SERVER COMMAND" --decode "DECODE SERVER COMMAND" --out results/<run>
+python src/pd_load_report.py results/<run>
+python src/compare_fits.py results/<run>/results.jsonl --pd-phase idle   # the four models under one load
+```
+
+- **Two states move T, each one part of it, and they add up.** If the next
+  prefill step is already running when a step's results are processed,
+  posting slows from 1.9 to 3.4 ms per request. A decode server in the middle
+  of a decode step notices arrived KV only once the step ends, which adds up
+  to one step to the tail: 12.4 ms (median) under 32 decoding requests,
+  against 3.5.
+- **Within one state, T is not bimodal.** A request alone takes 3.3 to 4.0 ms
+  with nothing else running; with the decode server busy, its tail spreads
+  evenly over one decode step. The full plan's small steps look bimodal
+  because they mix the states.
+- **Under memory pressure, the wait comes before the transfer.** The decode
+  server admits a request only once it can reserve its KV, and the prefill
+  server waits for that: about 24 s per probe in this run. Admitted requests
+  then come in bursts and share prefill steps, so a probe's transfer took
+  117 ms.
+- **Fitted on one load alone, the selected model's held-out error is 27%
+  idle, 35% under the prefill load, 19% under the decode load and 31% under
+  both** (`results/gptoss-pd-load-full-nixl-20261104`: the PD plan's batches,
+  `--probes src/pd_batches.json`, under each load). Idle reproduces the plan's
+  model; a busy decode server adds 5.5 ms to its constant; under the prefill
+  load, transfers can wait for the load's running step. A model fitted under
+  one load is off by 30% to 138% under another.
 
 ### Checking a system's PD transfer
 

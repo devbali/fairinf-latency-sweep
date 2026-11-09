@@ -1,3 +1,6 @@
 __pycache__/
 *.py[cod]
 .venv/
+
+# torch profiler traces: too large for the repo
+*.trace.json.gz

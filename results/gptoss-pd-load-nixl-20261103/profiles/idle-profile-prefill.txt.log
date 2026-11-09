@@ -1,0 +1,6 @@
+py-spy> Sampling process 250 times a second. Press Control-C to exit.
+
+
+py-spy> Stopped sampling because Control-C pressed
+py-spy> Wrote raw flamegraph data to '/home/devbali/latency-test/fairinf-latency-sweep/results/gptoss-pd-load-nixl-20261103/profiles/idle-profile-prefill.txt'. Samples: 43020 Errors: 0
+py-spy> You can use the flamegraph.pl script from https://github.com/brendangregg/flamegraph to generate a SVG

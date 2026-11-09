@@ -205,6 +205,40 @@ right after, with the same commands:
 $LT/venv/bin/python sanity_pd.py "$PREFILL" "$DECODE" --out results/gptoss-sanity-pd-4xa100-20261103
 ```
 
+**`results/gptoss-pd-load-nixl-20261103` and
+`results/gptoss-pd-pressure-nixl-20261103`: transfers under load.**
+`src/pd_load.py` with the same two servers, each scenario run again with py-spy
+on both schedulers. py-spy went into its own directory, not the venv, and
+needs ptrace rights over the servers; the sysctl lasts until the next boot.
+The pressure run caps the decode server's KV cache.
+
+```bash
+$LT/venv/bin/pip install --target $LT/pyspy py-spy==0.4.0
+sudo sysctl -w kernel.yama.ptrace_scope=0
+PROFILE="$LT/pyspy/bin/py-spy record --nonblocking --idle --threads --rate 250 --format raw --pid {pid} --output {out}"
+
+$LT/venv/bin/python src/pd_load.py --prefill "$PREFILL" --decode "$DECODE" --profile "$PROFILE" \
+    --scenarios idle,prefill,decode,both,idle:profile,prefill:profile,decode:profile,both:profile \
+    --out results/gptoss-pd-load-nixl-20261103
+$LT/venv/bin/python src/pd_load.py --prefill "$PREFILL" --decode "$DECODE --max-total-tokens 40000" \
+    --profile "$PROFILE" --scenarios pressure,pressure:profile --out results/gptoss-pd-pressure-nixl-20261103
+```
+
+Both took 19 minutes together. Before them, starting the VM failed for 20
+minutes with STOCKOUT (no spot capacity for a2-ultragpu-4g in the zone); a
+start every 2 minutes got it.
+
+**`results/gptoss-pd-load-full-nixl-20261104`: the transfer model under each
+load.** The same servers, with the PD plan's 334 batches as the probes, 3
+times each, under the four loads, without the profiler. It took 66 minutes:
+
+```bash
+$LT/venv/bin/python src/pd_load.py --prefill "$PREFILL" --decode "$DECODE" --probes src/pd_batches.json \
+    --samples 3 --scenarios idle,prefill,decode,both --out results/gptoss-pd-load-full-nixl-20261104
+```
+
+The VM again took about 24 minutes of tries every 2 minutes to start.
+
 PD mode turns piecewise CUDA graphs off (`server_args.py`, "13. PD
 disaggregation"), so prefill runs eagerly and the inductor flag does nothing.
 `pd_runner.py` adds `--enable-metrics`, `--skip-tokenizer-init` and

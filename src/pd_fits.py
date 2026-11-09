@@ -107,8 +107,10 @@ def transfer_time(step):
     return 1000 * (max(r["kv"] for r in step) - min(r["end"] for r in step))
 
 
-def transfer_samples(path):
-    """The transfer time of every prefill step of the plan's batches, in s, by its prompt lengths.
+def transfer_samples(path, phase="batches"):
+    """The transfer time of every prefill step of the phase's batches, in s, by its prompt lengths.
+
+    The phase is pd_runner.py's "batches", the plan's batches, or a pd_load.py scenario, e.g. "idle".
 
     Keyed as runner.py results load, ("transfer", lengths as JSON), so compare_fits.py fits them
     like step latencies: every step of the same prompt lengths is one batch, and its times are
@@ -117,7 +119,7 @@ def transfer_samples(path):
     requests, _ = load(path)
     samples = defaultdict(list)
     for key, batch in sent_batches(requests).items():
-        if key[0] == "batches":
+        if key[0] == phase:
             for step in steps(batch):
                 lens = sorted((r["len"] for r in step), reverse=True)
                 samples["transfer", json.dumps(lens)].append(transfer_time(step) / 1000)

@@ -25,16 +25,25 @@ standard error of the path's best (the one-standard-error rule). Repeating the
 whole selection inside each training fold (nested cross-validation) checks
 that choosing the terms didn't overfit.
 
+Two scikit-learn models are compared alongside: a random forest and gradient
+boosted trees (HistGradientBoostingRegressor), each on the step's variables
+(N, S, M and sum l^2, both parts' for a hybrid step), with scikit-learn's
+default settings and no floor or bends, on the same held-out folds. They have
+no coefficients; trees also cannot predict beyond the times they were fitted on.
+
 Prints markdown: accuracy in-sample and on held-out batches (5-fold
 cross-validation), the elimination path, and every coefficient in ms per unit,
 with bootstrap 95% intervals for the selected model.
 
-Usage: python src/compare_fits.py RESULTS.jsonl [MORE.jsonl ...]
+Usage: python src/compare_fits.py RESULTS.jsonl [MORE.jsonl ...] [--pd-phase NAME]
+
+--pd-phase picks which phase of PD results to fit: pd_runner.py's "batches"
+(the default), or one scenario of a pd_load.py run, e.g. "idle".
 """
 
+import argparse
 import itertools
 import json
-import sys
 from collections import defaultdict
 
 import numpy as np
@@ -47,7 +56,11 @@ GRAPH_BS = [1, 2, 4, 8, 12, 16, 24] + list(range(32, 257, 8))
 # Decode time is piecewise linear in the padded batch size, bending at each power of two.
 DECODE_KNOTS = [2, 4, 8, 16, 32, 64, 128]
 MODELS = ["linear", "degree 2", "degree 2 + sum l^2"]
+# A hybrid step with an empty part is the step the scheduler runs instead (see runner.py): each such piece is
+# fitted as that kind of step, so a hybrid step's time is piecewise in which parts it has.
+EDGES = {"hybrid, no decode": "prefill", "hybrid, no prefill": "decode"}
 SELECTED = "selected"
+TREES = ["random forest", "gradient boosting"]
 
 
 def variables(phase, batch):
@@ -75,6 +88,22 @@ def terms(phase, batch, model, bends):
         for knot in DECODE_KNOTS:
             t[f"(N-{knot})+"] = max(0, v["N"] - knot)
     return t
+
+
+def tree_model(name):
+    """A scikit-learn model with its default settings, seeded."""
+    from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
+    if name == TREES[0]:
+        return RandomForestRegressor(random_state=0, n_jobs=-1)
+    return HistGradientBoostingRegressor(random_state=0)
+
+
+def tree_held_out(name, X, y):
+    """Each batch's prediction by a tree model fitted without its fold."""
+    pred = np.empty_like(y)
+    for train, test in folds(len(y)):
+        pred[test] = tree_model(name).fit(X[train], y[train]).predict(X[test])
+    return pred
 
 
 def columns(names, kept):
@@ -115,13 +144,22 @@ def nested(names, X, y, floor):
     return errors(pred, y), chosen
 
 
-samples = load([path for path in sys.argv[1:] if not is_pd(path)])
-for path in filter(is_pd, sys.argv[1:]):
-    for key, values in transfer_samples(path).items():
+parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("results", nargs="+", help="runner.py or pd_runner.py results")
+parser.add_argument("--pd-phase", default="batches", help="the phase of PD results to fit")
+args = parser.parse_args()
+samples = load([path for path in args.results if not is_pd(path)])
+for path in filter(is_pd, args.results):
+    for key, values in transfer_samples(path, args.pd_phase).items():
         samples[key] += values
+for key in [k for k in samples if k[0] == "hybrid"]:
+    p, d = json.loads(key[1])
+    if not d or not p:
+        samples["hybrid, no decode" if not d else "hybrid, no prefill", json.dumps(p or d)] += samples.pop(key)
 header = "| model | params | R^2 | held-out R^2 | held-out RMSE | mean error | median | p90 | max |\n" + "|---" * 9 + "|"
 summary, plain = defaultdict(dict), defaultdict(dict)  # (phase, statistic) -> {model: value}
-for phase in ("prefill", "decode", "hybrid", "transfer"):
+for phase in ("prefill", "decode", "hybrid", *EDGES, "transfer"):
+    kind = EDGES.get(phase, phase)
     keys = sorted(key for key in samples if key[0] == phase)
     if not keys:
         continue
@@ -129,7 +167,7 @@ for phase in ("prefill", "decode", "hybrid", "transfer"):
     y = np.array([np.median(samples[key]) for key in keys]) * 1e3  # ms
     # A transfer batch can have one sample: every step of the same prompt lengths is one
     spread = np.array([np.ptp(samples[key]) / np.median(samples[key]) for key in keys if len(samples[key]) > 1])
-    floor, bends = phase in ("prefill", "hybrid"), phase == "decode"
+    floor, bends = kind in ("prefill", "hybrid"), kind == "decode"
     wrapper = "the floor" if floor else "the bends" if bends else "neither floor nor bends"
     print(f"\n## {phase}: {len(y)} batches, samples spread by {100 * np.median(spread):.1f}% (median)")
 
@@ -137,7 +175,7 @@ for phase in ("prefill", "decode", "hybrid", "transfer"):
     models = {}  # name -> (term names, X)
     for name in order:
         if name != SELECTED:
-            rows = [terms(phase, batch, name, bends) for batch in batches]
+            rows = [terms(kind, batch, name, bends) for batch in batches]
             models[name] = (list(rows[0]), np.array([list(r.values()) for r in rows], dtype=float))
     names, X = models[MODELS[2]]
     path, kept, limit = eliminate(names, X, y, floor)
@@ -158,6 +196,19 @@ for phase in ("prefill", "decode", "hybrid", "transfer"):
         summary[phase, "held-out R^2"][name] = f"{r2(y, pred[name]):.4f}"
         summary[phase, "mean error"][name] = f"{err.mean():.1f}%"
         summary[phase, "max error"][name] = f"{err.max():.1f}%"
+    X_raw = np.array([list(variables(kind, batch)[0].values()) + [variables(kind, batch)[1]] for batch in batches],
+                     dtype=float)
+    for name in TREES:
+        pred[name] = tree_held_out(name, X_raw, y)
+        err = errors(pred[name], y)
+        rmse = np.sqrt(((pred[name] - y) ** 2).mean())
+        in_sample = tree_model(name).fit(X_raw, y).predict(X_raw)
+        print(f"| {name} | - | {r2(y, in_sample):.4f} | {r2(y, pred[name]):.4f} | {rmse:.1f} ms | {err.mean():.1f}% "
+              f"| {np.median(err):.1f}% | {np.percentile(err, 90):.1f}% | {err.max():.1f}% |")
+        summary[phase, "parameters"][name] = "-"
+        summary[phase, "held-out R^2"][name] = f"{r2(y, pred[name]):.4f}"
+        summary[phase, "mean error"][name] = f"{err.mean():.1f}%"
+        summary[phase, "max error"][name] = f"{err.max():.1f}%"
 
     err, chosen = nested(names, X, y, floor)
     print(f"\nWith the terms also chosen inside each training fold (nested cross-validation), the "
@@ -167,23 +218,23 @@ for phase in ("prefill", "decode", "hybrid", "transfer"):
         changes = [f"+{t}" for t in fold_kept if t not in kept] + [f"-{t}" for t in kept if t not in fold_kept]
         print(f"- fold {fold} chose {len(fold_kept)} terms: {', '.join(changes) or 'the same ones'}")
 
-    if phase != "decode":
+    if kind != "decode":
         # With one prompt, sum l^2 = S^2 = M^2; with equal prompts it is S*M.
-        prompts = [batch[0] if phase == "hybrid" else batch for batch in batches]
+        prompts = [batch[0] if kind == "hybrid" else batch for batch in batches]
         kinds = np.array(["one prompt" if len(p) == 1 else "equal prompts" if len(set(p)) == 1
                           else "unequal prompts" for p in prompts])
         groups = ["one prompt", "equal prompts", "unequal prompts"]
         print(f"\nHeld-out error by the step's prompts: mean, max.\n\n| model | "
               + " | ".join(f"{k} ({(kinds == k).sum()})" for k in groups) + " |\n" + "|---" * 4 + "|")
-        for name in order:
+        for name in order + TREES:
             err = errors(pred[name], y)
             print(f"| {name} | " + " | ".join(f"{err[kinds == k].mean():.1f}%, {err[kinds == k].max():.1f}%"
-                                              for k in groups) + " |")
+                                              if (kinds == k).any() else "-" for k in groups) + " |")
 
     if floor or bends:
         print(f"\nThe polynomial alone, without {wrapper}.\n\n{header}")
         for name in MODELS:
-            X_plain = np.array([list(terms(phase, batch, name, False).values()) for batch in batches], dtype=float)
+            X_plain = np.array([list(terms(kind, batch, name, False).values()) for batch in batches], dtype=float)
             p = held_out(X_plain, y, False)
             err = errors(p, y)
             print(f"| {name} | {X_plain.shape[1]} | {r2(y, predict(fit(X_plain, y, False), X_plain)):.4f} "
@@ -222,15 +273,35 @@ for phase in ("prefill", "decode", "hybrid", "transfer"):
         print(f"| {term} | " + " | ".join(f"{coef[name][term]:.4g}" if term in coef[name] else ""
                                           for name in order) + " |")
 
-    if floor:
-        sm, l2 = ("S_p*M_p", "sum l_p^2") if phase == "hybrid" else ("S*M", "sum l^2")
+    sm, l2 = ("S_p*M_p", "sum l_p^2") if kind == "hybrid" else ("S*M", "sum l^2")
+    if floor and sm in selected_names and l2 in selected_names:
         ratio = boot[:, 1 + selected_names.index(l2)] / boot[:, 1 + selected_names.index(sm)]
         print(f"\n{l2} / {sm}: {coef[SELECTED][l2] / coef[SELECTED][sm]:.3f} in the {SELECTED} model "
               f"(95% interval [{np.percentile(ratio, 2.5):.3f}, {np.percentile(ratio, 97.5):.3f}]), "
               f"{coef[MODELS[2]][l2] / coef[MODELS[2]][sm]:.3f} in {MODELS[2]}")
 
-shown = MODELS + [SELECTED]
-print("\n## Summary, held out, with the floor and bends (transfer has neither)\n\n| | " + " | ".join(shown) + " |\n"
+edge = {k: np.median(v) * 1e3 for k, v in samples.items() if k[0] in EDGES}
+full = {tuple(map(json.dumps, json.loads(k[1]))): np.median(v) * 1e3 for k, v in samples.items() if k[0] == "hybrid"}
+if edge and full:
+    print("\n## Hybrid at its edges: what the first request of the other part adds (ms, medians)\n")
+    for phase, other in (("hybrid, no prefill", 0), ("hybrid, no decode", 1)):
+        rows = []
+        for (_, part), t in sorted(edge.items()):
+            if _ != phase:
+                continue
+            pairs = [(json.loads(k[other]), v) for k, v in full.items() if k[1 - other] == part]
+            if pairs:
+                smallest = min(pairs, key=lambda kv: (len(kv[0]), sum(kv[0])))
+                rows.append((json.loads(part), t, smallest[0], smallest[1]))
+        label = "decode part, alone as a CUDA graph" if other == 0 else "prefill part, alone"
+        print(f"| {label} | alone | with the smallest other part | that part | added |\n|---|---|---|---|---|")
+        for part, t, small, t2 in rows:
+            show = lambda b: f"{len(b)} x {b[0]}" if len(set(b)) == 1 else f"{len(b)} requests, {sum(b)} tokens"
+            print(f"| {show(part)} | {t:.2f} | {t2:.2f} | {show(small)} | {t2 - t:+.2f} |")
+        print()
+
+shown = MODELS + [SELECTED] + TREES
+print("\n## Summary, held out, with the floor and bends (transfer has neither; nor have the trees)\n\n| | " + " | ".join(shown) + " |\n"
       + "|---" * (len(shown) + 1) + "|")
 for (phase, stat), values in summary.items():
     print(f"| {phase} {stat} | " + " | ".join(values[name] for name in shown) + " |")

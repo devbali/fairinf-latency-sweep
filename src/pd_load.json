@@ -1,0 +1,23 @@
+{
+  "about": "The plan pd_load.py runs through a prefill and a decode server: probe batches, sent one at a time in each scenario while its loads keep the servers busy. A load is clients that each send one request of len prompt tokens and new_tokens output tokens at a time, until the scenario ends; warm_s is how long it runs before the first probe. The pressure scenario needs a decode server started with --max-total-tokens 40000. Written by generate_batches.py, which explains the design.",
+  "probes": [
+    [128],
+    [1024],
+    [4096],
+    [128, 128, 128, 128],
+    [128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+    [1024, 1024, 1024, 1024, 1024, 1024, 1024, 1024]
+  ],
+  "loads": [
+    {"name": "prefill", "clients": 2, "len": 2048, "new_tokens": 1, "warm_s": 2},
+    {"name": "decode", "clients": 32, "len": 256, "new_tokens": 6000, "warm_s": 5},
+    {"name": "pressure", "clients": 32, "len": 1024, "new_tokens": 1500, "warm_s": 5}
+  ],
+  "scenarios": [
+    {"name": "idle", "loads": [], "samples": 8},
+    {"name": "prefill", "loads": ["prefill"], "samples": 8},
+    {"name": "decode", "loads": ["decode"], "samples": 8},
+    {"name": "both", "loads": ["prefill", "decode"], "samples": 8},
+    {"name": "pressure", "loads": ["pressure"], "samples": 4, "max_s": 180}
+  ]
+}

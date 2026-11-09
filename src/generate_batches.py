@@ -6,6 +6,12 @@
   server, to time the KV cache transfer between them.
 - pd_sanity_batches.json: 20 batches and 1 burst of the PD plan, for
   sanity_pd.py.
+- pd_load.json: probe batches and background loads for pd_load.py, to see
+  what a transfer's time depends on besides its batch.
+- hybrid_edges_batches.json: hybrid steps with an empty prefill or decode
+  part, next to the full ones, to model a hybrid step piecewise.
+- pd_load_sweep.json: the PD plan's batches under loads of several shapes, for
+  pd_load.py, to see how each part of a transfer's time scales with the load.
 
 The plans list every batch as data, so they never change behind anyone's back.
 To change one, edit this file and rerun it:
@@ -213,6 +219,87 @@ PD_SANITY = {
     "bursts": [[1024] * 64],
 }
 
+# The PD load plan, for pd_load.py: what a transfer's time depends on besides
+# its batch. The same probe batches go out one at a time in every scenario,
+# while background load keeps the prefill server, the decode server, both or
+# neither busy. A load is clients that each send one request at a time, again
+# and again, until the scenario ends:
+# - prefill: two clients with 2,048-token prompts and one output token, so a
+#   prefill step is always queued (the prefill server never decodes) and the
+#   decode server only receives KV;
+# - decode: 32 clients with 256-token prompts and 6,000 output tokens, so the
+#   decode server always runs a decode step and its KV cache stays far from
+#   full (32 x 6,256 of 309,703 tokens);
+# - pressure: 32 clients with 1,024-token prompts and 1,500 output tokens, more
+#   than a decode server started with --max-total-tokens 40000 holds, so it has
+#   to make requests wait and retract running ones.
+# The probes: one prompt of 128, 1,024 and 4,096 tokens, 4 and 16 of 128, and
+# 8 of 1,024, each sent 8 times per scenario (4 under pressure, for at most
+# 3 minutes).
+PD_LOAD = {
+    "probes": [[128], [1024], [4096], [128] * 4, [128] * 16, [1024] * 8],
+    "loads": [
+        {"name": "prefill", "clients": 2, "len": 2048, "new_tokens": 1, "warm_s": 2},
+        {"name": "decode", "clients": 32, "len": 256, "new_tokens": 6000, "warm_s": 5},
+        {"name": "pressure", "clients": 32, "len": 1024, "new_tokens": 1500, "warm_s": 5},
+    ],
+    "scenarios": [
+        {"name": "idle", "loads": [], "samples": 8},
+        {"name": "prefill", "loads": ["prefill"], "samples": 8},
+        {"name": "decode", "loads": ["decode"], "samples": 8},
+        {"name": "both", "loads": ["prefill", "decode"], "samples": 8},
+        {"name": "pressure", "loads": ["pressure"], "samples": 4, "max_s": 180},
+    ],
+}
+
+# The PD load sweep, for pd_load.py: how each part of a transfer's time scales
+# with the work around it. The probes are the PD plan's batches, each sent once
+# per scenario. Each load is one shape of one server's work:
+# - prefill: two clients with 512- or 2,048-token prompts, or one with 8,192
+#   (the whole budget), and one output token, so a prefill step of that size
+#   is always queued;
+# - decode: 8, 32 or 128 clients with 256-token prompts, or 32 with 4,096, so
+#   the decode step runs from about 12 to 30 ms. Their longest contexts, 8 and
+#   32 x 6,256, 128 x 1,756 and 32 x 5,596 tokens, stay far below the decode
+#   server's KV cache. "spread" shortens each client's first request, so the
+#   clients' requests end at spread-out times and the decode batch holds steady.
+# The scenarios: idle, each load alone, and three pairs: the earlier runs' pair,
+# the shortest prefill steps with the largest decode batch, and the longest with
+# the smallest.
+PD_LOAD_SWEEP = {
+    "probes": PD_BATCHES,
+    "loads": [
+        {"name": "prefill-512", "clients": 2, "len": 512, "new_tokens": 1, "warm_s": 2},
+        {"name": "prefill-2048", "clients": 2, "len": 2048, "new_tokens": 1, "warm_s": 2},
+        {"name": "prefill-8192", "clients": 1, "len": 8192, "new_tokens": 1, "warm_s": 2},
+        {"name": "decode-8", "clients": 8, "len": 256, "new_tokens": 6000, "warm_s": 5, "spread": True},
+        {"name": "decode-32", "clients": 32, "len": 256, "new_tokens": 6000, "warm_s": 5, "spread": True},
+        {"name": "decode-128", "clients": 128, "len": 256, "new_tokens": 1500, "warm_s": 10, "spread": True},
+        {"name": "decode-32-long", "clients": 32, "len": 4096, "new_tokens": 1500, "warm_s": 10, "spread": True},
+    ],
+    "scenarios": [{"name": "idle", "loads": [], "samples": 1}]
+    + [{"name": load, "loads": [load], "samples": 1}
+       for load in ("prefill-512", "prefill-2048", "prefill-8192", "decode-8", "decode-32", "decode-128",
+                    "decode-32-long")]
+    + [{"name": f"{p}+{d}", "loads": [p, d], "samples": 1}
+       for p, d in (("prefill-2048", "decode-32"), ("prefill-512", "decode-128"), ("prefill-8192", "decode-8"))],
+}
+
+# The hybrid edges plan: hybrid steps whose prefill or decode part is empty,
+# next to the full ones they border, timed in one run, to model a hybrid step
+# piecewise. With one part empty the scheduler mixes nothing, and runner.py
+# times the step it runs instead: a prefill step, or a decode step as a CUDA
+# graph. Every prefill part of the denser hybrid design with every decode part
+# (up to 64k context tokens) and with none, and every decode part with none.
+HYBRID_EDGE_PREFILL = [[16], [64], [256], [1024], [2048], [4096], [6144], [256] * 4, [1024] * 4, [256] * 8,
+                       [64] * 16, [128] * 32, [32] * 64]
+HYBRID_EDGE_DECODE = [[length] * n for n in (1, 2, 4, 8, 16, 32, 64, 128, 256) for length in (128, 512, 2048, 8192)
+                      if length * n <= HYBRID_DECODE_TOKENS]
+HYBRID_EDGES = {
+    "hybrid": [[p, d] for p in HYBRID_EDGE_PREFILL + [[]] for d in HYBRID_EDGE_DECODE + [[]]
+               if (p or d) and hybrid_fits(p, d)],
+}
+
 # The sanity plan: a short sweep, about 1.5 minutes of timing after the model
 # loads, that covers each regime the models describe:
 # - prefill: one prompt from the CPU floor up to the full budget, the budget
@@ -289,6 +376,33 @@ if __name__ == "__main__":
         "pd_batches.json that cover what the PD transfer model describes, about 2 minutes of sending. Written "
         "by generate_batches.py.",
         PD_SANITY,
+    )
+    write(
+        os.path.join(HERE, "pd_load.json"),
+        "The plan pd_load.py runs through a prefill and a decode server: probe batches, sent one at a time in "
+        "each scenario while its loads keep the servers busy. A load is clients that each send one request of "
+        "len prompt tokens and new_tokens output tokens at a time, until the scenario ends; warm_s is how long "
+        "it runs before the first probe. The pressure scenario needs a decode server started with "
+        "--max-total-tokens 40000. Written by generate_batches.py, which explains the design.",
+        PD_LOAD,
+    )
+    write(
+        os.path.join(HERE, "hybrid_edges_batches.json"),
+        "Hybrid steps whose prefill or decode part is empty, with the full ones they border, for runner.py: "
+        "every prefill part of the denser hybrid design with every decode part and with none, and every "
+        "decode part with none. Each batch is a [prefill, decode] pair; runner.py times an empty part's step "
+        "as the prefill or decode step the scheduler runs instead. Written by generate_batches.py.",
+        HYBRID_EDGES,
+    )
+    write(
+        os.path.join(HERE, "pd_load_sweep.json"),
+        "The load sweep pd_load.py runs through a prefill and a decode server: the PD plan's batches as the "
+        "probes, each sent once per scenario, under loads of several shapes, one server's work each. A load is "
+        "clients that each send one request of len prompt tokens and new_tokens output tokens at a time, until "
+        "the scenario ends; warm_s is how long it runs before the first probe, and spread shortens each "
+        "client's first request so their requests end at spread-out times. Written by generate_batches.py, "
+        "which explains the design.",
+        {**PD_LOAD_SWEEP, "probes": unique(PD_LOAD_SWEEP["probes"])},
     )
     for phase, batches in plan.items():
         print(f"{phase}: {len(batches):,} batches, the first {OLD[phase]} from results/gptoss-clean-20261028; "
