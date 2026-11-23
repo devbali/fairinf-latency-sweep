@@ -33,6 +33,7 @@ calls. `results/README.md` lists every model.
 | `src/pd_load.py` | Given the same two commands, sends probe batches while background loads keep the prefill server, the decode server, both or neither busy, or overfill a capped decode cache. It can run a profiler such as py-spy on both schedulers meanwhile. |
 | `src/pd_load.json` | Its plan: the probe batches, the loads and the scenarios. Written by `src/generate_batches.py`. |
 | `src/pd_load_report.py` | Reports on a `pd_load.py` run: the probes' transfer time by scenario and state, the waits and retractions under memory pressure, and what each scheduler did according to the profiles. |
+| `src/estimators/` | Latency estimators to use: `prefill.py`, `decode.py`, `hybrid.py` (20b, CUDA graphs), `prefill_tp4.py`, `decode_tp4.py` (120b, TP 4), each degree 2 + sum l^2, and `pd_kv_transfer.py`, one request's PD KV migration time (5-term robust linear model). Every one goes through the same two functions in `estimator.py`: `pooled(model, percentile, refit=False)` and `isolated(estimator, n)`. See below. |
 | `src/pd_transfer/` | The PD transfer model of `results/pd-transfer-model`: which decode batch a request's KV joins after its prefill, with each posting model. `run.sh RUN_DIR WORK_DIR` runs it on a `pd_load.py` run. |
 | `vm/` | Setup and run scripts for the A100 VM. `vm/README.md` lists the exact setup, server command and commands used on it. |
 | `results/` | One directory per run: its samples, its log, and a README on what it shows. `results/README.md` lists every model fitted on them. |
@@ -731,3 +732,39 @@ on `PYTHONPATH`.
   - gpt-oss's MoE goes through `triton_kernels` instead and avoids the stub.
   - Its MXFP4 weights are converted to BF16 in software on A100, which runs
     the experts about 44× slower. Hence the BF16 checkpoint.
+
+## Using the estimators
+
+```python
+# from src/; the PD model and refit=True need scikit-learn
+from estimators import prefill, decode, hybrid, prefill_tp4, decode_tp4, pd_kv_transfer
+from estimators.estimator import pooled, isolated
+
+est = pooled(prefill.MODEL)               # the central fit, as compare_fits.py fits it
+p90 = pooled(prefill.MODEL, 90)           # 90% of the measured samples are at or below it
+p90r = pooled(prefill.MODEL, 90, refit=True)
+p90([512, 1024])                          # ms
+isolated(p90, 4)([512, 1024])             # with 1/4 of the resources
+```
+
+- **`pooled(model, percentile=None, refit=False)`** fits the model on every sample of its run. Without a
+  percentile it is the central fit: least squares on each batch's median sample, with the floor for prefill and
+  hybrid (a robust Huber fit on every request for the PD transfer). With a percentile p, by default it shifts the
+  central fit's constant and floor up by the p-th percentile of the residuals over all samples, so p% of the
+  samples fall at or below it. With `refit=True` it fits a linear quantile regression at p instead, so every
+  coefficient can move.
+- **`isolated(estimator, n)`** is the hypothetical latency with 1/n of the resources. The constant and the floor
+  stay the same, each linear term's coefficient is multiplied by n, and each quadratic term's by n^2. Each model
+  lists its terms' degrees. N, S and M are linear; their squares, products and sum l^2 are quadratic; the decode
+  bends are linear. For the PD transfer, n_ov x D_next is quadratic and the rest linear.
+- `python -m estimators.prefill` (from `src/`, likewise for each module) prints the central fit and the share of
+  samples at or below each of the p50, p90 and p99 estimators, both ways.
+
+| module | input | fitted on |
+|---|---|---|
+| `prefill` | prompt lengths, `[512, 1024]` | `gptoss-cuda-graphs-20261029` |
+| `decode` | context lengths, `[2048] * 32` | `gptoss-cuda-graphs-20261029` |
+| `hybrid` | `[prompt lengths, decode context lengths]`, both non-empty | `gptoss-cuda-graphs-20261029` |
+| `prefill_tp4` | as `prefill` | `gptoss-120b-tp4-20261103` |
+| `decode_tp4` | as `decode` | `gptoss-120b-tp4-20261103` |
+| `pd_kv_transfer` | `{"sends": [{"kv_pieces", "state_pieces", "MB"}, ...], "place": k, "d_next_ms": D}` | `gptoss-pd-kv-migration-20261111` |
