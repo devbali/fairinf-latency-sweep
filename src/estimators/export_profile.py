@@ -69,8 +69,10 @@ def max_decode_ms(est, max_batch, max_tokens, max_context, steps=48):
 
 
 def model_json(est):
+    """T = max(floor_ms, terms) + add_ms, as the fork evaluates every model of a profile."""
     return {"terms": {t: float(c) for t, c in zip(est.model.terms, est.coef)},
             "floor_ms": 0.0 if est.floor == NO_FLOOR else float(est.floor),
+            "add_ms": float(est.add),
             "label": est.label}
 
 
@@ -78,15 +80,21 @@ def profile(name, percentile, n, refit=False, static_gap_ms=10.0):
     ests = [pooled(m, percentile, refit) for m in MODELS[name]()]
     floor, (n_, s_, m_) = max_decode_ms(ests[1], **DECODE_RANGE)
     return {
+        # 2: every model is max(floor_ms, terms) + add_ms, the isolated ones complete (floor and gap inside).
+        "format": 2,
         "source": f"fairinf-latency-sweep estimators: {name}, pooled p{percentile:g}"
                   f"{' refit' if refit else ' shifted'}, isolated n={n}",
         "pooled": {k: model_json(e) for k, e in zip(KINDS, ests)},
-        "isolated": {"n": n, **{k: model_json(isolated(e, n)) for k, e in zip(KINDS, ests)}},
-        # D^MT: the largest pooled decode step over the measured decode range. Isolated decode steps are
-        # never faster (the paper's D^MT_B <= D^ISO_B), so the fork floors them at it.
+        # The isolated models, complete: an isolated step that decodes (decode, hybrid) is floored at D^MT,
+        # the largest pooled decode step over the measured decode range (the paper's D^MT_B <= D^ISO_B), and
+        # takes the static gap on top: T = max(D^MT, terms) + gap. Hybrid's floor stays at least its fitted one.
+        "isolated": {"n": n,
+                     "prefill": model_json(isolated(ests[0], n)),
+                     "decode": model_json(isolated(ests[1], n, floor=floor, add=static_gap_ms)),
+                     "hybrid": model_json(isolated(ests[2], n, floor=floor, add=static_gap_ms))},
+        # For reference: the isolated decode and hybrid models above already include both.
         "max_pooled_decode_ms": floor,
         "max_pooled_decode_at": {"N": n_, "S": s_, "M": m_, "range": DECODE_RANGE},
-        # A fixed time added to every isolated decode step (the fork's static gap).
         "static_gap_ms": static_gap_ms,
     }
 

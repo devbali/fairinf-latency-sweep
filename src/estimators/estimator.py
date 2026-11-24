@@ -59,23 +59,26 @@ class Model:
 
 @dataclass(frozen=True)
 class Estimator:
-    """A fitted model: T = max(floor, terms @ coef), in ms."""
+    """A fitted model: T = max(floor, terms @ coef) + add, in ms. add is 0 for a fitted model; an isolated
+    decode model adds the static gap (isolated())."""
     model: Model
     coef: np.ndarray
     floor: float = NO_FLOOR
     label: str = "central"
+    add: float = 0.0
 
     def __call__(self, x):
-        return max(self.floor, float(np.dot(self.model.features(x), self.coef)))
+        return max(self.floor, float(np.dot(self.model.features(x), self.coef))) + self.add
 
     def predict(self, X):
         """Latencies of many rows of term values at once."""
-        return np.maximum(self.floor, X @ self.coef)
+        return np.maximum(self.floor, X @ self.coef) + self.add
 
     def formula(self):
         parts = [f"{self.coef[0]:.6g}"] + [f"{w:+.6g} {t}" for t, w in zip(self.model.terms[1:], self.coef[1:])]
         body = " ".join(parts)
-        return f"T = max({self.floor:.6g}, {body})" if self.floor > NO_FLOOR else f"T = {body}"
+        t = f"max({self.floor:.6g}, {body})" if self.floor > NO_FLOOR else body
+        return f"T = {t} + {self.add:.6g}" if self.add else f"T = {t}"
 
 
 def _medians(X, y, group):
@@ -143,11 +146,14 @@ def pooled(model, percentile=None, refit=False):
     return replace(central, coef=coef, floor=central.floor + shift, label=f"p{percentile:g} shifted")
 
 
-def isolated(estimator, n):
-    """The estimator with 1/n of the resources: the constant (and floor) unchanged, linear terms x n,
-    quadratic terms x n^2."""
+def isolated(estimator, n, floor=None, add=0.0):
+    """The estimator with 1/n of the resources: the constant unchanged, linear terms x n, quadratic terms
+    x n^2. floor, if given, raises the estimator's floor to it (an isolated step is never faster than the
+    slowest pooled one, D^MT <= D^ISO); add is a time added to every step after the floor (the static gap)."""
     scale = float(n) ** np.array(estimator.model.degrees, dtype=float)
-    return replace(estimator, coef=estimator.coef * scale, label=f"{estimator.label}, isolated n={n:g}")
+    lowest = estimator.floor if floor is None else max(estimator.floor, floor)
+    return replace(estimator, coef=estimator.coef * scale, floor=lowest, add=add,
+                   label=f"{estimator.label}, isolated n={n:g}")
 
 
 def report(model, percentiles=(50, 90, 99)):

@@ -48,8 +48,11 @@ def _terms(phase, batch):
 
 @lru_cache(maxsize=None)
 def _data(phase, run):
+    """The samples of one run, or of several (a tuple of runs) together."""
     X, y, group = [], [], []
-    for line in open(os.path.join(RESULTS, run, "results.jsonl")):
+    runs = run if isinstance(run, tuple) else (run,)
+    lines = (line for r in runs for line in open(os.path.join(RESULTS, r, "results.jsonl")))
+    for line in lines:
         row = json.loads(line)
         if row["phase"] != phase:
             continue
