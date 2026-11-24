@@ -15,13 +15,20 @@ from . import decode, decode_tp4, hybrid, prefill, prefill_tp4
 from .estimator import NO_FLOOR, isolated, pooled
 from .steps import step_model
 
+KINDS = ("prefill", "decode", "hybrid")
+
 MODELS = {
     "gpt-oss-20b-a100": lambda: (prefill.MODEL, decode.MODEL, hybrid.MODEL),
     # Hybrid at TP 4 has no module of its own (no experiment runs it); the run measured it and a profile needs one.
     "gpt-oss-120b-tp4": lambda: (prefill_tp4.MODEL, decode_tp4.MODEL,
                                  step_model("hybrid", "gptoss-120b-tp4-20261103", "hybrid, gpt-oss-120b, TP 4")),
+    # The same sweep on the FairInference experiments setup (the fork after its upstream sync, torch 2.14.1):
+    # decode runs 1.2-1.9x slower there than on the runs above, prefill and hybrid faster.
+    **{name: (lambda run=run, what=what: tuple(step_model(k, run, f"{k}, {what}, experiments' setup") for k in KINDS))
+       for name, run, what in (
+           ("gpt-oss-20b-a100-synced", "gptoss-20b-final-setup-20261124", "gpt-oss-20b, 1 A100"),
+           ("gpt-oss-120b-tp4-synced", "gptoss-120b-tp4-final-setup-20261124", "gpt-oss-120b, TP 4"))},
 }
-KINDS = ("prefill", "decode", "hybrid")
 
 # The decode batches the largest pooled decode step is taken over: the range the sweep measured decode on
 # (src/batches.json, the same for both runs): up to 256 requests, 299,118 tokens in all, a longest request of
