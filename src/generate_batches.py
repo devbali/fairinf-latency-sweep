@@ -339,6 +339,51 @@ def write(path, about, phases):
         out.write("{\n" + f'  "about": {json.dumps(about)},\n' + ",\n".join(lists) + "\n}\n")
 
 
+# Large decode steps, a plan of their own per model (decode_large_<model>.json): the main plan stops at 256
+# requests and 300,000 context tokens, and has few steps of more than 128 requests at large S. Past that
+# the fits extrapolate (the isolated model, with its quadratic terms x n^2, the most). Each plan reaches
+# the model's KV cache at the experiments' settings:
+# - a grid: N at CUDA-graph sizes from 64 to 512, crossed with total context S from 50,000 to the cap,
+#   every request the same length (least sum l^2), or one of up to 131,072 tokens and the rest even;
+# - random batches of 32 to 512 requests, S log-uniform from 50,000 to the cap, lengths split with
+#   lognormal weights as random_lengths does.
+# Its own random generator, so the plans above stay as they were.
+LARGE_DECODE_N = (64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512)
+LARGE_DECODE_KV = {"20b": 300_000, "120b-tp4": 580_000}  # below 309,703 and 587,876 tokens of KV
+N_LARGE_RANDOM = 400
+
+
+def large_decode(kv_tokens, seed):
+    r = random.Random(seed)
+    fits = lambda lens: sum(lens) + len(lens) <= kv_tokens and max(lens) <= 131_072
+    totals = sorted({50_000, 100_000, 150_000, 200_000, 250_000, kv_tokens}
+                    | {t for t in range(300_000, kv_tokens, 70_000)})
+    out = []
+    for n in LARGE_DECODE_N:
+        for total in totals:
+            total = min(total, kv_tokens - n)
+            even = [total // n] * n
+            if total // n >= 32 and fits(even):
+                out.append(even)
+            for longest in (32_768, 131_072):
+                rest = (total - longest) // (n - 1)
+                batch = [longest] + [rest] * (n - 1)
+                if 32 <= rest < longest and fits(batch):
+                    out.append(batch)
+    drawn = 0
+    while drawn < N_LARGE_RANDOM:
+        n = int(round(32 * (512 / 32) ** r.random()))
+        total = int(round(50_000 * ((kv_tokens - n) / 50_000) ** r.random()))
+        sigma = r.uniform(0, 2)
+        weights = [r.lognormvariate(0, sigma) for _ in range(n)]
+        scale = total / sum(weights)
+        batch = [min(131_072, max(32, round(w * scale))) for w in weights]
+        if fits(batch) and sum(batch) >= 50_000:
+            out.append(batch)
+            drawn += 1
+    return unique(out)
+
+
 if __name__ == "__main__":
     plan = {"prefill": unique(PREFILL), "decode": unique(DECODE), "hybrid": unique(HYBRID)}
     for phase, batches in SANITY.items():
@@ -410,3 +455,14 @@ if __name__ == "__main__":
     for phase, batches in pd_plan.items():
         print(f"PD {phase}: {len(batches):,}, {sum(map(len, batches)):,} requests; "
               f"{len(PD_SANITY[phase])} in the PD sanity plan")
+    for model, kv in LARGE_DECODE_KV.items():
+        batches = large_decode(kv, seed=1)
+        write(
+            os.path.join(HERE, f"decode_large_{model}.json"),
+            f"Large decode steps for runner.py, gpt-oss-{model}: N from 32 to 512 and up to {kv:,} context "
+            "tokens, where the main plan has little or no data. Written by generate_batches.py, which explains "
+            "the design.",
+            {"decode": batches},
+        )
+        print(f"decode_large_{model}: {len(batches)} decode batches, S up to {max(map(sum, batches)):,}, "
+              f"N up to {max(map(len, batches))}")
