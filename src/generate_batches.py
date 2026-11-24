@@ -349,7 +349,9 @@ def write(path, about, phases):
 #   lognormal weights as random_lengths does.
 # Its own random generator, so the plans above stay as they were.
 LARGE_DECODE_N = (64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512)
-LARGE_DECODE_KV = {"20b": 300_000, "120b-tp4": 580_000}  # below 309,703 and 587,876 tokens of KV
+# Below each model's KV cache as runner.py allocates it: 20b 309,703 tokens; 120b 470,300, its sliding-window
+# pool (runner.py fills every layer's pool, while a server keeps only the window there and holds 587,876).
+LARGE_DECODE_KV = {"20b": 300_000, "120b-tp4": 465_000}
 N_LARGE_RANDOM = 400
 
 
