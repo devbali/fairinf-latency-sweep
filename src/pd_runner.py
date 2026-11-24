@@ -91,7 +91,8 @@ ADDED_FLAGS = [
 # The line each server logs as a request finishes (Req.log_time_stats)
 STATS_LINE = re.compile(
     r"ReqTimeStats\(rid=(?P<rid>[^,]+), (?:bootstrap_room=(?P<room>\d+), )?input_len=(?P<input_len>\d+), "
-    r"cached_input_len=(?P<cached>\d+), output_len=(?P<output_len>\d+), type=(?P<type>\w+)\): (?P<stats>.*)"
+    r"cached_input_len=(?P<cached>\d+), output_len=(?P<output_len>\d+), (?:attempts=\d+, )?type=(?P<type>\w+)\): "
+    r"(?P<stats>.*)"  # attempts= is in SGLang after the fork's upstream sync
 )
 FIELD = re.compile(r"#?(\w+)=(-?[\d.]+)")
 # Sent once before the recorded batches: one short, one long and two many-prompt batches
