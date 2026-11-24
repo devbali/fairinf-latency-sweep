@@ -24,7 +24,16 @@ import uuid
 import numpy as np
 import torch
 
-from sglang.bench_one_batch import TreeCacheNamespace
+# SGLang moved bench_one_batch to sglang.benchmark.one_batch (upstream #40795) and changed
+# how a ModelRunner is built and fed; NEW_API follows that module, the old path 4e84427ab.
+try:
+    from sglang.benchmark import one_batch as _ob
+    from sglang.benchmark.one_batch import TreeCacheNamespace
+    NEW_API = True
+except ImportError:
+    from sglang.bench_one_batch import TreeCacheNamespace
+    NEW_API = False
+from array import array
 from sglang.srt.configs.model_config import ModelConfig
 from sglang.srt.entrypoints.engine import _set_envs_and_config
 from sglang.srt.layers.moe import initialize_moe_config
@@ -44,6 +53,11 @@ SEED = 0  # of the random prompt tokens, the same on every TP rank
 
 def load_model(server_args, port_args, gpu_id, tp_rank):
     """Load TP rank tp_rank's weights, allocate its KV cache and capture CUDA graphs on gpu_id."""
+    if NEW_API:
+        _ob.publish(server_args, role="scheduler", ranks=_ob.SpawnRanks(
+            world_rank=_ob.spawn_world_rank(server_args, tp_rank=tp_rank, pp_rank=0), gpu_id=gpu_id))
+        _ob._init_process_global_configs()
+        return _ob.load_model(server_args, port_args, gpu_id, tp_rank)[0].torch_runner
     initialize_moe_config(server_args)  # MoE layers read their kernel choices from it
     return ModelRunner(
         model_config=ModelConfig.from_server_args(server_args),
@@ -73,26 +87,40 @@ def fake_batch(model_runner, lens):
     assert tokens <= free, f"batch needs {tokens} KV slots, {free} are free"
     reqs = []
     for n in lens:
+        ids = np.random.randint(0, 10000, n).tolist()
         req = Req(
             rid=uuid.uuid4().hex,
             origin_input_text="",
-            origin_input_ids=np.random.randint(0, 10000, n).tolist(),
+            origin_input_ids=array("q", ids) if NEW_API else ids,
             sampling_params=SamplingParams(temperature=0, max_new_tokens=16),
         )
-        req.fill_ids = req.origin_input_ids
         req.logprob_start_len = -1
-        req.set_extend_input_len(n)
+        if NEW_API:
+            req.full_untruncated_fill_ids = req.origin_input_ids
+            req.extend_end = n
+        else:
+            req.fill_ids = req.origin_input_ids
+            req.set_extend_input_len(n)
         reqs.append(req)
+    # bench_one_batch's stand-in for the radix cache: allocation only, no prefix reuse
+    if NEW_API:
+        tree_cache = TreeCacheNamespace(
+            page_size=_ob.get_schedule().page_size,
+            device=model_runner.device,
+            req_to_token_pool=model_runner.req_to_token_pool,
+            token_to_kv_pool_allocator=model_runner.token_to_kv_pool_allocator,
+        )
+    else:
+        tree_cache = TreeCacheNamespace(
+            page_size=model_runner.server_args.page_size,
+            device=model_runner.device,
+            token_to_kv_pool_allocator=model_runner.token_to_kv_pool_allocator,
+        )
     return ScheduleBatch.init_new(
         reqs=reqs,
         req_to_token_pool=model_runner.req_to_token_pool,
         token_to_kv_pool_allocator=model_runner.token_to_kv_pool_allocator,
-        # bench_one_batch's stand-in for the radix cache: allocation only, no prefix reuse
-        tree_cache=TreeCacheNamespace(
-            page_size=model_runner.server_args.page_size,
-            device=model_runner.device,
-            token_to_kv_pool_allocator=model_runner.token_to_kv_pool_allocator,
-        ),
+        tree_cache=tree_cache,
         model_config=model_runner.model_config,
         enable_overlap=False,
         spec_algorithm=SpeculativeAlgorithm.NONE,
@@ -107,20 +135,43 @@ def decode_batch(model_runner, lens):
     same whatever the cached values are, so only the lengths matter.
     """
     batch = fake_batch(model_runner, lens)
-    batch.prepare_for_extend()
+    prepare_extend(model_runner, batch)
     # Stand-in for the token each request's prefill would have sampled,
     # recorded on the requests too, as the scheduler does after a prefill.
     next_token_ids = np.random.randint(0, 10000, len(lens))
     for req, token_id in zip(batch.reqs, next_token_ids.tolist()):
         req.output_ids.append(token_id)
-    batch.output_ids = torch.tensor(next_token_ids, device=model_runner.device)
+    tokens = torch.tensor(next_token_ids, dtype=torch.int64, device=model_runner.device)
+    if NEW_API:
+        batch.input_ids = tokens  # prepare_for_decode reads the last sampled token here
+    else:
+        batch.output_ids = tokens
     return batch
+
+
+def prepare_extend(model_runner, batch):
+    """batch.prepare_for_extend(), plus what one_batch.extend does after it on the new API."""
+    batch.prepare_for_extend()
+    if NEW_API:
+        _ob._maybe_prepare_mlp_sync_batch(batch, model_runner)
+        if batch.input_ids is None and getattr(batch, "prefill_input_ids_cpu", None) is not None:
+            batch.input_ids = batch.prefill_input_ids_cpu.to(batch.device, non_blocking=True)
+            batch.prefill_input_ids_cpu = None
+
+
+def prepare_decode(model_runner, batch):
+    batch.prepare_for_decode()
+    if NEW_API:
+        _ob._maybe_prepare_mlp_sync_batch(batch, model_runner)
 
 
 @torch.no_grad()
 def forward(model_runner, batch):
     """One forward pass over a prepared batch; samples one token per request."""
-    forward_batch = ForwardBatch.init_new(batch.get_model_worker_batch(), model_runner)
+    if NEW_API:
+        forward_batch = ForwardBatch.init_new(batch, model_runner, return_hidden_states_before_norm=False)
+    else:
+        forward_batch = ForwardBatch.init_new(batch.get_model_worker_batch(), model_runner)
     logits_output = model_runner.forward(forward_batch).logits_output
     return model_runner.sample(logits_output, forward_batch)
 
@@ -135,7 +186,7 @@ def time_prefill(model_runner, lens):
     batch = fake_batch(model_runner, lens)
     torch.cuda.synchronize()
     start = time.perf_counter()
-    batch.prepare_for_extend()
+    prepare_extend(model_runner, batch)
     forward(model_runner, batch)
     torch.cuda.synchronize()
     return time.perf_counter() - start
@@ -147,7 +198,7 @@ def time_decode(model_runner, lens):
     batch = decode_batch(model_runner, lens)
     torch.cuda.synchronize()
     start = time.perf_counter()
-    batch.prepare_for_decode()
+    prepare_decode(model_runner, batch)
     forward(model_runner, batch)
     torch.cuda.synchronize()
     return time.perf_counter() - start
@@ -176,9 +227,15 @@ def time_hybrid(model_runner, prefill_lens, decode_lens):
     batch = fake_batch(model_runner, prefill_lens)
     torch.cuda.synchronize()
     start = time.perf_counter()
-    batch.prepare_for_extend()
-    running.prepare_for_decode()
+    prepare_extend(model_runner, batch)
+    prompt_ids, decode_ids = batch.input_ids, running.input_ids
+    prepare_decode(model_runner, running)
     batch.mix_with_running(running)
+    if NEW_API:
+        # mix_with_running leaves input_ids for the scheduler to join at forward entry
+        # (overlap_utils.resolve_forward_inputs): the prompts' tokens, then each decode's last token.
+        batch.input_ids = torch.cat([prompt_ids, decode_ids])
+        batch.mix_running_indices = None
     forward(model_runner, batch)
     torch.cuda.synchronize()
     return time.perf_counter() - start
@@ -270,6 +327,8 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     server_args = ServerArgs.from_cli_args(args)
+    if NEW_API:
+        server_args.resolve_once()  # as launch_server and one_batch do before starting ranks
     _set_envs_and_config(server_args)
     port_args = PortArgs.init_new(server_args)
     if server_args.tp_size == 1:
