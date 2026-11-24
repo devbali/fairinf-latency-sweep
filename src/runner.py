@@ -241,8 +241,26 @@ def time_hybrid(model_runner, prefill_lens, decode_lens):
     return time.perf_counter() - start
 
 
+def recorded_batches(out_path):
+    """The (phase, batch) pairs out_path already holds all SAMPLES samples of, so a rerun
+    (say, after a spot VM was preempted) picks up where the last one stopped."""
+    counts = {}
+    if os.path.exists(out_path):
+        with open(out_path) as f:
+            for line in f:
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:  # a line cut short when the run stopped
+                    continue
+                key = (row["phase"], json.dumps(row["batch"]))
+                counts[key] = counts.get(key, 0) + 1
+    return {key for key, n in counts.items() if n >= SAMPLES}
+
+
 def time_plan(server_args, port_args, plan, out_path, gpu_id=0, tp_rank=0):
-    """Times every batch of plan on one TP rank. Rank 0 appends the samples to out_path."""
+    """Times every batch of plan on one TP rank. Rank 0 appends the samples to out_path.
+    Batches out_path already holds are skipped, on every rank alike."""
+    done = recorded_batches(out_path)  # read before rank 0 appends anything
     # Only rank 0 logs the setup; every rank's errors still show
     logging.basicConfig(format="%(message)s")  # a rank's own process starts unconfigured
     logging.getLogger().setLevel(logging.INFO if tp_rank == 0 else logging.WARNING)
@@ -264,6 +282,8 @@ def time_plan(server_args, port_args, plan, out_path, gpu_id=0, tp_rank=0):
     with open(out_path, "a") if tp_rank == 0 else open(os.devnull, "w") as out:
         for phase, time_fn, batches in phases:
             for i, batch in enumerate(batches):
+                if (phase, json.dumps(batch)) in done:
+                    continue
                 for _ in range(WARMUP_RUNS):
                     time_fn(model_runner, batch)
                 for sample in range(SAMPLES):
