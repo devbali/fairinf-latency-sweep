@@ -1,0 +1,1757 @@
+sglang       0.0.0.dev0, source 66697235d3bb
+sgl_kernel   0.4.10
+flashinfer   0.7.2
+transformers 5.19.0
+torch        2.14.1+cu130 cuda 13.0
+gpu          NVIDIA A100-SXM4-80GB
+command: PYTHONPATH=/home/devbali/fairinf-experiments/external/fairinf-sglang/python CUDA_VISIBLE_DEVICES=0 /home/devbali/final-venv/bin/python src/runner.py --model-path /home/devbali/.cache/huggingface/hub/models--lmsys--gpt-oss-20b-bf16/snapshots/8de8d3dfa4da071323322a4a3049612203a3b1eb --dtype bfloat16 --sampling-backend pytorch --mem-fraction-static 0.7 --batches /home/devbali/fairinf-experiments/vm/latency_check/decode_large_20b.json --out /home/devbali/fairinf-experiments/experiments/latency-models/results/gptoss-20b-decode-large-final-setup/results.jsonl
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:37:48] Detected GPT-OSS model, enabling triton_kernels MOE kernel.
+[2026-11-24 22:37:48] Init parallel begin.
+[2026-11-24 22:37:49] Init parallel ends. elapsed=0.36 s
+[2026-11-24 22:37:49] Memory baseline taken. mem usage=0.00 GB
+[2026-11-24 22:37:51] Load weight begin. avail mem=78.74 GB
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+Multi-thread loading shards:   0% Completed | 0/5 [00:00<?, ?it/s]Multi-thread loading shards:  20% Completed | 1/5 [00:00<00:01,  3.62it/s]Multi-thread loading shards: 100% Completed | 5/5 [00:00<00:00, 18.05it/s]
+[2026-11-24 22:39:21] Load weight end. elapsed=90.18 s, type=GptOssForCausalLM, avail mem=39.58 GB, mem usage=39.16 GB.
+[2026-11-24 22:39:21] Use sliding window memory pool. full_layer_tokens=387129, swa_layer_tokens=309703
+[2026-11-24 22:39:21] Full KV Cache is allocated. dtype: torch.bfloat16, #tokens: 387129, K size: 4.43 GB, V size: 4.43 GB
+[2026-11-24 22:39:21] SWA KV Cache is allocated. dtype: torch.bfloat16, #tokens: 309703, K size: 3.54 GB, V size: 3.54 GB
+[2026-11-24 22:39:21] SWAKVPool mem usage: 15.95 GB, swa size: 309703, full size: 387129
+[2026-11-24 22:39:21] Memory pool end. avail mem=22.57 GB
+[2026-11-24 22:39:22] Capture target prefill CUDA graph begin. backend=breakable, num_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096, 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192], avail mem=22.53 GB
+  0%|          | 0/58 [00:00<?, ?it/s]Capturing prefill shape (num_tokens=8192 avail_mem=22.53 GB):   0%|          | 0/58 [00:00<?, ?it/s]Capturing prefill shape (num_tokens=8192 avail_mem=22.53 GB):   2%|▏         | 1/58 [00:05<05:19,  5.61s/it]Capturing prefill shape (num_tokens=7680 avail_mem=20.94 GB):   2%|▏         | 1/58 [00:05<05:19,  5.61s/it]Capturing prefill shape (num_tokens=7680 avail_mem=20.94 GB):   3%|▎         | 2/58 [00:06<02:31,  2.71s/it]Capturing prefill shape (num_tokens=7168 avail_mem=20.77 GB):   3%|▎         | 2/58 [00:06<02:31,  2.71s/it]Capturing prefill shape (num_tokens=7168 avail_mem=20.77 GB):   5%|▌         | 3/58 [00:07<01:41,  1.85s/it]Capturing prefill shape (num_tokens=6656 avail_mem=20.76 GB):   5%|▌         | 3/58 [00:07<01:41,  1.85s/it]Capturing prefill shape (num_tokens=6656 avail_mem=20.76 GB):   7%|▋         | 4/58 [00:07<01:09,  1.29s/it]Capturing prefill shape (num_tokens=6144 avail_mem=20.76 GB):   7%|▋         | 4/58 [00:07<01:09,  1.29s/it]Capturing prefill shape (num_tokens=6144 avail_mem=20.76 GB):   9%|▊         | 5/58 [00:08<00:55,  1.05s/it]Capturing prefill shape (num_tokens=5632 avail_mem=20.75 GB):   9%|▊         | 5/58 [00:08<00:55,  1.05s/it]Capturing prefill shape (num_tokens=5632 avail_mem=20.75 GB):  10%|█         | 6/58 [00:08<00:43,  1.21it/s]Capturing prefill shape (num_tokens=5120 avail_mem=20.74 GB):  10%|█         | 6/58 [00:08<00:43,  1.21it/s]Capturing prefill shape (num_tokens=5120 avail_mem=20.74 GB):  12%|█▏        | 7/58 [00:09<00:35,  1.43it/s]Capturing prefill shape (num_tokens=4608 avail_mem=20.74 GB):  12%|█▏        | 7/58 [00:09<00:35,  1.43it/s]Capturing prefill shape (num_tokens=4608 avail_mem=20.74 GB):  14%|█▍        | 8/58 [00:09<00:31,  1.61it/s]Capturing prefill shape (num_tokens=4096 avail_mem=20.73 GB):  14%|█▍        | 8/58 [00:09<00:31,  1.61it/s]Capturing prefill shape (num_tokens=4096 avail_mem=20.73 GB):  16%|█▌        | 9/58 [00:09<00:25,  1.90it/s]Capturing prefill shape (num_tokens=3840 avail_mem=20.73 GB):  16%|█▌        | 9/58 [00:09<00:25,  1.90it/s]Capturing prefill shape (num_tokens=3840 avail_mem=20.73 GB):  17%|█▋        | 10/58 [00:10<00:22,  2.16it/s]Capturing prefill shape (num_tokens=3584 avail_mem=20.72 GB):  17%|█▋        | 10/58 [00:10<00:22,  2.16it/s]Capturing prefill shape (num_tokens=3584 avail_mem=20.72 GB):  19%|█▉        | 11/58 [00:10<00:19,  2.42it/s]Capturing prefill shape (num_tokens=3328 avail_mem=20.72 GB):  19%|█▉        | 11/58 [00:10<00:19,  2.42it/s]Capturing prefill shape (num_tokens=3328 avail_mem=20.72 GB):  21%|██        | 12/58 [00:10<00:17,  2.67it/s]Capturing prefill shape (num_tokens=3072 avail_mem=20.71 GB):  21%|██        | 12/58 [00:10<00:17,  2.67it/s]Capturing prefill shape (num_tokens=3072 avail_mem=20.71 GB):  22%|██▏       | 13/58 [00:10<00:15,  2.90it/s]Capturing prefill shape (num_tokens=2816 avail_mem=20.71 GB):  22%|██▏       | 13/58 [00:10<00:15,  2.90it/s]Capturing prefill shape (num_tokens=2816 avail_mem=20.71 GB):  24%|██▍       | 14/58 [00:11<00:14,  3.04it/s]Capturing prefill shape (num_tokens=2560 avail_mem=20.70 GB):  24%|██▍       | 14/58 [00:11<00:14,  3.04it/s]Capturing prefill shape (num_tokens=2560 avail_mem=20.70 GB):  26%|██▌       | 15/58 [00:11<00:13,  3.24it/s]Capturing prefill shape (num_tokens=2304 avail_mem=20.70 GB):  26%|██▌       | 15/58 [00:11<00:13,  3.24it/s]Capturing prefill shape (num_tokens=2304 avail_mem=20.70 GB):  28%|██▊       | 16/58 [00:11<00:12,  3.44it/s]Capturing prefill shape (num_tokens=2048 avail_mem=20.69 GB):  28%|██▊       | 16/58 [00:11<00:12,  3.44it/s]Capturing prefill shape (num_tokens=2048 avail_mem=20.69 GB):  29%|██▉       | 17/58 [00:12<00:11,  3.62it/s]Capturing prefill shape (num_tokens=1792 avail_mem=20.68 GB):  29%|██▉       | 17/58 [00:12<00:11,  3.62it/s]Capturing prefill shape (num_tokens=1792 avail_mem=20.68 GB):  31%|███       | 18/58 [00:12<00:10,  3.78it/s]Capturing prefill shape (num_tokens=1536 avail_mem=20.68 GB):  31%|███       | 18/58 [00:12<00:10,  3.78it/s]Capturing prefill shape (num_tokens=1536 avail_mem=20.68 GB):  33%|███▎      | 19/58 [00:12<00:10,  3.80it/s]Capturing prefill shape (num_tokens=1280 avail_mem=20.67 GB):  33%|███▎      | 19/58 [00:12<00:10,  3.80it/s]Capturing prefill shape (num_tokens=1280 avail_mem=20.67 GB):  34%|███▍      | 20/58 [00:12<00:09,  3.90it/s]Capturing prefill shape (num_tokens=1024 avail_mem=20.67 GB):  34%|███▍      | 20/58 [00:12<00:09,  3.90it/s]Capturing prefill shape (num_tokens=1024 avail_mem=20.67 GB):  36%|███▌      | 21/58 [00:12<00:09,  3.98it/s]Capturing prefill shape (num_tokens=960 avail_mem=20.66 GB):  36%|███▌      | 21/58 [00:12<00:09,  3.98it/s] Capturing prefill shape (num_tokens=960 avail_mem=20.66 GB):  38%|███▊      | 22/58 [00:13<00:08,  4.03it/s]Capturing prefill shape (num_tokens=896 avail_mem=20.65 GB):  38%|███▊      | 22/58 [00:13<00:08,  4.03it/s]Capturing prefill shape (num_tokens=896 avail_mem=20.65 GB):  40%|███▉      | 23/58 [00:13<00:08,  4.08it/s]Capturing prefill shape (num_tokens=832 avail_mem=20.65 GB):  40%|███▉      | 23/58 [00:13<00:08,  4.08it/s]Capturing prefill shape (num_tokens=832 avail_mem=20.65 GB):  41%|████▏     | 24/58 [00:13<00:08,  4.13it/s]Capturing prefill shape (num_tokens=768 avail_mem=20.64 GB):  41%|████▏     | 24/58 [00:13<00:08,  4.13it/s]Capturing prefill shape (num_tokens=768 avail_mem=20.64 GB):  43%|████▎     | 25/58 [00:13<00:07,  4.17it/s]Capturing prefill shape (num_tokens=704 avail_mem=20.64 GB):  43%|████▎     | 25/58 [00:13<00:07,  4.17it/s]Capturing prefill shape (num_tokens=704 avail_mem=20.64 GB):  45%|████▍     | 26/58 [00:14<00:07,  4.19it/s]Capturing prefill shape (num_tokens=640 avail_mem=20.63 GB):  45%|████▍     | 26/58 [00:14<00:07,  4.19it/s]Capturing prefill shape (num_tokens=640 avail_mem=20.63 GB):  47%|████▋     | 27/58 [00:14<00:07,  4.20it/s]Capturing prefill shape (num_tokens=576 avail_mem=20.62 GB):  47%|████▋     | 27/58 [00:14<00:07,  4.20it/s]Capturing prefill shape (num_tokens=576 avail_mem=20.62 GB):  48%|████▊     | 28/58 [00:14<00:07,  4.20it/s]Capturing prefill shape (num_tokens=512 avail_mem=20.62 GB):  48%|████▊     | 28/58 [00:14<00:07,  4.20it/s]Capturing prefill shape (num_tokens=512 avail_mem=20.62 GB):  50%|█████     | 29/58 [00:14<00:07,  4.08it/s]Capturing prefill shape (num_tokens=480 avail_mem=20.61 GB):  50%|█████     | 29/58 [00:14<00:07,  4.08it/s]Capturing prefill shape (num_tokens=480 avail_mem=20.61 GB):  52%|█████▏    | 30/58 [00:15<00:06,  4.09it/s]Capturing prefill shape (num_tokens=448 avail_mem=20.61 GB):  52%|█████▏    | 30/58 [00:15<00:06,  4.09it/s]Capturing prefill shape (num_tokens=448 avail_mem=20.61 GB):  53%|█████▎    | 31/58 [00:15<00:06,  4.10it/s]Capturing prefill shape (num_tokens=416 avail_mem=20.60 GB):  53%|█████▎    | 31/58 [00:15<00:06,  4.10it/s]Capturing prefill shape (num_tokens=416 avail_mem=20.60 GB):  55%|█████▌    | 32/58 [00:15<00:06,  4.11it/s]Capturing prefill shape (num_tokens=384 avail_mem=20.60 GB):  55%|█████▌    | 32/58 [00:15<00:06,  4.11it/s]Capturing prefill shape (num_tokens=384 avail_mem=20.60 GB):  57%|█████▋    | 33/58 [00:15<00:06,  4.07it/s]Capturing prefill shape (num_tokens=352 avail_mem=20.59 GB):  57%|█████▋    | 33/58 [00:15<00:06,  4.07it/s]Capturing prefill shape (num_tokens=352 avail_mem=20.59 GB):  59%|█████▊    | 34/58 [00:16<00:05,  4.07it/s]Capturing prefill shape (num_tokens=320 avail_mem=20.58 GB):  59%|█████▊    | 34/58 [00:16<00:05,  4.07it/s]Capturing prefill shape (num_tokens=320 avail_mem=20.58 GB):  60%|██████    | 35/58 [00:16<00:05,  4.04it/s]Capturing prefill shape (num_tokens=288 avail_mem=20.58 GB):  60%|██████    | 35/58 [00:16<00:05,  4.04it/s]Capturing prefill shape (num_tokens=288 avail_mem=20.58 GB):  62%|██████▏   | 36/58 [00:16<00:05,  4.05it/s]Capturing prefill shape (num_tokens=256 avail_mem=20.57 GB):  62%|██████▏   | 36/58 [00:16<00:05,  4.05it/s]Capturing prefill shape (num_tokens=256 avail_mem=20.57 GB):  64%|██████▍   | 37/58 [00:16<00:05,  4.07it/s]Capturing prefill shape (num_tokens=240 avail_mem=20.57 GB):  64%|██████▍   | 37/58 [00:16<00:05,  4.07it/s]Capturing prefill shape (num_tokens=240 avail_mem=20.57 GB):  66%|██████▌   | 38/58 [00:17<00:04,  4.15it/s]Capturing prefill shape (num_tokens=224 avail_mem=20.56 GB):  66%|██████▌   | 38/58 [00:17<00:04,  4.15it/s]Capturing prefill shape (num_tokens=224 avail_mem=20.56 GB):  67%|██████▋   | 39/58 [00:17<00:04,  4.14it/s]Capturing prefill shape (num_tokens=208 avail_mem=20.55 GB):  67%|██████▋   | 39/58 [00:17<00:04,  4.14it/s]Capturing prefill shape (num_tokens=208 avail_mem=20.55 GB):  69%|██████▉   | 40/58 [00:17<00:04,  4.18it/s]Capturing prefill shape (num_tokens=192 avail_mem=20.55 GB):  69%|██████▉   | 40/58 [00:17<00:04,  4.18it/s]Capturing prefill shape (num_tokens=192 avail_mem=20.55 GB):  71%|███████   | 41/58 [00:17<00:04,  4.18it/s]Capturing prefill shape (num_tokens=176 avail_mem=20.54 GB):  71%|███████   | 41/58 [00:17<00:04,  4.18it/s]Capturing prefill shape (num_tokens=176 avail_mem=20.54 GB):  72%|███████▏  | 42/58 [00:18<00:03,  4.24it/s]Capturing prefill shape (num_tokens=160 avail_mem=20.53 GB):  72%|███████▏  | 42/58 [00:18<00:03,  4.24it/s]Capturing prefill shape (num_tokens=160 avail_mem=20.53 GB):  74%|███████▍  | 43/58 [00:18<00:03,  4.21it/s]Capturing prefill shape (num_tokens=144 avail_mem=20.53 GB):  74%|███████▍  | 43/58 [00:18<00:03,  4.21it/s]Capturing prefill shape (num_tokens=144 avail_mem=20.53 GB):  76%|███████▌  | 44/58 [00:18<00:03,  4.25it/s]Capturing prefill shape (num_tokens=128 avail_mem=20.52 GB):  76%|███████▌  | 44/58 [00:18<00:03,  4.25it/s]Capturing prefill shape (num_tokens=128 avail_mem=20.52 GB):  78%|███████▊  | 45/58 [00:18<00:03,  4.09it/s]Capturing prefill shape (num_tokens=112 avail_mem=20.52 GB):  78%|███████▊  | 45/58 [00:18<00:03,  4.09it/s]Capturing prefill shape (num_tokens=112 avail_mem=20.52 GB):  79%|███████▉  | 46/58 [00:19<00:02,  4.16it/s]Capturing prefill shape (num_tokens=96 avail_mem=20.51 GB):  79%|███████▉  | 46/58 [00:19<00:02,  4.16it/s] Capturing prefill shape (num_tokens=96 avail_mem=20.51 GB):  81%|████████  | 47/58 [00:19<00:02,  4.14it/s]Capturing prefill shape (num_tokens=80 avail_mem=20.51 GB):  81%|████████  | 47/58 [00:19<00:02,  4.14it/s]Capturing prefill shape (num_tokens=80 avail_mem=20.51 GB):  83%|████████▎ | 48/58 [00:19<00:02,  4.19it/s]Capturing prefill shape (num_tokens=64 avail_mem=20.50 GB):  83%|████████▎ | 48/58 [00:19<00:02,  4.19it/s]Capturing prefill shape (num_tokens=64 avail_mem=20.50 GB):  84%|████████▍ | 49/58 [00:19<00:02,  4.05it/s]Capturing prefill shape (num_tokens=48 avail_mem=20.49 GB):  84%|████████▍ | 49/58 [00:19<00:02,  4.05it/s]Capturing prefill shape (num_tokens=48 avail_mem=20.49 GB):  86%|████████▌ | 50/58 [00:19<00:01,  4.15it/s]Capturing prefill shape (num_tokens=32 avail_mem=20.49 GB):  86%|████████▌ | 50/58 [00:19<00:01,  4.15it/s]Capturing prefill shape (num_tokens=32 avail_mem=20.49 GB):  88%|████████▊ | 51/58 [00:20<00:01,  4.15it/s]Capturing prefill shape (num_tokens=28 avail_mem=20.48 GB):  88%|████████▊ | 51/58 [00:20<00:01,  4.15it/s]Capturing prefill shape (num_tokens=28 avail_mem=20.48 GB):  90%|████████▉ | 52/58 [00:20<00:01,  4.13it/s]Capturing prefill shape (num_tokens=24 avail_mem=20.47 GB):  90%|████████▉ | 52/58 [00:20<00:01,  4.13it/s]Capturing prefill shape (num_tokens=24 avail_mem=20.47 GB):  91%|█████████▏| 53/58 [00:20<00:01,  4.20it/s]Capturing prefill shape (num_tokens=20 avail_mem=20.47 GB):  91%|█████████▏| 53/58 [00:20<00:01,  4.20it/s]Capturing prefill shape (num_tokens=20 avail_mem=20.47 GB):  93%|█████████▎| 54/58 [00:20<00:00,  4.26it/s]Capturing prefill shape (num_tokens=16 avail_mem=20.46 GB):  93%|█████████▎| 54/58 [00:20<00:00,  4.26it/s]Capturing prefill shape (num_tokens=16 avail_mem=20.46 GB):  95%|█████████▍| 55/58 [00:21<00:00,  3.89it/s]Capturing prefill shape (num_tokens=12 avail_mem=20.46 GB):  95%|█████████▍| 55/58 [00:21<00:00,  3.89it/s]Capturing prefill shape (num_tokens=12 avail_mem=20.46 GB):  97%|█████████▋| 56/58 [00:21<00:00,  4.02it/s]Capturing prefill shape (num_tokens=8 avail_mem=20.45 GB):  97%|█████████▋| 56/58 [00:21<00:00,  4.02it/s] Capturing prefill shape (num_tokens=8 avail_mem=20.45 GB):  98%|█████████▊| 57/58 [00:21<00:00,  3.80it/s]Capturing prefill shape (num_tokens=4 avail_mem=20.45 GB):  98%|█████████▊| 57/58 [00:21<00:00,  3.80it/s]Capturing prefill shape (num_tokens=4 avail_mem=20.45 GB): 100%|██████████| 58/58 [00:22<00:00,  3.82it/s]Capturing prefill shape (num_tokens=4 avail_mem=20.45 GB): 100%|██████████| 58/58 [00:22<00:00,  2.63it/s]
+[2026-11-24 22:39:45] Capture target prefill CUDA graph end. elapsed=23.02 s, mem usage=1.32 GB, avail mem=21.21 GB.
+[2026-11-24 22:39:45] Capture target decode CUDA graph begin. backend=full, num_tokens_per_req=1, avail mem=21.21 GB
+  0%|          | 0/36 [00:00<?, ?it/s]Capturing batches (bs=256 avail_mem=20.93 GB):   0%|          | 0/36 [00:00<?, ?it/s]Capturing batches (bs=256 avail_mem=20.93 GB):   3%|▎         | 1/36 [00:00<00:11,  3.07it/s]Capturing batches (bs=248 avail_mem=20.93 GB):   3%|▎         | 1/36 [00:00<00:11,  3.07it/s]Capturing batches (bs=248 avail_mem=20.93 GB):   6%|▌         | 2/36 [00:00<00:09,  3.52it/s]Capturing batches (bs=240 avail_mem=20.93 GB):   6%|▌         | 2/36 [00:00<00:09,  3.52it/s]Capturing batches (bs=240 avail_mem=20.93 GB):   8%|▊         | 3/36 [00:00<00:08,  3.84it/s]Capturing batches (bs=232 avail_mem=20.92 GB):   8%|▊         | 3/36 [00:00<00:08,  3.84it/s]Capturing batches (bs=232 avail_mem=20.92 GB):  11%|█         | 4/36 [00:01<00:07,  4.01it/s]Capturing batches (bs=224 avail_mem=20.92 GB):  11%|█         | 4/36 [00:01<00:07,  4.01it/s]Capturing batches (bs=224 avail_mem=20.92 GB):  14%|█▍        | 5/36 [00:01<00:07,  4.11it/s]Capturing batches (bs=216 avail_mem=20.91 GB):  14%|█▍        | 5/36 [00:01<00:07,  4.11it/s]Capturing batches (bs=216 avail_mem=20.91 GB):  17%|█▋        | 6/36 [00:01<00:07,  4.09it/s]Capturing batches (bs=208 avail_mem=20.91 GB):  17%|█▋        | 6/36 [00:01<00:07,  4.09it/s]Capturing batches (bs=208 avail_mem=20.91 GB):  19%|█▉        | 7/36 [00:01<00:06,  4.17it/s]Capturing batches (bs=200 avail_mem=20.90 GB):  19%|█▉        | 7/36 [00:01<00:06,  4.17it/s]Capturing batches (bs=200 avail_mem=20.90 GB):  22%|██▏       | 8/36 [00:01<00:06,  4.21it/s]Capturing batches (bs=192 avail_mem=20.90 GB):  22%|██▏       | 8/36 [00:01<00:06,  4.21it/s]Capturing batches (bs=192 avail_mem=20.90 GB):  25%|██▌       | 9/36 [00:02<00:06,  4.25it/s]Capturing batches (bs=184 avail_mem=20.89 GB):  25%|██▌       | 9/36 [00:02<00:06,  4.25it/s]Capturing batches (bs=184 avail_mem=20.89 GB):  28%|██▊       | 10/36 [00:02<00:06,  4.21it/s]Capturing batches (bs=176 avail_mem=20.89 GB):  28%|██▊       | 10/36 [00:02<00:06,  4.21it/s]Capturing batches (bs=176 avail_mem=20.89 GB):  31%|███       | 11/36 [00:02<00:05,  4.25it/s]Capturing batches (bs=168 avail_mem=20.89 GB):  31%|███       | 11/36 [00:02<00:05,  4.25it/s]Capturing batches (bs=168 avail_mem=20.89 GB):  33%|███▎      | 12/36 [00:02<00:05,  4.25it/s]Capturing batches (bs=160 avail_mem=20.88 GB):  33%|███▎      | 12/36 [00:02<00:05,  4.25it/s]Capturing batches (bs=160 avail_mem=20.88 GB):  36%|███▌      | 13/36 [00:03<00:05,  4.25it/s]Capturing batches (bs=152 avail_mem=20.88 GB):  36%|███▌      | 13/36 [00:03<00:05,  4.25it/s]Capturing batches (bs=152 avail_mem=20.88 GB):  39%|███▉      | 14/36 [00:03<00:05,  4.20it/s]Capturing batches (bs=144 avail_mem=20.87 GB):  39%|███▉      | 14/36 [00:03<00:05,  4.20it/s]Capturing batches (bs=144 avail_mem=20.87 GB):  42%|████▏     | 15/36 [00:03<00:04,  4.23it/s]Capturing batches (bs=136 avail_mem=20.87 GB):  42%|████▏     | 15/36 [00:03<00:04,  4.23it/s]Capturing batches (bs=136 avail_mem=20.87 GB):  44%|████▍     | 16/36 [00:03<00:04,  4.25it/s]Capturing batches (bs=128 avail_mem=20.86 GB):  44%|████▍     | 16/36 [00:03<00:04,  4.25it/s]Capturing batches (bs=128 avail_mem=20.86 GB):  47%|████▋     | 17/36 [00:04<00:04,  4.29it/s]Capturing batches (bs=120 avail_mem=20.86 GB):  47%|████▋     | 17/36 [00:04<00:04,  4.29it/s]Capturing batches (bs=120 avail_mem=20.86 GB):  50%|█████     | 18/36 [00:04<00:04,  4.23it/s]Capturing batches (bs=112 avail_mem=20.86 GB):  50%|█████     | 18/36 [00:04<00:04,  4.23it/s]Capturing batches (bs=112 avail_mem=20.86 GB):  53%|█████▎    | 19/36 [00:04<00:03,  4.25it/s]Capturing batches (bs=104 avail_mem=20.85 GB):  53%|█████▎    | 19/36 [00:04<00:03,  4.25it/s]Capturing batches (bs=104 avail_mem=20.85 GB):  56%|█████▌    | 20/36 [00:04<00:03,  4.29it/s]Capturing batches (bs=96 avail_mem=20.85 GB):  56%|█████▌    | 20/36 [00:04<00:03,  4.29it/s] Capturing batches (bs=96 avail_mem=20.85 GB):  58%|█████▊    | 21/36 [00:05<00:03,  4.29it/s]Capturing batches (bs=88 avail_mem=20.84 GB):  58%|█████▊    | 21/36 [00:05<00:03,  4.29it/s]Capturing batches (bs=88 avail_mem=20.84 GB):  61%|██████    | 22/36 [00:05<00:03,  4.21it/s]Capturing batches (bs=80 avail_mem=20.84 GB):  61%|██████    | 22/36 [00:05<00:03,  4.21it/s]Capturing batches (bs=80 avail_mem=20.84 GB):  64%|██████▍   | 23/36 [00:05<00:03,  4.24it/s]Capturing batches (bs=72 avail_mem=20.84 GB):  64%|██████▍   | 23/36 [00:05<00:03,  4.24it/s]Capturing batches (bs=72 avail_mem=20.84 GB):  67%|██████▋   | 24/36 [00:05<00:02,  4.29it/s]Capturing batches (bs=64 avail_mem=20.83 GB):  67%|██████▋   | 24/36 [00:05<00:02,  4.29it/s]Capturing batches (bs=64 avail_mem=20.83 GB):  69%|██████▉   | 25/36 [00:05<00:02,  4.29it/s]Capturing batches (bs=56 avail_mem=20.83 GB):  69%|██████▉   | 25/36 [00:05<00:02,  4.29it/s]Capturing batches (bs=56 avail_mem=20.83 GB):  72%|███████▏  | 26/36 [00:06<00:02,  4.24it/s]Capturing batches (bs=48 avail_mem=20.82 GB):  72%|███████▏  | 26/36 [00:06<00:02,  4.24it/s]Capturing batches (bs=48 avail_mem=20.82 GB):  75%|███████▌  | 27/36 [00:06<00:02,  4.31it/s]Capturing batches (bs=40 avail_mem=20.82 GB):  75%|███████▌  | 27/36 [00:06<00:02,  4.31it/s]Capturing batches (bs=40 avail_mem=20.82 GB):  78%|███████▊  | 28/36 [00:06<00:01,  4.36it/s]Capturing batches (bs=32 avail_mem=20.82 GB):  78%|███████▊  | 28/36 [00:06<00:01,  4.36it/s]Capturing batches (bs=32 avail_mem=20.82 GB):  81%|████████  | 29/36 [00:06<00:01,  4.39it/s]Capturing batches (bs=24 avail_mem=20.81 GB):  81%|████████  | 29/36 [00:06<00:01,  4.39it/s]Capturing batches (bs=24 avail_mem=20.81 GB):  83%|████████▎ | 30/36 [00:07<00:01,  4.41it/s]Capturing batches (bs=16 avail_mem=20.81 GB):  83%|████████▎ | 30/36 [00:07<00:01,  4.41it/s]Capturing batches (bs=16 avail_mem=20.81 GB):  86%|████████▌ | 31/36 [00:07<00:01,  4.41it/s]Capturing batches (bs=12 avail_mem=20.80 GB):  86%|████████▌ | 31/36 [00:07<00:01,  4.41it/s]Capturing batches (bs=12 avail_mem=20.80 GB):  89%|████████▉ | 32/36 [00:07<00:00,  4.38it/s]Capturing batches (bs=8 avail_mem=20.80 GB):  89%|████████▉ | 32/36 [00:07<00:00,  4.38it/s] Capturing batches (bs=8 avail_mem=20.80 GB):  92%|█████████▏| 33/36 [00:07<00:00,  4.29it/s]Capturing batches (bs=4 avail_mem=20.80 GB):  92%|█████████▏| 33/36 [00:07<00:00,  4.29it/s]Capturing batches (bs=4 avail_mem=20.80 GB):  94%|█████████▍| 34/36 [00:08<00:00,  4.25it/s]Capturing batches (bs=2 avail_mem=20.79 GB):  94%|█████████▍| 34/36 [00:08<00:00,  4.25it/s]Capturing batches (bs=2 avail_mem=20.79 GB):  97%|█████████▋| 35/36 [00:08<00:00,  4.05it/s]Capturing batches (bs=1 avail_mem=20.79 GB):  97%|█████████▋| 35/36 [00:08<00:00,  4.05it/s]Capturing batches (bs=1 avail_mem=20.79 GB): 100%|██████████| 36/36 [00:08<00:00,  3.84it/s]Capturing batches (bs=1 avail_mem=20.79 GB): 100%|██████████| 36/36 [00:08<00:00,  4.17it/s]
+[2026-11-24 22:39:54] Capture target decode CUDA graph end. bs=[1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256], elapsed=9.66 s, mem usage=0.43 GB, avail mem=20.78 GB.
+max_total_num_tokens=387129
+decode 1/576 sample 1/3: 32.22 ms
+decode 1/576 sample 2/3: 32.43 ms
+decode 1/576 sample 3/3: 32.32 ms
+decode 2/576 sample 1/3: 34.13 ms
+decode 2/576 sample 2/3: 34.41 ms
+decode 2/576 sample 3/3: 29.17 ms
+decode 3/576 sample 1/3: 29.95 ms
+decode 3/576 sample 2/3: 29.60 ms
+decode 3/576 sample 3/3: 29.72 ms
+decode 4/576 sample 1/3: 30.95 ms
+decode 4/576 sample 2/3: 30.78 ms
+decode 4/576 sample 3/3: 31.37 ms
+decode 5/576 sample 1/3: 31.16 ms
+decode 5/576 sample 2/3: 31.82 ms
+decode 5/576 sample 3/3: 30.88 ms
+decode 6/576 sample 1/3: 32.15 ms
+decode 6/576 sample 2/3: 32.12 ms
+decode 6/576 sample 3/3: 32.03 ms
+decode 7/576 sample 1/3: 39.10 ms
+decode 7/576 sample 2/3: 39.04 ms
+decode 7/576 sample 3/3: 38.78 ms
+decode 8/576 sample 1/3: 32.16 ms
+decode 8/576 sample 2/3: 32.40 ms
+decode 8/576 sample 3/3: 32.56 ms
+decode 9/576 sample 1/3: 32.85 ms
+decode 9/576 sample 2/3: 32.67 ms
+decode 9/576 sample 3/3: 32.87 ms
+decode 10/576 sample 1/3: 39.74 ms
+decode 10/576 sample 2/3: 39.01 ms
+decode 10/576 sample 3/3: 39.75 ms
+decode 11/576 sample 1/3: 34.38 ms
+decode 11/576 sample 2/3: 33.52 ms
+decode 11/576 sample 3/3: 33.11 ms
+decode 12/576 sample 1/3: 33.42 ms
+decode 12/576 sample 2/3: 34.08 ms
+decode 12/576 sample 3/3: 33.54 ms
+decode 13/576 sample 1/3: 40.29 ms
+decode 13/576 sample 2/3: 39.89 ms
+decode 13/576 sample 3/3: 39.83 ms
+decode 14/576 sample 1/3: 34.82 ms
+decode 14/576 sample 2/3: 35.49 ms
+decode 14/576 sample 3/3: 34.70 ms
+decode 15/576 sample 1/3: 35.81 ms
+decode 15/576 sample 2/3: 35.47 ms
+decode 15/576 sample 3/3: 36.00 ms
+decode 16/576 sample 1/3: 41.03 ms
+decode 16/576 sample 2/3: 40.92 ms
+decode 16/576 sample 3/3: 40.80 ms
+decode 17/576 sample 1/3: 22.30 ms
+decode 17/576 sample 2/3: 21.79 ms
+decode 17/576 sample 3/3: 21.75 ms
+decode 18/576 sample 1/3: 25.01 ms
+decode 18/576 sample 2/3: 24.72 ms
+decode 18/576 sample 3/3: 24.82 ms
+decode 19/576 sample 1/3: 23.16 ms
+decode 19/576 sample 2/3: 24.58 ms
+decode 19/576 sample 3/3: 23.49 ms
+decode 20/576 sample 1/3: 25.26 ms
+decode 20/576 sample 2/3: 25.14 ms
+decode 20/576 sample 3/3: 25.70 ms
+decode 21/576 sample 1/3: 25.29 ms
+decode 21/576 sample 2/3: 25.57 ms
+decode 21/576 sample 3/3: 25.27 ms
+decode 22/576 sample 1/3: 26.66 ms
+decode 22/576 sample 2/3: 26.02 ms
+decode 22/576 sample 3/3: 26.49 ms
+decode 23/576 sample 1/3: 32.69 ms
+decode 23/576 sample 2/3: 33.23 ms
+decode 23/576 sample 3/3: 32.68 ms
+decode 24/576 sample 1/3: 26.83 ms
+decode 24/576 sample 2/3: 25.91 ms
+decode 24/576 sample 3/3: 26.26 ms
+decode 25/576 sample 1/3: 27.27 ms
+decode 25/576 sample 2/3: 27.06 ms
+decode 25/576 sample 3/3: 27.26 ms
+decode 26/576 sample 1/3: 33.56 ms
+decode 26/576 sample 2/3: 33.03 ms
+decode 26/576 sample 3/3: 33.09 ms
+decode 27/576 sample 1/3: 27.13 ms
+decode 27/576 sample 2/3: 27.44 ms
+decode 27/576 sample 3/3: 27.06 ms
+decode 28/576 sample 1/3: 27.69 ms
+decode 28/576 sample 2/3: 28.17 ms
+decode 28/576 sample 3/3: 27.78 ms
+decode 29/576 sample 1/3: 34.37 ms
+decode 29/576 sample 2/3: 34.20 ms
+decode 29/576 sample 3/3: 34.02 ms
+decode 30/576 sample 1/3: 28.28 ms
+decode 30/576 sample 2/3: 28.32 ms
+decode 30/576 sample 3/3: 28.44 ms
+decode 31/576 sample 1/3: 28.54 ms
+decode 31/576 sample 2/3: 28.15 ms
+decode 31/576 sample 3/3: 28.82 ms
+decode 32/576 sample 1/3: 35.52 ms
+decode 32/576 sample 2/3: 35.31 ms
+decode 32/576 sample 3/3: 34.85 ms
+decode 33/576 sample 1/3: 24.75 ms
+decode 33/576 sample 2/3: 24.20 ms
+decode 33/576 sample 3/3: 24.43 ms
+decode 34/576 sample 1/3: 26.21 ms
+decode 34/576 sample 2/3: 26.15 ms
+decode 34/576 sample 3/3: 26.40 ms
+decode 35/576 sample 1/3: 26.84 ms
+decode 35/576 sample 2/3: 26.35 ms
+decode 35/576 sample 3/3: 26.74 ms
+decode 36/576 sample 1/3: 28.02 ms
+decode 36/576 sample 2/3: 28.08 ms
+decode 36/576 sample 3/3: 28.39 ms
+decode 37/576 sample 1/3: 28.64 ms
+decode 37/576 sample 2/3: 27.03 ms
+decode 37/576 sample 3/3: 27.14 ms
+decode 38/576 sample 1/3: 28.69 ms
+decode 38/576 sample 2/3: 28.73 ms
+decode 38/576 sample 3/3: 28.63 ms
+decode 39/576 sample 1/3: 35.18 ms
+decode 39/576 sample 2/3: 35.75 ms
+decode 39/576 sample 3/3: 34.22 ms
+decode 40/576 sample 1/3: 28.48 ms
+decode 40/576 sample 2/3: 28.66 ms
+decode 40/576 sample 3/3: 28.83 ms
+decode 41/576 sample 1/3: 29.56 ms
+decode 41/576 sample 2/3: 29.57 ms
+decode 41/576 sample 3/3: 29.02 ms
+decode 42/576 sample 1/3: 36.28 ms
+decode 42/576 sample 2/3: 35.70 ms
+decode 42/576 sample 3/3: 36.06 ms
+decode 43/576 sample 1/3: 29.45 ms
+decode 43/576 sample 2/3: 29.21 ms
+decode 43/576 sample 3/3: 29.84 ms
+decode 44/576 sample 1/3: 30.84 ms
+decode 44/576 sample 2/3: 30.43 ms
+decode 44/576 sample 3/3: 30.92 ms
+decode 45/576 sample 1/3: 36.82 ms
+decode 45/576 sample 2/3: 36.66 ms
+decode 45/576 sample 3/3: 36.89 ms
+decode 46/576 sample 1/3: 30.69 ms
+decode 46/576 sample 2/3: 31.10 ms
+decode 46/576 sample 3/3: 30.78 ms
+decode 47/576 sample 1/3: 31.64 ms
+decode 47/576 sample 2/3: 31.92 ms
+decode 47/576 sample 3/3: 31.91 ms
+decode 48/576 sample 1/3: 37.34 ms
+decode 48/576 sample 2/3: 37.38 ms
+decode 48/576 sample 3/3: 38.03 ms
+decode 49/576 sample 1/3: 22.81 ms
+decode 49/576 sample 2/3: 23.42 ms
+decode 49/576 sample 3/3: 23.17 ms
+decode 50/576 sample 1/3: 25.03 ms
+decode 50/576 sample 2/3: 25.16 ms
+decode 50/576 sample 3/3: 25.92 ms
+decode 51/576 sample 1/3: 24.40 ms
+decode 51/576 sample 2/3: 24.55 ms
+decode 51/576 sample 3/3: 24.57 ms
+decode 52/576 sample 1/3: 25.98 ms
+decode 52/576 sample 2/3: 26.02 ms
+decode 52/576 sample 3/3: 26.01 ms
+decode 53/576 sample 1/3: 25.73 ms
+decode 53/576 sample 2/3: 26.31 ms
+decode 53/576 sample 3/3: 25.67 ms
+decode 54/576 sample 1/3: 27.21 ms
+decode 54/576 sample 2/3: 27.06 ms
+decode 54/576 sample 3/3: 27.17 ms
+decode 55/576 sample 1/3: 33.29 ms
+decode 55/576 sample 2/3: 33.22 ms
+decode 55/576 sample 3/3: 33.39 ms
+decode 56/576 sample 1/3: 27.66 ms
+decode 56/576 sample 2/3: 26.84 ms
+decode 56/576 sample 3/3: 27.11 ms
+decode 57/576 sample 1/3: 28.03 ms
+decode 57/576 sample 2/3: 27.87 ms
+decode 57/576 sample 3/3: 27.95 ms
+decode 58/576 sample 1/3: 34.34 ms
+decode 58/576 sample 2/3: 34.25 ms
+decode 58/576 sample 3/3: 34.12 ms
+decode 59/576 sample 1/3: 27.81 ms
+decode 59/576 sample 2/3: 28.17 ms
+decode 59/576 sample 3/3: 27.64 ms
+decode 60/576 sample 1/3: 28.93 ms
+decode 60/576 sample 2/3: 29.01 ms
+decode 60/576 sample 3/3: 29.32 ms
+decode 61/576 sample 1/3: 35.16 ms
+decode 61/576 sample 2/3: 35.12 ms
+decode 61/576 sample 3/3: 35.29 ms
+decode 62/576 sample 1/3: 29.48 ms
+decode 62/576 sample 2/3: 29.39 ms
+decode 62/576 sample 3/3: 29.91 ms
+decode 63/576 sample 1/3: 29.92 ms
+decode 63/576 sample 2/3: 30.54 ms
+decode 63/576 sample 3/3: 30.21 ms
+decode 64/576 sample 1/3: 36.34 ms
+decode 64/576 sample 2/3: 36.68 ms
+decode 64/576 sample 3/3: 36.86 ms
+decode 65/576 sample 1/3: 25.28 ms
+decode 65/576 sample 2/3: 23.99 ms
+decode 65/576 sample 3/3: 24.47 ms
+decode 66/576 sample 1/3: 26.15 ms
+decode 66/576 sample 2/3: 25.86 ms
+decode 66/576 sample 3/3: 26.17 ms
+decode 67/576 sample 1/3: 25.07 ms
+decode 67/576 sample 2/3: 25.49 ms
+decode 67/576 sample 3/3: 25.40 ms
+decode 68/576 sample 1/3: 27.33 ms
+decode 68/576 sample 2/3: 27.00 ms
+decode 68/576 sample 3/3: 27.03 ms
+decode 69/576 sample 1/3: 26.61 ms
+decode 69/576 sample 2/3: 26.85 ms
+decode 69/576 sample 3/3: 26.85 ms
+decode 70/576 sample 1/3: 28.02 ms
+decode 70/576 sample 2/3: 28.00 ms
+decode 70/576 sample 3/3: 28.29 ms
+decode 71/576 sample 1/3: 34.27 ms
+decode 71/576 sample 2/3: 34.51 ms
+decode 71/576 sample 3/3: 33.75 ms
+decode 72/576 sample 1/3: 27.68 ms
+decode 72/576 sample 2/3: 27.73 ms
+decode 72/576 sample 3/3: 28.00 ms
+decode 73/576 sample 1/3: 29.21 ms
+decode 73/576 sample 2/3: 28.88 ms
+decode 73/576 sample 3/3: 29.17 ms
+decode 74/576 sample 1/3: 34.75 ms
+decode 74/576 sample 2/3: 34.78 ms
+decode 74/576 sample 3/3: 35.08 ms
+decode 75/576 sample 1/3: 29.45 ms
+decode 75/576 sample 2/3: 28.21 ms
+decode 75/576 sample 3/3: 28.35 ms
+decode 76/576 sample 1/3: 30.70 ms
+decode 76/576 sample 2/3: 30.76 ms
+decode 76/576 sample 3/3: 30.83 ms
+decode 77/576 sample 1/3: 36.09 ms
+decode 77/576 sample 2/3: 36.17 ms
+decode 77/576 sample 3/3: 36.22 ms
+decode 78/576 sample 1/3: 29.95 ms
+decode 78/576 sample 2/3: 29.78 ms
+decode 78/576 sample 3/3: 29.30 ms
+decode 79/576 sample 1/3: 31.72 ms
+decode 79/576 sample 2/3: 31.05 ms
+decode 79/576 sample 3/3: 30.79 ms
+decode 80/576 sample 1/3: 37.38 ms
+decode 80/576 sample 2/3: 36.67 ms
+decode 80/576 sample 3/3: 37.36 ms
+decode 81/576 sample 1/3: 26.20 ms
+decode 81/576 sample 2/3: 25.68 ms
+decode 81/576 sample 3/3: 25.64 ms
+decode 82/576 sample 1/3: 27.67 ms
+decode 82/576 sample 2/3: 27.40 ms
+decode 82/576 sample 3/3: 27.79 ms
+decode 83/576 sample 1/3: 26.61 ms
+decode 83/576 sample 2/3: 26.49 ms
+decode 83/576 sample 3/3: 26.79 ms
+decode 84/576 sample 1/3: 29.22 ms
+decode 84/576 sample 2/3: 28.94 ms
+decode 84/576 sample 3/3: 29.09 ms
+decode 85/576 sample 1/3: 27.50 ms
+decode 85/576 sample 2/3: 27.72 ms
+decode 85/576 sample 3/3: 27.75 ms
+decode 86/576 sample 1/3: 29.29 ms
+decode 86/576 sample 2/3: 29.59 ms
+decode 86/576 sample 3/3: 29.43 ms
+decode 87/576 sample 1/3: 34.87 ms
+decode 87/576 sample 2/3: 34.49 ms
+decode 87/576 sample 3/3: 34.68 ms
+decode 88/576 sample 1/3: 28.37 ms
+decode 88/576 sample 2/3: 28.23 ms
+decode 88/576 sample 3/3: 28.28 ms
+decode 89/576 sample 1/3: 30.11 ms
+decode 89/576 sample 2/3: 30.04 ms
+decode 89/576 sample 3/3: 30.05 ms
+decode 90/576 sample 1/3: 36.65 ms
+decode 90/576 sample 2/3: 37.19 ms
+decode 90/576 sample 3/3: 37.11 ms
+decode 91/576 sample 1/3: 28.78 ms
+decode 91/576 sample 2/3: 29.20 ms
+decode 91/576 sample 3/3: 29.16 ms
+decode 92/576 sample 1/3: 31.12 ms
+decode 92/576 sample 2/3: 31.34 ms
+decode 92/576 sample 3/3: 31.10 ms
+decode 93/576 sample 1/3: 38.48 ms
+decode 93/576 sample 2/3: 39.13 ms
+decode 93/576 sample 3/3: 38.28 ms
+decode 94/576 sample 1/3: 29.92 ms
+decode 94/576 sample 2/3: 29.86 ms
+decode 94/576 sample 3/3: 29.96 ms
+decode 95/576 sample 1/3: 31.51 ms
+decode 95/576 sample 2/3: 31.60 ms
+decode 95/576 sample 3/3: 31.67 ms
+decode 96/576 sample 1/3: 38.88 ms
+decode 96/576 sample 2/3: 38.66 ms
+decode 96/576 sample 3/3: 39.16 ms
+decode 97/576 sample 1/3: 26.18 ms
+decode 97/576 sample 2/3: 25.83 ms
+decode 97/576 sample 3/3: 26.30 ms
+decode 98/576 sample 1/3: 27.07 ms
+decode 98/576 sample 2/3: 26.69 ms
+decode 98/576 sample 3/3: 26.68 ms
+decode 99/576 sample 1/3: 27.95 ms
+decode 99/576 sample 2/3: 27.07 ms
+decode 99/576 sample 3/3: 26.90 ms
+decode 100/576 sample 1/3: 29.25 ms
+decode 100/576 sample 2/3: 28.86 ms
+decode 100/576 sample 3/3: 29.38 ms
+decode 101/576 sample 1/3: 28.24 ms
+decode 101/576 sample 2/3: 28.25 ms
+decode 101/576 sample 3/3: 28.14 ms
+decode 102/576 sample 1/3: 30.34 ms
+decode 102/576 sample 2/3: 30.74 ms
+decode 102/576 sample 3/3: 29.97 ms
+decode 103/576 sample 1/3: 36.17 ms
+decode 103/576 sample 2/3: 36.09 ms
+decode 103/576 sample 3/3: 36.18 ms
+decode 104/576 sample 1/3: 29.69 ms
+decode 104/576 sample 2/3: 29.19 ms
+decode 104/576 sample 3/3: 30.42 ms
+decode 105/576 sample 1/3: 30.66 ms
+decode 105/576 sample 2/3: 30.98 ms
+decode 105/576 sample 3/3: 30.56 ms
+decode 106/576 sample 1/3: 38.40 ms
+decode 106/576 sample 2/3: 37.42 ms
+decode 106/576 sample 3/3: 37.43 ms
+decode 107/576 sample 1/3: 30.84 ms
+decode 107/576 sample 2/3: 30.68 ms
+decode 107/576 sample 3/3: 30.17 ms
+decode 108/576 sample 1/3: 31.56 ms
+decode 108/576 sample 2/3: 32.22 ms
+decode 108/576 sample 3/3: 31.81 ms
+decode 109/576 sample 1/3: 37.99 ms
+decode 109/576 sample 2/3: 38.06 ms
+decode 109/576 sample 3/3: 38.23 ms
+decode 110/576 sample 1/3: 30.89 ms
+decode 110/576 sample 2/3: 31.17 ms
+decode 110/576 sample 3/3: 30.97 ms
+decode 111/576 sample 1/3: 32.49 ms
+decode 111/576 sample 2/3: 32.55 ms
+decode 111/576 sample 3/3: 32.71 ms
+decode 112/576 sample 1/3: 39.74 ms
+decode 112/576 sample 2/3: 39.34 ms
+decode 112/576 sample 3/3: 39.02 ms
+decode 113/576 sample 1/3: 87.18 ms
+decode 113/576 sample 2/3: 84.88 ms
+decode 113/576 sample 3/3: 83.40 ms
+decode 114/576 sample 1/3: 82.32 ms
+decode 114/576 sample 2/3: 80.54 ms
+decode 114/576 sample 3/3: 79.88 ms
+decode 115/576 sample 1/3: 85.66 ms
+decode 115/576 sample 2/3: 84.54 ms
+decode 115/576 sample 3/3: 85.31 ms
+decode 116/576 sample 1/3: 90.42 ms
+decode 116/576 sample 2/3: 88.97 ms
+decode 116/576 sample 3/3: 88.67 ms
+decode 117/576 sample 1/3: 83.04 ms
+decode 117/576 sample 2/3: 82.21 ms
+decode 117/576 sample 3/3: 81.51 ms
+decode 118/576 sample 1/3: 81.02 ms
+decode 118/576 sample 2/3: 79.40 ms
+decode 118/576 sample 3/3: 86.35 ms
+decode 119/576 sample 1/3: 85.03 ms
+decode 119/576 sample 2/3: 86.11 ms
+decode 119/576 sample 3/3: 85.94 ms
+decode 120/576 sample 1/3: 85.77 ms
+decode 120/576 sample 2/3: 88.83 ms
+decode 120/576 sample 3/3: 85.85 ms
+decode 121/576 sample 1/3: 84.38 ms
+decode 121/576 sample 2/3: 85.07 ms
+decode 121/576 sample 3/3: 83.55 ms
+decode 122/576 sample 1/3: 84.09 ms
+decode 122/576 sample 2/3: 84.44 ms
+decode 122/576 sample 3/3: 83.10 ms
+decode 123/576 sample 1/3: 80.46 ms
+decode 123/576 sample 2/3: 84.63 ms
+decode 123/576 sample 3/3: 83.65 ms
+decode 124/576 sample 1/3: 86.40 ms
+decode 124/576 sample 2/3: 83.67 ms
+decode 124/576 sample 3/3: 83.67 ms
+decode 125/576 sample 1/3: 83.83 ms
+decode 125/576 sample 2/3: 85.00 ms
+decode 125/576 sample 3/3: 85.93 ms
+decode 126/576 sample 1/3: 83.65 ms
+decode 126/576 sample 2/3: 85.07 ms
+decode 126/576 sample 3/3: 84.00 ms
+decode 127/576 sample 1/3: 83.81 ms
+decode 127/576 sample 2/3: 81.76 ms
+decode 127/576 sample 3/3: 83.22 ms
+decode 128/576 sample 1/3: 86.23 ms
+decode 128/576 sample 2/3: 87.86 ms
+decode 128/576 sample 3/3: 86.87 ms
+decode 129/576 sample 1/3: 91.15 ms
+decode 129/576 sample 2/3: 88.86 ms
+decode 129/576 sample 3/3: 89.92 ms
+decode 130/576 sample 1/3: 88.69 ms
+decode 130/576 sample 2/3: 87.74 ms
+decode 130/576 sample 3/3: 88.00 ms
+decode 131/576 sample 1/3: 85.61 ms
+decode 131/576 sample 2/3: 84.88 ms
+decode 131/576 sample 3/3: 83.57 ms
+decode 132/576 sample 1/3: 80.24 ms
+decode 132/576 sample 2/3: 81.45 ms
+decode 132/576 sample 3/3: 83.96 ms
+decode 133/576 sample 1/3: 86.60 ms
+decode 133/576 sample 2/3: 90.29 ms
+decode 133/576 sample 3/3: 89.24 ms
+decode 134/576 sample 1/3: 88.12 ms
+decode 134/576 sample 2/3: 89.94 ms
+decode 134/576 sample 3/3: 88.04 ms
+decode 135/576 sample 1/3: 83.18 ms
+decode 135/576 sample 2/3: 84.59 ms
+decode 135/576 sample 3/3: 85.07 ms
+decode 136/576 sample 1/3: 82.83 ms
+decode 136/576 sample 2/3: 82.80 ms
+decode 136/576 sample 3/3: 82.84 ms
+decode 137/576 sample 1/3: 80.88 ms
+decode 137/576 sample 2/3: 80.44 ms
+decode 137/576 sample 3/3: 81.35 ms
+decode 138/576 sample 1/3: 82.93 ms
+decode 138/576 sample 2/3: 82.57 ms
+decode 138/576 sample 3/3: 82.78 ms
+decode 139/576 sample 1/3: 83.66 ms
+decode 139/576 sample 2/3: 83.36 ms
+decode 139/576 sample 3/3: 82.86 ms
+decode 140/576 sample 1/3: 82.20 ms
+decode 140/576 sample 2/3: 85.17 ms
+decode 140/576 sample 3/3: 86.52 ms
+decode 141/576 sample 1/3: 89.35 ms
+decode 141/576 sample 2/3: 88.79 ms
+decode 141/576 sample 3/3: 85.29 ms
+decode 142/576 sample 1/3: 84.01 ms
+decode 142/576 sample 2/3: 84.19 ms
+decode 142/576 sample 3/3: 83.30 ms
+decode 143/576 sample 1/3: 86.40 ms
+decode 143/576 sample 2/3: 84.98 ms
+decode 143/576 sample 3/3: 83.12 ms
+decode 144/576 sample 1/3: 82.77 ms
+decode 144/576 sample 2/3: 79.18 ms
+decode 144/576 sample 3/3: 80.43 ms
+decode 145/576 sample 1/3: 86.35 ms
+decode 145/576 sample 2/3: 86.27 ms
+decode 145/576 sample 3/3: 88.37 ms
+decode 146/576 sample 1/3: 90.44 ms
+decode 146/576 sample 2/3: 86.82 ms
+decode 146/576 sample 3/3: 86.13 ms
+decode 147/576 sample 1/3: 85.34 ms
+decode 147/576 sample 2/3: 87.08 ms
+decode 147/576 sample 3/3: 85.73 ms
+decode 148/576 sample 1/3: 83.73 ms
+decode 148/576 sample 2/3: 84.07 ms
+decode 148/576 sample 3/3: 84.06 ms
+decode 149/576 sample 1/3: 82.57 ms
+decode 149/576 sample 2/3: 81.13 ms
+decode 149/576 sample 3/3: 84.42 ms
+decode 150/576 sample 1/3: 85.63 ms
+decode 150/576 sample 2/3: 86.88 ms
+decode 150/576 sample 3/3: 86.55 ms
+decode 151/576 sample 1/3: 87.87 ms
+decode 151/576 sample 2/3: 85.85 ms
+decode 151/576 sample 3/3: 88.71 ms
+decode 152/576 sample 1/3: 84.13 ms
+decode 152/576 sample 2/3: 83.25 ms
+decode 152/576 sample 3/3: 84.67 ms
+decode 153/576 sample 1/3: 82.94 ms
+decode 153/576 sample 2/3: 82.40 ms
+decode 153/576 sample 3/3: 83.43 ms
+decode 154/576 sample 1/3: 79.90 ms
+decode 154/576 sample 2/3: 82.37 ms
+decode 154/576 sample 3/3: 82.53 ms
+decode 155/576 sample 1/3: 82.24 ms
+decode 155/576 sample 2/3: 83.75 ms
+decode 155/576 sample 3/3: 84.79 ms
+decode 156/576 sample 1/3: 84.69 ms
+decode 156/576 sample 2/3: 82.91 ms
+decode 156/576 sample 3/3: 83.85 ms
+decode 157/576 sample 1/3: 81.20 ms
+decode 157/576 sample 2/3: 81.77 ms
+decode 157/576 sample 3/3: 82.64 ms
+decode 158/576 sample 1/3: 83.73 ms
+decode 158/576 sample 2/3: 83.23 ms
+decode 158/576 sample 3/3: 82.92 ms
+decode 159/576 sample 1/3: 84.82 ms
+decode 159/576 sample 2/3: 84.26 ms
+decode 159/576 sample 3/3: 84.58 ms
+decode 160/576 sample 1/3: 84.21 ms
+decode 160/576 sample 2/3: 85.36 ms
+decode 160/576 sample 3/3: 85.05 ms
+decode 161/576 sample 1/3: 83.48 ms
+decode 161/576 sample 2/3: 80.58 ms
+decode 161/576 sample 3/3: 79.86 ms
+decode 162/576 sample 1/3: 86.41 ms
+decode 162/576 sample 2/3: 85.07 ms
+decode 162/576 sample 3/3: 84.57 ms
+decode 163/576 sample 1/3: 84.71 ms
+decode 163/576 sample 2/3: 83.32 ms
+decode 163/576 sample 3/3: 83.57 ms
+decode 164/576 sample 1/3: 86.40 ms
+decode 164/576 sample 2/3: 88.57 ms
+decode 164/576 sample 3/3: 85.25 ms
+decode 165/576 sample 1/3: 85.44 ms
+decode 165/576 sample 2/3: 86.77 ms
+decode 165/576 sample 3/3: 84.82 ms
+decode 166/576 sample 1/3: 81.95 ms
+decode 166/576 sample 2/3: 87.35 ms
+decode 166/576 sample 3/3: 86.14 ms
+decode 167/576 sample 1/3: 87.40 ms
+decode 167/576 sample 2/3: 85.61 ms
+decode 167/576 sample 3/3: 89.28 ms
+decode 168/576 sample 1/3: 86.26 ms
+decode 168/576 sample 2/3: 85.07 ms
+decode 168/576 sample 3/3: 86.83 ms
+decode 169/576 sample 1/3: 84.70 ms
+decode 169/576 sample 2/3: 81.17 ms
+decode 169/576 sample 3/3: 84.20 ms
+decode 170/576 sample 1/3: 91.54 ms
+decode 170/576 sample 2/3: 90.45 ms
+decode 170/576 sample 3/3: 86.80 ms
+decode 171/576 sample 1/3: 85.40 ms
+decode 171/576 sample 2/3: 84.94 ms
+decode 171/576 sample 3/3: 83.92 ms
+decode 172/576 sample 1/3: 84.29 ms
+decode 172/576 sample 2/3: 84.81 ms
+decode 172/576 sample 3/3: 83.05 ms
+decode 173/576 sample 1/3: 82.92 ms
+decode 173/576 sample 2/3: 80.68 ms
+decode 173/576 sample 3/3: 79.64 ms
+decode 174/576 sample 1/3: 86.37 ms
+decode 174/576 sample 2/3: 84.80 ms
+decode 174/576 sample 3/3: 85.95 ms
+decode 175/576 sample 1/3: 84.37 ms
+decode 175/576 sample 2/3: 84.29 ms
+decode 175/576 sample 3/3: 86.48 ms
+decode 176/576 sample 1/3: 84.27 ms
+decode 176/576 sample 2/3: 83.10 ms
+decode 176/576 sample 3/3: 86.36 ms
+decode 177/576 sample 1/3: 34.01 ms
+decode 177/576 sample 2/3: 34.79 ms
+decode 177/576 sample 3/3: 32.15 ms
+decode 178/576 sample 1/3: 78.58 ms
+decode 178/576 sample 2/3: 82.03 ms
+decode 178/576 sample 3/3: 84.38 ms
+decode 179/576 sample 1/3: 24.05 ms
+decode 179/576 sample 2/3: 23.70 ms
+decode 179/576 sample 3/3: 24.37 ms
+decode 180/576 sample 1/3: 85.01 ms
+decode 180/576 sample 2/3: 84.88 ms
+decode 180/576 sample 3/3: 83.90 ms
+decode 181/576 sample 1/3: 26.03 ms
+decode 181/576 sample 2/3: 25.53 ms
+decode 181/576 sample 3/3: 25.41 ms
+decode 182/576 sample 1/3: 26.56 ms
+decode 182/576 sample 2/3: 27.30 ms
+decode 182/576 sample 3/3: 27.46 ms
+decode 183/576 sample 1/3: 33.93 ms
+decode 183/576 sample 2/3: 34.00 ms
+decode 183/576 sample 3/3: 34.22 ms
+decode 184/576 sample 1/3: 32.90 ms
+decode 184/576 sample 2/3: 32.70 ms
+decode 184/576 sample 3/3: 32.46 ms
+decode 185/576 sample 1/3: 25.63 ms
+decode 185/576 sample 2/3: 25.54 ms
+decode 185/576 sample 3/3: 25.22 ms
+decode 186/576 sample 1/3: 24.60 ms
+decode 186/576 sample 2/3: 24.27 ms
+decode 186/576 sample 3/3: 24.31 ms
+decode 187/576 sample 1/3: 25.37 ms
+decode 187/576 sample 2/3: 26.44 ms
+decode 187/576 sample 3/3: 26.56 ms
+decode 188/576 sample 1/3: 26.23 ms
+decode 188/576 sample 2/3: 25.84 ms
+decode 188/576 sample 3/3: 25.64 ms
+decode 189/576 sample 1/3: 81.68 ms
+decode 189/576 sample 2/3: 81.13 ms
+decode 189/576 sample 3/3: 80.56 ms
+decode 190/576 sample 1/3: 84.56 ms
+decode 190/576 sample 2/3: 84.28 ms
+decode 190/576 sample 3/3: 86.04 ms
+decode 191/576 sample 1/3: 24.84 ms
+decode 191/576 sample 2/3: 24.50 ms
+decode 191/576 sample 3/3: 24.43 ms
+decode 192/576 sample 1/3: 27.78 ms
+decode 192/576 sample 2/3: 27.62 ms
+decode 192/576 sample 3/3: 28.54 ms
+decode 193/576 sample 1/3: 34.53 ms
+decode 193/576 sample 2/3: 34.82 ms
+decode 193/576 sample 3/3: 34.14 ms
+decode 194/576 sample 1/3: 25.68 ms
+decode 194/576 sample 2/3: 26.03 ms
+decode 194/576 sample 3/3: 25.32 ms
+decode 195/576 sample 1/3: 84.63 ms
+decode 195/576 sample 2/3: 82.96 ms
+decode 195/576 sample 3/3: 92.29 ms
+decode 196/576 sample 1/3: 24.23 ms
+decode 196/576 sample 2/3: 24.25 ms
+decode 196/576 sample 3/3: 24.66 ms
+decode 197/576 sample 1/3: 85.12 ms
+decode 197/576 sample 2/3: 85.70 ms
+decode 197/576 sample 3/3: 84.57 ms
+decode 198/576 sample 1/3: 23.19 ms
+decode 198/576 sample 2/3: 23.07 ms
+decode 198/576 sample 3/3: 23.14 ms
+decode 199/576 sample 1/3: 26.75 ms
+decode 199/576 sample 2/3: 26.75 ms
+decode 199/576 sample 3/3: 26.54 ms
+decode 200/576 sample 1/3: 84.61 ms
+decode 200/576 sample 2/3: 82.56 ms
+decode 200/576 sample 3/3: 82.38 ms
+decode 201/576 sample 1/3: 27.87 ms
+decode 201/576 sample 2/3: 27.69 ms
+decode 201/576 sample 3/3: 27.42 ms
+decode 202/576 sample 1/3: 31.45 ms
+decode 202/576 sample 2/3: 31.85 ms
+decode 202/576 sample 3/3: 31.34 ms
+decode 203/576 sample 1/3: 29.35 ms
+decode 203/576 sample 2/3: 28.62 ms
+decode 203/576 sample 3/3: 28.93 ms
+decode 204/576 sample 1/3: 29.31 ms
+decode 204/576 sample 2/3: 29.11 ms
+decode 204/576 sample 3/3: 28.94 ms
+decode 205/576 sample 1/3: 35.29 ms
+decode 205/576 sample 2/3: 34.46 ms
+decode 205/576 sample 3/3: 35.63 ms
+decode 206/576 sample 1/3: 84.82 ms
+decode 206/576 sample 2/3: 84.74 ms
+decode 206/576 sample 3/3: 85.96 ms
+decode 207/576 sample 1/3: 31.72 ms
+decode 207/576 sample 2/3: 32.02 ms
+decode 207/576 sample 3/3: 32.09 ms
+decode 208/576 sample 1/3: 26.29 ms
+decode 208/576 sample 2/3: 26.52 ms
+decode 208/576 sample 3/3: 26.05 ms
+decode 209/576 sample 1/3: 32.37 ms
+decode 209/576 sample 2/3: 32.14 ms
+decode 209/576 sample 3/3: 32.20 ms
+decode 210/576 sample 1/3: 27.83 ms
+decode 210/576 sample 2/3: 28.06 ms
+decode 210/576 sample 3/3: 28.34 ms
+decode 211/576 sample 1/3: 26.96 ms
+decode 211/576 sample 2/3: 27.39 ms
+decode 211/576 sample 3/3: 28.44 ms
+decode 212/576 sample 1/3: 27.58 ms
+decode 212/576 sample 2/3: 28.10 ms
+decode 212/576 sample 3/3: 27.11 ms
+decode 213/576 sample 1/3: 83.08 ms
+decode 213/576 sample 2/3: 82.00 ms
+decode 213/576 sample 3/3: 81.78 ms
+decode 214/576 sample 1/3: 23.33 ms
+decode 214/576 sample 2/3: 23.21 ms
+decode 214/576 sample 3/3: 22.81 ms
+decode 215/576 sample 1/3: 29.73 ms
+decode 215/576 sample 2/3: 29.65 ms
+decode 215/576 sample 3/3: 29.68 ms
+decode 216/576 sample 1/3: 30.54 ms
+decode 216/576 sample 2/3: 30.46 ms
+decode 216/576 sample 3/3: 30.72 ms
+decode 217/576 sample 1/3: 27.30 ms
+decode 217/576 sample 2/3: 27.47 ms
+decode 217/576 sample 3/3: 27.29 ms
+decode 218/576 sample 1/3: 29.81 ms
+decode 218/576 sample 2/3: 29.56 ms
+decode 218/576 sample 3/3: 31.34 ms
+decode 219/576 sample 1/3: 31.12 ms
+decode 219/576 sample 2/3: 32.14 ms
+decode 219/576 sample 3/3: 32.18 ms
+decode 220/576 sample 1/3: 84.65 ms
+decode 220/576 sample 2/3: 86.43 ms
+decode 220/576 sample 3/3: 88.03 ms
+decode 221/576 sample 1/3: 35.84 ms
+decode 221/576 sample 2/3: 35.19 ms
+decode 221/576 sample 3/3: 35.55 ms
+decode 222/576 sample 1/3: 24.82 ms
+decode 222/576 sample 2/3: 25.25 ms
+decode 222/576 sample 3/3: 25.11 ms
+decode 223/576 sample 1/3: 87.82 ms
+decode 223/576 sample 2/3: 83.51 ms
+decode 223/576 sample 3/3: 87.35 ms
+decode 224/576 sample 1/3: 28.45 ms
+decode 224/576 sample 2/3: 29.11 ms
+decode 224/576 sample 3/3: 29.15 ms
+decode 225/576 sample 1/3: 30.33 ms
+decode 225/576 sample 2/3: 29.21 ms
+decode 225/576 sample 3/3: 29.62 ms
+decode 226/576 sample 1/3: 33.58 ms
+decode 226/576 sample 2/3: 34.82 ms
+decode 226/576 sample 3/3: 34.24 ms
+decode 227/576 sample 1/3: 31.11 ms
+decode 227/576 sample 2/3: 31.01 ms
+decode 227/576 sample 3/3: 30.40 ms
+decode 228/576 sample 1/3: 86.47 ms
+decode 228/576 sample 2/3: 86.54 ms
+decode 228/576 sample 3/3: 87.15 ms
+decode 229/576 sample 1/3: 26.20 ms
+decode 229/576 sample 2/3: 27.17 ms
+decode 229/576 sample 3/3: 26.60 ms
+decode 230/576 sample 1/3: 29.55 ms
+decode 230/576 sample 2/3: 29.26 ms
+decode 230/576 sample 3/3: 29.68 ms
+decode 231/576 sample 1/3: 31.26 ms
+decode 231/576 sample 2/3: 30.52 ms
+decode 231/576 sample 3/3: 30.88 ms
+decode 232/576 sample 1/3: 32.68 ms
+decode 232/576 sample 2/3: 32.02 ms
+decode 232/576 sample 3/3: 32.91 ms
+decode 233/576 sample 1/3: 27.33 ms
+decode 233/576 sample 2/3: 26.68 ms
+decode 233/576 sample 3/3: 27.77 ms
+decode 234/576 sample 1/3: 78.36 ms
+decode 234/576 sample 2/3: 79.87 ms
+decode 234/576 sample 3/3: 85.08 ms
+decode 235/576 sample 1/3: 84.19 ms
+decode 235/576 sample 2/3: 84.53 ms
+decode 235/576 sample 3/3: 84.31 ms
+decode 236/576 sample 1/3: 84.45 ms
+decode 236/576 sample 2/3: 83.41 ms
+decode 236/576 sample 3/3: 83.56 ms
+decode 237/576 sample 1/3: 25.93 ms
+decode 237/576 sample 2/3: 25.55 ms
+decode 237/576 sample 3/3: 26.27 ms
+decode 238/576 sample 1/3: 28.79 ms
+decode 238/576 sample 2/3: 29.23 ms
+decode 238/576 sample 3/3: 28.09 ms
+decode 239/576 sample 1/3: 26.80 ms
+decode 239/576 sample 2/3: 26.38 ms
+decode 239/576 sample 3/3: 26.95 ms
+decode 240/576 sample 1/3: 82.41 ms
+decode 240/576 sample 2/3: 81.90 ms
+decode 240/576 sample 3/3: 79.07 ms
+decode 241/576 sample 1/3: 25.03 ms
+decode 241/576 sample 2/3: 24.72 ms
+decode 241/576 sample 3/3: 24.65 ms
+decode 242/576 sample 1/3: 25.06 ms
+decode 242/576 sample 2/3: 25.78 ms
+decode 242/576 sample 3/3: 25.42 ms
+decode 243/576 sample 1/3: 34.02 ms
+decode 243/576 sample 2/3: 33.95 ms
+decode 243/576 sample 3/3: 33.11 ms
+decode 244/576 sample 1/3: 26.34 ms
+decode 244/576 sample 2/3: 26.14 ms
+decode 244/576 sample 3/3: 25.50 ms
+decode 245/576 sample 1/3: 85.02 ms
+decode 245/576 sample 2/3: 84.25 ms
+decode 245/576 sample 3/3: 84.61 ms
+decode 246/576 sample 1/3: 26.78 ms
+decode 246/576 sample 2/3: 26.45 ms
+decode 246/576 sample 3/3: 27.04 ms
+decode 247/576 sample 1/3: 24.39 ms
+decode 247/576 sample 2/3: 24.78 ms
+decode 247/576 sample 3/3: 24.13 ms
+decode 248/576 sample 1/3: 27.82 ms
+decode 248/576 sample 2/3: 27.46 ms
+decode 248/576 sample 3/3: 27.43 ms
+decode 249/576 sample 1/3: 31.80 ms
+decode 249/576 sample 2/3: 31.43 ms
+decode 249/576 sample 3/3: 31.28 ms
+decode 250/576 sample 1/3: 25.23 ms
+decode 250/576 sample 2/3: 24.90 ms
+decode 250/576 sample 3/3: 24.12 ms
+decode 251/576 sample 1/3: 28.64 ms
+decode 251/576 sample 2/3: 28.49 ms
+decode 251/576 sample 3/3: 28.93 ms
+decode 252/576 sample 1/3: 87.42 ms
+decode 252/576 sample 2/3: 88.21 ms
+decode 252/576 sample 3/3: 88.18 ms
+decode 253/576 sample 1/3: 24.14 ms
+decode 253/576 sample 2/3: 23.73 ms
+decode 253/576 sample 3/3: 23.82 ms
+decode 254/576 sample 1/3: 24.59 ms
+decode 254/576 sample 2/3: 24.82 ms
+decode 254/576 sample 3/3: 24.21 ms
+decode 255/576 sample 1/3: 32.79 ms
+decode 255/576 sample 2/3: 31.90 ms
+decode 255/576 sample 3/3: 32.05 ms
+decode 256/576 sample 1/3: 29.66 ms
+decode 256/576 sample 2/3: 29.96 ms
+decode 256/576 sample 3/3: 29.08 ms
+decode 257/576 sample 1/3: 31.88 ms
+decode 257/576 sample 2/3: 31.26 ms
+decode 257/576 sample 3/3: 31.45 ms
+decode 258/576 sample 1/3: 28.76 ms
+decode 258/576 sample 2/3: 28.12 ms
+decode 258/576 sample 3/3: 28.38 ms
+decode 259/576 sample 1/3: 29.26 ms
+decode 259/576 sample 2/3: 27.95 ms
+decode 259/576 sample 3/3: 27.63 ms
+decode 260/576 sample 1/3: 28.52 ms
+decode 260/576 sample 2/3: 28.07 ms
+decode 260/576 sample 3/3: 28.22 ms
+decode 261/576 sample 1/3: 28.99 ms
+decode 261/576 sample 2/3: 29.23 ms
+decode 261/576 sample 3/3: 28.87 ms
+decode 262/576 sample 1/3: 28.49 ms
+decode 262/576 sample 2/3: 28.87 ms
+decode 262/576 sample 3/3: 28.56 ms
+decode 263/576 sample 1/3: 31.15 ms
+decode 263/576 sample 2/3: 30.20 ms
+decode 263/576 sample 3/3: 31.17 ms
+decode 264/576 sample 1/3: 28.61 ms
+decode 264/576 sample 2/3: 28.19 ms
+decode 264/576 sample 3/3: 28.31 ms
+decode 265/576 sample 1/3: 27.64 ms
+decode 265/576 sample 2/3: 27.42 ms
+decode 265/576 sample 3/3: 27.96 ms
+decode 266/576 sample 1/3: 29.59 ms
+decode 266/576 sample 2/3: 30.07 ms
+decode 266/576 sample 3/3: 28.68 ms
+decode 267/576 sample 1/3: 26.84 ms
+decode 267/576 sample 2/3: 26.40 ms
+decode 267/576 sample 3/3: 26.35 ms
+decode 268/576 sample 1/3: 29.55 ms
+decode 268/576 sample 2/3: 29.02 ms
+decode 268/576 sample 3/3: 29.77 ms
+decode 269/576 sample 1/3: 24.76 ms
+decode 269/576 sample 2/3: 25.01 ms
+decode 269/576 sample 3/3: 25.02 ms
+decode 270/576 sample 1/3: 30.52 ms
+decode 270/576 sample 2/3: 30.44 ms
+decode 270/576 sample 3/3: 29.99 ms
+decode 271/576 sample 1/3: 30.11 ms
+decode 271/576 sample 2/3: 29.68 ms
+decode 271/576 sample 3/3: 30.00 ms
+decode 272/576 sample 1/3: 24.61 ms
+decode 272/576 sample 2/3: 25.76 ms
+decode 272/576 sample 3/3: 25.16 ms
+decode 273/576 sample 1/3: 86.90 ms
+decode 273/576 sample 2/3: 84.54 ms
+decode 273/576 sample 3/3: 89.17 ms
+decode 274/576 sample 1/3: 87.94 ms
+decode 274/576 sample 2/3: 85.15 ms
+decode 274/576 sample 3/3: 85.30 ms
+decode 275/576 sample 1/3: 26.16 ms
+decode 275/576 sample 2/3: 25.59 ms
+decode 275/576 sample 3/3: 26.02 ms
+decode 276/576 sample 1/3: 29.91 ms
+decode 276/576 sample 2/3: 29.64 ms
+decode 276/576 sample 3/3: 30.20 ms
+decode 277/576 sample 1/3: 28.85 ms
+decode 277/576 sample 2/3: 29.54 ms
+decode 277/576 sample 3/3: 27.88 ms
+decode 278/576 sample 1/3: 25.30 ms
+decode 278/576 sample 2/3: 25.42 ms
+decode 278/576 sample 3/3: 25.82 ms
+decode 279/576 sample 1/3: 89.62 ms
+decode 279/576 sample 2/3: 87.60 ms
+decode 279/576 sample 3/3: 88.05 ms
+decode 280/576 sample 1/3: 89.55 ms
+decode 280/576 sample 2/3: 88.44 ms
+decode 280/576 sample 3/3: 88.91 ms
+decode 281/576 sample 1/3: 32.30 ms
+decode 281/576 sample 2/3: 31.47 ms
+decode 281/576 sample 3/3: 31.90 ms
+decode 282/576 sample 1/3: 26.76 ms
+decode 282/576 sample 2/3: 27.95 ms
+decode 282/576 sample 3/3: 26.69 ms
+decode 283/576 sample 1/3: 31.22 ms
+decode 283/576 sample 2/3: 30.78 ms
+decode 283/576 sample 3/3: 30.56 ms
+decode 284/576 sample 1/3: 30.40 ms
+decode 284/576 sample 2/3: 30.13 ms
+decode 284/576 sample 3/3: 30.48 ms
+decode 285/576 sample 1/3: 30.58 ms
+decode 285/576 sample 2/3: 30.00 ms
+decode 285/576 sample 3/3: 30.70 ms
+decode 286/576 sample 1/3: 32.52 ms
+decode 286/576 sample 2/3: 32.36 ms
+decode 286/576 sample 3/3: 31.55 ms
+decode 287/576 sample 1/3: 90.77 ms
+decode 287/576 sample 2/3: 89.73 ms
+decode 287/576 sample 3/3: 89.59 ms
+decode 288/576 sample 1/3: 23.81 ms
+decode 288/576 sample 2/3: 25.58 ms
+decode 288/576 sample 3/3: 24.99 ms
+decode 289/576 sample 1/3: 34.21 ms
+decode 289/576 sample 2/3: 33.85 ms
+decode 289/576 sample 3/3: 32.66 ms
+decode 290/576 sample 1/3: 27.48 ms
+decode 290/576 sample 2/3: 27.47 ms
+decode 290/576 sample 3/3: 27.72 ms
+decode 291/576 sample 1/3: 30.26 ms
+decode 291/576 sample 2/3: 30.09 ms
+decode 291/576 sample 3/3: 30.28 ms
+decode 292/576 sample 1/3: 24.31 ms
+decode 292/576 sample 2/3: 23.79 ms
+decode 292/576 sample 3/3: 23.92 ms
+decode 293/576 sample 1/3: 87.86 ms
+decode 293/576 sample 2/3: 88.44 ms
+decode 293/576 sample 3/3: 89.91 ms
+decode 294/576 sample 1/3: 88.55 ms
+decode 294/576 sample 2/3: 91.13 ms
+decode 294/576 sample 3/3: 91.13 ms
+decode 295/576 sample 1/3: 30.49 ms
+decode 295/576 sample 2/3: 30.68 ms
+decode 295/576 sample 3/3: 30.67 ms
+decode 296/576 sample 1/3: 31.34 ms
+decode 296/576 sample 2/3: 30.77 ms
+decode 296/576 sample 3/3: 30.63 ms
+decode 297/576 sample 1/3: 29.80 ms
+decode 297/576 sample 2/3: 29.54 ms
+decode 297/576 sample 3/3: 30.04 ms
+decode 298/576 sample 1/3: 29.57 ms
+decode 298/576 sample 2/3: 30.17 ms
+decode 298/576 sample 3/3: 28.87 ms
+decode 299/576 sample 1/3: 28.64 ms
+decode 299/576 sample 2/3: 28.31 ms
+decode 299/576 sample 3/3: 28.06 ms
+decode 300/576 sample 1/3: 30.30 ms
+decode 300/576 sample 2/3: 31.03 ms
+decode 300/576 sample 3/3: 30.96 ms
+decode 301/576 sample 1/3: 91.25 ms
+decode 301/576 sample 2/3: 89.63 ms
+decode 301/576 sample 3/3: 91.98 ms
+decode 302/576 sample 1/3: 30.74 ms
+decode 302/576 sample 2/3: 31.04 ms
+decode 302/576 sample 3/3: 30.76 ms
+decode 303/576 sample 1/3: 88.80 ms
+decode 303/576 sample 2/3: 88.13 ms
+decode 303/576 sample 3/3: 88.39 ms
+decode 304/576 sample 1/3: 25.94 ms
+decode 304/576 sample 2/3: 26.16 ms
+decode 304/576 sample 3/3: 25.80 ms
+decode 305/576 sample 1/3: 30.15 ms
+decode 305/576 sample 2/3: 30.27 ms
+decode 305/576 sample 3/3: 30.14 ms
+decode 306/576 sample 1/3: 88.10 ms
+decode 306/576 sample 2/3: 86.34 ms
+decode 306/576 sample 3/3: 82.79 ms
+decode 307/576 sample 1/3: 91.55 ms
+decode 307/576 sample 2/3: 89.96 ms
+decode 307/576 sample 3/3: 90.32 ms
+decode 308/576 sample 1/3: 89.21 ms
+decode 308/576 sample 2/3: 89.74 ms
+decode 308/576 sample 3/3: 88.08 ms
+decode 309/576 sample 1/3: 23.69 ms
+decode 309/576 sample 2/3: 23.96 ms
+decode 309/576 sample 3/3: 24.56 ms
+decode 310/576 sample 1/3: 29.49 ms
+decode 310/576 sample 2/3: 29.71 ms
+decode 310/576 sample 3/3: 30.16 ms
+decode 311/576 sample 1/3: 88.61 ms
+decode 311/576 sample 2/3: 90.47 ms
+decode 311/576 sample 3/3: 89.85 ms
+decode 312/576 sample 1/3: 89.58 ms
+decode 312/576 sample 2/3: 83.80 ms
+decode 312/576 sample 3/3: 89.72 ms
+decode 313/576 sample 1/3: 30.11 ms
+decode 313/576 sample 2/3: 30.61 ms
+decode 313/576 sample 3/3: 30.22 ms
+decode 314/576 sample 1/3: 25.94 ms
+decode 314/576 sample 2/3: 25.24 ms
+decode 314/576 sample 3/3: 25.90 ms
+decode 315/576 sample 1/3: 89.45 ms
+decode 315/576 sample 2/3: 88.09 ms
+decode 315/576 sample 3/3: 87.96 ms
+decode 316/576 sample 1/3: 28.81 ms
+decode 316/576 sample 2/3: 28.71 ms
+decode 316/576 sample 3/3: 28.52 ms
+decode 317/576 sample 1/3: 25.40 ms
+decode 317/576 sample 2/3: 26.12 ms
+decode 317/576 sample 3/3: 26.08 ms
+decode 318/576 sample 1/3: 28.17 ms
+decode 318/576 sample 2/3: 28.92 ms
+decode 318/576 sample 3/3: 29.17 ms
+decode 319/576 sample 1/3: 28.20 ms
+decode 319/576 sample 2/3: 28.00 ms
+decode 319/576 sample 3/3: 27.82 ms
+decode 320/576 sample 1/3: 29.59 ms
+decode 320/576 sample 2/3: 29.45 ms
+decode 320/576 sample 3/3: 29.38 ms
+decode 321/576 sample 1/3: 30.59 ms
+decode 321/576 sample 2/3: 30.93 ms
+decode 321/576 sample 3/3: 31.39 ms
+decode 322/576 sample 1/3: 33.37 ms
+decode 322/576 sample 2/3: 33.33 ms
+decode 322/576 sample 3/3: 33.29 ms
+decode 323/576 sample 1/3: 28.52 ms
+decode 323/576 sample 2/3: 28.92 ms
+decode 323/576 sample 3/3: 28.79 ms
+decode 324/576 sample 1/3: 26.85 ms
+decode 324/576 sample 2/3: 26.45 ms
+decode 324/576 sample 3/3: 26.75 ms
+decode 325/576 sample 1/3: 88.99 ms
+decode 325/576 sample 2/3: 87.87 ms
+decode 325/576 sample 3/3: 86.53 ms
+decode 326/576 sample 1/3: 32.48 ms
+decode 326/576 sample 2/3: 33.00 ms
+decode 326/576 sample 3/3: 32.37 ms
+decode 327/576 sample 1/3: 29.93 ms
+decode 327/576 sample 2/3: 30.28 ms
+decode 327/576 sample 3/3: 29.78 ms
+decode 328/576 sample 1/3: 82.97 ms
+decode 328/576 sample 2/3: 85.66 ms
+decode 328/576 sample 3/3: 87.31 ms
+decode 329/576 sample 1/3: 31.72 ms
+decode 329/576 sample 2/3: 30.11 ms
+decode 329/576 sample 3/3: 30.55 ms
+decode 330/576 sample 1/3: 24.83 ms
+decode 330/576 sample 2/3: 25.57 ms
+decode 330/576 sample 3/3: 24.90 ms
+decode 331/576 sample 1/3: 86.43 ms
+decode 331/576 sample 2/3: 88.28 ms
+decode 331/576 sample 3/3: 88.32 ms
+decode 332/576 sample 1/3: 88.45 ms
+decode 332/576 sample 2/3: 86.45 ms
+decode 332/576 sample 3/3: 86.33 ms
+decode 333/576 sample 1/3: 88.99 ms
+decode 333/576 sample 2/3: 86.73 ms
+decode 333/576 sample 3/3: 84.43 ms
+decode 334/576 sample 1/3: 86.59 ms
+decode 334/576 sample 2/3: 89.62 ms
+decode 334/576 sample 3/3: 90.47 ms
+decode 335/576 sample 1/3: 32.53 ms
+decode 335/576 sample 2/3: 31.69 ms
+decode 335/576 sample 3/3: 31.92 ms
+decode 336/576 sample 1/3: 89.28 ms
+decode 336/576 sample 2/3: 88.37 ms
+decode 336/576 sample 3/3: 89.65 ms
+decode 337/576 sample 1/3: 32.56 ms
+decode 337/576 sample 2/3: 31.71 ms
+decode 337/576 sample 3/3: 31.78 ms
+decode 338/576 sample 1/3: 33.15 ms
+decode 338/576 sample 2/3: 33.76 ms
+decode 338/576 sample 3/3: 33.65 ms
+decode 339/576 sample 1/3: 25.25 ms
+decode 339/576 sample 2/3: 25.35 ms
+decode 339/576 sample 3/3: 24.63 ms
+decode 340/576 sample 1/3: 29.93 ms
+decode 340/576 sample 2/3: 28.70 ms
+decode 340/576 sample 3/3: 29.71 ms
+decode 341/576 sample 1/3: 25.02 ms
+decode 341/576 sample 2/3: 25.41 ms
+decode 341/576 sample 3/3: 25.33 ms
+decode 342/576 sample 1/3: 25.55 ms
+decode 342/576 sample 2/3: 25.93 ms
+decode 342/576 sample 3/3: 25.61 ms
+decode 343/576 sample 1/3: 30.67 ms
+decode 343/576 sample 2/3: 30.53 ms
+decode 343/576 sample 3/3: 30.72 ms
+decode 344/576 sample 1/3: 91.55 ms
+decode 344/576 sample 2/3: 89.75 ms
+decode 344/576 sample 3/3: 88.08 ms
+decode 345/576 sample 1/3: 88.70 ms
+decode 345/576 sample 2/3: 91.96 ms
+decode 345/576 sample 3/3: 90.85 ms
+decode 346/576 sample 1/3: 29.75 ms
+decode 346/576 sample 2/3: 30.22 ms
+decode 346/576 sample 3/3: 30.33 ms
+decode 347/576 sample 1/3: 25.86 ms
+decode 347/576 sample 2/3: 26.07 ms
+decode 347/576 sample 3/3: 26.06 ms
+decode 348/576 sample 1/3: 86.66 ms
+decode 348/576 sample 2/3: 89.26 ms
+decode 348/576 sample 3/3: 86.48 ms
+decode 349/576 sample 1/3: 30.58 ms
+decode 349/576 sample 2/3: 29.62 ms
+decode 349/576 sample 3/3: 30.65 ms
+decode 350/576 sample 1/3: 87.20 ms
+decode 350/576 sample 2/3: 87.85 ms
+decode 350/576 sample 3/3: 86.75 ms
+decode 351/576 sample 1/3: 89.94 ms
+decode 351/576 sample 2/3: 87.93 ms
+decode 351/576 sample 3/3: 90.64 ms
+decode 352/576 sample 1/3: 27.02 ms
+decode 352/576 sample 2/3: 26.83 ms
+decode 352/576 sample 3/3: 27.37 ms
+decode 353/576 sample 1/3: 28.49 ms
+decode 353/576 sample 2/3: 29.52 ms
+decode 353/576 sample 3/3: 28.93 ms
+decode 354/576 sample 1/3: 26.98 ms
+decode 354/576 sample 2/3: 26.83 ms
+decode 354/576 sample 3/3: 27.14 ms
+decode 355/576 sample 1/3: 27.73 ms
+decode 355/576 sample 2/3: 28.09 ms
+decode 355/576 sample 3/3: 27.56 ms
+decode 356/576 sample 1/3: 29.51 ms
+decode 356/576 sample 2/3: 29.55 ms
+decode 356/576 sample 3/3: 29.61 ms
+decode 357/576 sample 1/3: 83.26 ms
+decode 357/576 sample 2/3: 85.43 ms
+decode 357/576 sample 3/3: 91.83 ms
+decode 358/576 sample 1/3: 25.65 ms
+decode 358/576 sample 2/3: 25.10 ms
+decode 358/576 sample 3/3: 25.88 ms
+decode 359/576 sample 1/3: 33.95 ms
+decode 359/576 sample 2/3: 33.52 ms
+decode 359/576 sample 3/3: 34.66 ms
+decode 360/576 sample 1/3: 86.45 ms
+decode 360/576 sample 2/3: 85.67 ms
+decode 360/576 sample 3/3: 86.24 ms
+decode 361/576 sample 1/3: 28.92 ms
+decode 361/576 sample 2/3: 28.78 ms
+decode 361/576 sample 3/3: 28.47 ms
+decode 362/576 sample 1/3: 28.08 ms
+decode 362/576 sample 2/3: 28.14 ms
+decode 362/576 sample 3/3: 28.91 ms
+decode 363/576 sample 1/3: 25.94 ms
+decode 363/576 sample 2/3: 26.02 ms
+decode 363/576 sample 3/3: 25.99 ms
+decode 364/576 sample 1/3: 26.39 ms
+decode 364/576 sample 2/3: 26.60 ms
+decode 364/576 sample 3/3: 26.36 ms
+decode 365/576 sample 1/3: 30.44 ms
+decode 365/576 sample 2/3: 31.44 ms
+decode 365/576 sample 3/3: 31.28 ms
+decode 366/576 sample 1/3: 26.12 ms
+decode 366/576 sample 2/3: 26.34 ms
+decode 366/576 sample 3/3: 26.58 ms
+decode 367/576 sample 1/3: 31.79 ms
+decode 367/576 sample 2/3: 31.44 ms
+decode 367/576 sample 3/3: 32.00 ms
+decode 368/576 sample 1/3: 92.25 ms
+decode 368/576 sample 2/3: 86.95 ms
+decode 368/576 sample 3/3: 89.09 ms
+decode 369/576 sample 1/3: 30.79 ms
+decode 369/576 sample 2/3: 30.53 ms
+decode 369/576 sample 3/3: 30.71 ms
+decode 370/576 sample 1/3: 28.80 ms
+decode 370/576 sample 2/3: 28.68 ms
+decode 370/576 sample 3/3: 28.79 ms
+decode 371/576 sample 1/3: 30.03 ms
+decode 371/576 sample 2/3: 30.04 ms
+decode 371/576 sample 3/3: 30.60 ms
+decode 372/576 sample 1/3: 89.57 ms
+decode 372/576 sample 2/3: 87.40 ms
+decode 372/576 sample 3/3: 84.19 ms
+decode 373/576 sample 1/3: 26.05 ms
+decode 373/576 sample 2/3: 26.73 ms
+decode 373/576 sample 3/3: 26.39 ms
+decode 374/576 sample 1/3: 28.67 ms
+decode 374/576 sample 2/3: 28.57 ms
+decode 374/576 sample 3/3: 28.36 ms
+decode 375/576 sample 1/3: 83.02 ms
+decode 375/576 sample 2/3: 88.08 ms
+decode 375/576 sample 3/3: 87.22 ms
+decode 376/576 sample 1/3: 89.56 ms
+decode 376/576 sample 2/3: 89.49 ms
+decode 376/576 sample 3/3: 89.59 ms
+decode 377/576 sample 1/3: 88.58 ms
+decode 377/576 sample 2/3: 89.71 ms
+decode 377/576 sample 3/3: 88.60 ms
+decode 378/576 sample 1/3: 31.67 ms
+decode 378/576 sample 2/3: 31.92 ms
+decode 378/576 sample 3/3: 31.06 ms
+decode 379/576 sample 1/3: 34.20 ms
+decode 379/576 sample 2/3: 34.36 ms
+decode 379/576 sample 3/3: 32.04 ms
+decode 380/576 sample 1/3: 86.98 ms
+decode 380/576 sample 2/3: 86.36 ms
+decode 380/576 sample 3/3: 86.60 ms
+decode 381/576 sample 1/3: 29.15 ms
+decode 381/576 sample 2/3: 29.32 ms
+decode 381/576 sample 3/3: 29.72 ms
+decode 382/576 sample 1/3: 25.30 ms
+decode 382/576 sample 2/3: 24.82 ms
+decode 382/576 sample 3/3: 25.25 ms
+decode 383/576 sample 1/3: 86.33 ms
+decode 383/576 sample 2/3: 87.85 ms
+decode 383/576 sample 3/3: 85.64 ms
+decode 384/576 sample 1/3: 31.64 ms
+decode 384/576 sample 2/3: 31.12 ms
+decode 384/576 sample 3/3: 31.82 ms
+decode 385/576 sample 1/3: 28.60 ms
+decode 385/576 sample 2/3: 28.80 ms
+decode 385/576 sample 3/3: 28.56 ms
+decode 386/576 sample 1/3: 25.41 ms
+decode 386/576 sample 2/3: 25.73 ms
+decode 386/576 sample 3/3: 25.69 ms
+decode 387/576 sample 1/3: 31.59 ms
+decode 387/576 sample 2/3: 31.72 ms
+decode 387/576 sample 3/3: 31.84 ms
+decode 388/576 sample 1/3: 27.63 ms
+decode 388/576 sample 2/3: 28.95 ms
+decode 388/576 sample 3/3: 28.20 ms
+decode 389/576 sample 1/3: 25.60 ms
+decode 389/576 sample 2/3: 24.89 ms
+decode 389/576 sample 3/3: 25.31 ms
+decode 390/576 sample 1/3: 26.01 ms
+decode 390/576 sample 2/3: 26.75 ms
+decode 390/576 sample 3/3: 27.15 ms
+decode 391/576 sample 1/3: 33.18 ms
+decode 391/576 sample 2/3: 32.97 ms
+decode 391/576 sample 3/3: 32.89 ms
+decode 392/576 sample 1/3: 27.32 ms
+decode 392/576 sample 2/3: 27.46 ms
+decode 392/576 sample 3/3: 27.53 ms
+decode 393/576 sample 1/3: 30.96 ms
+decode 393/576 sample 2/3: 30.79 ms
+decode 393/576 sample 3/3: 31.46 ms
+decode 394/576 sample 1/3: 31.24 ms
+decode 394/576 sample 2/3: 30.96 ms
+decode 394/576 sample 3/3: 31.39 ms
+decode 395/576 sample 1/3: 23.22 ms
+decode 395/576 sample 2/3: 23.15 ms
+decode 395/576 sample 3/3: 23.40 ms
+decode 396/576 sample 1/3: 29.77 ms
+decode 396/576 sample 2/3: 29.47 ms
+decode 396/576 sample 3/3: 29.57 ms
+decode 397/576 sample 1/3: 29.70 ms
+decode 397/576 sample 2/3: 30.39 ms
+decode 397/576 sample 3/3: 29.86 ms
+decode 398/576 sample 1/3: 78.60 ms
+decode 398/576 sample 2/3: 78.99 ms
+decode 398/576 sample 3/3: 79.14 ms
+decode 399/576 sample 1/3: 30.29 ms
+decode 399/576 sample 2/3: 30.38 ms
+decode 399/576 sample 3/3: 30.70 ms
+decode 400/576 sample 1/3: 22.60 ms
+decode 400/576 sample 2/3: 23.55 ms
+decode 400/576 sample 3/3: 22.72 ms
+decode 401/576 sample 1/3: 31.32 ms
+decode 401/576 sample 2/3: 31.51 ms
+decode 401/576 sample 3/3: 31.41 ms
+decode 402/576 sample 1/3: 29.65 ms
+decode 402/576 sample 2/3: 29.87 ms
+decode 402/576 sample 3/3: 30.00 ms
+decode 403/576 sample 1/3: 78.11 ms
+decode 403/576 sample 2/3: 78.92 ms
+decode 403/576 sample 3/3: 78.17 ms
+decode 404/576 sample 1/3: 79.50 ms
+decode 404/576 sample 2/3: 79.45 ms
+decode 404/576 sample 3/3: 79.76 ms
+decode 405/576 sample 1/3: 82.58 ms
+decode 405/576 sample 2/3: 81.66 ms
+decode 405/576 sample 3/3: 81.75 ms
+decode 406/576 sample 1/3: 33.65 ms
+decode 406/576 sample 2/3: 34.03 ms
+decode 406/576 sample 3/3: 33.43 ms
+decode 407/576 sample 1/3: 29.58 ms
+decode 407/576 sample 2/3: 29.76 ms
+decode 407/576 sample 3/3: 29.73 ms
+decode 408/576 sample 1/3: 25.32 ms
+decode 408/576 sample 2/3: 25.30 ms
+decode 408/576 sample 3/3: 25.87 ms
+decode 409/576 sample 1/3: 30.14 ms
+decode 409/576 sample 2/3: 29.14 ms
+decode 409/576 sample 3/3: 29.52 ms
+decode 410/576 sample 1/3: 81.08 ms
+decode 410/576 sample 2/3: 81.00 ms
+decode 410/576 sample 3/3: 79.89 ms
+decode 411/576 sample 1/3: 82.25 ms
+decode 411/576 sample 2/3: 82.89 ms
+decode 411/576 sample 3/3: 82.48 ms
+decode 412/576 sample 1/3: 29.06 ms
+decode 412/576 sample 2/3: 28.72 ms
+decode 412/576 sample 3/3: 29.14 ms
+decode 413/576 sample 1/3: 33.47 ms
+decode 413/576 sample 2/3: 34.40 ms
+decode 413/576 sample 3/3: 34.44 ms
+decode 414/576 sample 1/3: 31.45 ms
+decode 414/576 sample 2/3: 30.23 ms
+decode 414/576 sample 3/3: 30.97 ms
+decode 415/576 sample 1/3: 27.47 ms
+decode 415/576 sample 2/3: 27.24 ms
+decode 415/576 sample 3/3: 27.69 ms
+decode 416/576 sample 1/3: 78.87 ms
+decode 416/576 sample 2/3: 78.48 ms
+decode 416/576 sample 3/3: 78.78 ms
+decode 417/576 sample 1/3: 33.04 ms
+decode 417/576 sample 2/3: 33.00 ms
+decode 417/576 sample 3/3: 33.42 ms
+decode 418/576 sample 1/3: 79.53 ms
+decode 418/576 sample 2/3: 80.63 ms
+decode 418/576 sample 3/3: 81.00 ms
+decode 419/576 sample 1/3: 80.69 ms
+decode 419/576 sample 2/3: 78.92 ms
+decode 419/576 sample 3/3: 77.55 ms
+decode 420/576 sample 1/3: 30.96 ms
+decode 420/576 sample 2/3: 31.65 ms
+decode 420/576 sample 3/3: 30.39 ms
+decode 421/576 sample 1/3: 27.20 ms
+decode 421/576 sample 2/3: 26.77 ms
+decode 421/576 sample 3/3: 26.74 ms
+decode 422/576 sample 1/3: 32.77 ms
+decode 422/576 sample 2/3: 33.20 ms
+decode 422/576 sample 3/3: 33.03 ms
+decode 423/576 sample 1/3: 25.52 ms
+decode 423/576 sample 2/3: 25.56 ms
+decode 423/576 sample 3/3: 25.67 ms
+decode 424/576 sample 1/3: 29.92 ms
+decode 424/576 sample 2/3: 29.49 ms
+decode 424/576 sample 3/3: 29.38 ms
+decode 425/576 sample 1/3: 26.20 ms
+decode 425/576 sample 2/3: 26.99 ms
+decode 425/576 sample 3/3: 26.02 ms
+decode 426/576 sample 1/3: 25.24 ms
+decode 426/576 sample 2/3: 25.50 ms
+decode 426/576 sample 3/3: 25.35 ms
+decode 427/576 sample 1/3: 27.22 ms
+decode 427/576 sample 2/3: 26.88 ms
+decode 427/576 sample 3/3: 27.01 ms
+decode 428/576 sample 1/3: 29.24 ms
+decode 428/576 sample 2/3: 28.97 ms
+decode 428/576 sample 3/3: 28.54 ms
+decode 429/576 sample 1/3: 28.35 ms
+decode 429/576 sample 2/3: 28.02 ms
+decode 429/576 sample 3/3: 29.21 ms
+decode 430/576 sample 1/3: 78.21 ms
+decode 430/576 sample 2/3: 77.78 ms
+decode 430/576 sample 3/3: 77.74 ms
+decode 431/576 sample 1/3: 27.33 ms
+decode 431/576 sample 2/3: 27.41 ms
+decode 431/576 sample 3/3: 27.12 ms
+decode 432/576 sample 1/3: 30.99 ms
+decode 432/576 sample 2/3: 30.85 ms
+decode 432/576 sample 3/3: 30.56 ms
+decode 433/576 sample 1/3: 30.11 ms
+decode 433/576 sample 2/3: 29.36 ms
+decode 433/576 sample 3/3: 28.91 ms
+decode 434/576 sample 1/3: 27.17 ms
+decode 434/576 sample 2/3: 26.73 ms
+decode 434/576 sample 3/3: 26.62 ms
+decode 435/576 sample 1/3: 32.94 ms
+decode 435/576 sample 2/3: 32.59 ms
+decode 435/576 sample 3/3: 31.85 ms
+decode 436/576 sample 1/3: 34.25 ms
+decode 436/576 sample 2/3: 34.78 ms
+decode 436/576 sample 3/3: 35.16 ms
+decode 437/576 sample 1/3: 28.74 ms
+decode 437/576 sample 2/3: 28.96 ms
+decode 437/576 sample 3/3: 28.90 ms
+decode 438/576 sample 1/3: 28.21 ms
+decode 438/576 sample 2/3: 28.77 ms
+decode 438/576 sample 3/3: 28.21 ms
+decode 439/576 sample 1/3: 32.97 ms
+decode 439/576 sample 2/3: 33.01 ms
+decode 439/576 sample 3/3: 32.20 ms
+decode 440/576 sample 1/3: 34.12 ms
+decode 440/576 sample 2/3: 33.53 ms
+decode 440/576 sample 3/3: 33.32 ms
+decode 441/576 sample 1/3: 27.64 ms
+decode 441/576 sample 2/3: 27.03 ms
+decode 441/576 sample 3/3: 27.20 ms
+decode 442/576 sample 1/3: 30.85 ms
+decode 442/576 sample 2/3: 31.12 ms
+decode 442/576 sample 3/3: 30.89 ms
+decode 443/576 sample 1/3: 28.09 ms
+decode 443/576 sample 2/3: 28.32 ms
+decode 443/576 sample 3/3: 28.01 ms
+decode 444/576 sample 1/3: 26.11 ms
+decode 444/576 sample 2/3: 26.45 ms
+decode 444/576 sample 3/3: 26.76 ms
+decode 445/576 sample 1/3: 26.59 ms
+decode 445/576 sample 2/3: 27.55 ms
+decode 445/576 sample 3/3: 26.69 ms
+decode 446/576 sample 1/3: 24.63 ms
+decode 446/576 sample 2/3: 25.09 ms
+decode 446/576 sample 3/3: 25.17 ms
+decode 447/576 sample 1/3: 34.95 ms
+decode 447/576 sample 2/3: 35.04 ms
+decode 447/576 sample 3/3: 35.48 ms
+decode 448/576 sample 1/3: 28.83 ms
+decode 448/576 sample 2/3: 29.50 ms
+decode 448/576 sample 3/3: 29.09 ms
+decode 449/576 sample 1/3: 28.35 ms
+decode 449/576 sample 2/3: 29.72 ms
+decode 449/576 sample 3/3: 29.45 ms
+decode 450/576 sample 1/3: 29.61 ms
+decode 450/576 sample 2/3: 29.96 ms
+decode 450/576 sample 3/3: 29.63 ms
+decode 451/576 sample 1/3: 79.58 ms
+decode 451/576 sample 2/3: 78.39 ms
+decode 451/576 sample 3/3: 76.24 ms
+decode 452/576 sample 1/3: 77.80 ms
+decode 452/576 sample 2/3: 76.49 ms
+decode 452/576 sample 3/3: 79.17 ms
+decode 453/576 sample 1/3: 23.92 ms
+decode 453/576 sample 2/3: 23.86 ms
+decode 453/576 sample 3/3: 24.13 ms
+decode 454/576 sample 1/3: 78.61 ms
+decode 454/576 sample 2/3: 78.43 ms
+decode 454/576 sample 3/3: 78.03 ms
+decode 455/576 sample 1/3: 25.73 ms
+decode 455/576 sample 2/3: 26.04 ms
+decode 455/576 sample 3/3: 25.65 ms
+decode 456/576 sample 1/3: 31.74 ms
+decode 456/576 sample 2/3: 32.30 ms
+decode 456/576 sample 3/3: 32.60 ms
+decode 457/576 sample 1/3: 80.75 ms
+decode 457/576 sample 2/3: 81.13 ms
+decode 457/576 sample 3/3: 79.81 ms
+decode 458/576 sample 1/3: 78.97 ms
+decode 458/576 sample 2/3: 78.92 ms
+decode 458/576 sample 3/3: 78.92 ms
+decode 459/576 sample 1/3: 33.04 ms
+decode 459/576 sample 2/3: 33.56 ms
+decode 459/576 sample 3/3: 32.96 ms
+decode 460/576 sample 1/3: 31.23 ms
+decode 460/576 sample 2/3: 30.96 ms
+decode 460/576 sample 3/3: 31.99 ms
+decode 461/576 sample 1/3: 79.35 ms
+decode 461/576 sample 2/3: 80.15 ms
+decode 461/576 sample 3/3: 80.17 ms
+decode 462/576 sample 1/3: 28.46 ms
+decode 462/576 sample 2/3: 28.89 ms
+decode 462/576 sample 3/3: 28.28 ms
+decode 463/576 sample 1/3: 30.64 ms
+decode 463/576 sample 2/3: 30.53 ms
+decode 463/576 sample 3/3: 29.97 ms
+decode 464/576 sample 1/3: 30.62 ms
+decode 464/576 sample 2/3: 31.31 ms
+decode 464/576 sample 3/3: 30.98 ms
+decode 465/576 sample 1/3: 25.81 ms
+decode 465/576 sample 2/3: 25.78 ms
+decode 465/576 sample 3/3: 25.61 ms
+decode 466/576 sample 1/3: 24.69 ms
+decode 466/576 sample 2/3: 23.87 ms
+decode 466/576 sample 3/3: 24.61 ms
+decode 467/576 sample 1/3: 29.18 ms
+decode 467/576 sample 2/3: 28.98 ms
+decode 467/576 sample 3/3: 28.40 ms
+decode 468/576 sample 1/3: 81.13 ms
+decode 468/576 sample 2/3: 81.32 ms
+decode 468/576 sample 3/3: 81.23 ms
+decode 469/576 sample 1/3: 25.90 ms
+decode 469/576 sample 2/3: 26.96 ms
+decode 469/576 sample 3/3: 25.65 ms
+decode 470/576 sample 1/3: 30.16 ms
+decode 470/576 sample 2/3: 30.27 ms
+decode 470/576 sample 3/3: 30.10 ms
+decode 471/576 sample 1/3: 81.58 ms
+decode 471/576 sample 2/3: 80.26 ms
+decode 471/576 sample 3/3: 80.69 ms
+decode 472/576 sample 1/3: 29.73 ms
+decode 472/576 sample 2/3: 29.82 ms
+decode 472/576 sample 3/3: 29.36 ms
+decode 473/576 sample 1/3: 82.07 ms
+decode 473/576 sample 2/3: 80.31 ms
+decode 473/576 sample 3/3: 79.37 ms
+decode 474/576 sample 1/3: 30.31 ms
+decode 474/576 sample 2/3: 30.72 ms
+decode 474/576 sample 3/3: 30.23 ms
+decode 475/576 sample 1/3: 26.93 ms
+decode 475/576 sample 2/3: 28.03 ms
+decode 475/576 sample 3/3: 26.59 ms
+decode 476/576 sample 1/3: 32.44 ms
+decode 476/576 sample 2/3: 32.75 ms
+decode 476/576 sample 3/3: 33.61 ms
+decode 477/576 sample 1/3: 29.95 ms
+decode 477/576 sample 2/3: 29.12 ms
+decode 477/576 sample 3/3: 28.66 ms
+decode 478/576 sample 1/3: 77.60 ms
+decode 478/576 sample 2/3: 78.23 ms
+decode 478/576 sample 3/3: 77.86 ms
+decode 479/576 sample 1/3: 79.30 ms
+decode 479/576 sample 2/3: 79.73 ms
+decode 479/576 sample 3/3: 82.06 ms
+decode 480/576 sample 1/3: 80.32 ms
+decode 480/576 sample 2/3: 79.33 ms
+decode 480/576 sample 3/3: 78.39 ms
+decode 481/576 sample 1/3: 78.96 ms
+decode 481/576 sample 2/3: 78.19 ms
+decode 481/576 sample 3/3: 79.06 ms
+decode 482/576 sample 1/3: 32.34 ms
+decode 482/576 sample 2/3: 31.65 ms
+decode 482/576 sample 3/3: 32.53 ms
+decode 483/576 sample 1/3: 23.00 ms
+decode 483/576 sample 2/3: 23.17 ms
+decode 483/576 sample 3/3: 23.97 ms
+decode 484/576 sample 1/3: 80.64 ms
+decode 484/576 sample 2/3: 83.74 ms
+decode 484/576 sample 3/3: 81.08 ms
+decode 485/576 sample 1/3: 80.42 ms
+decode 485/576 sample 2/3: 77.76 ms
+decode 485/576 sample 3/3: 78.68 ms
+decode 486/576 sample 1/3: 33.17 ms
+decode 486/576 sample 2/3: 32.49 ms
+decode 486/576 sample 3/3: 33.25 ms
+decode 487/576 sample 1/3: 79.10 ms
+decode 487/576 sample 2/3: 79.43 ms
+decode 487/576 sample 3/3: 78.97 ms
+decode 488/576 sample 1/3: 38.24 ms
+decode 488/576 sample 2/3: 37.66 ms
+decode 488/576 sample 3/3: 38.07 ms
+decode 489/576 sample 1/3: 32.47 ms
+decode 489/576 sample 2/3: 33.12 ms
+decode 489/576 sample 3/3: 32.43 ms
+decode 490/576 sample 1/3: 29.20 ms
+decode 490/576 sample 2/3: 29.69 ms
+decode 490/576 sample 3/3: 29.73 ms
+decode 491/576 sample 1/3: 35.46 ms
+decode 491/576 sample 2/3: 35.41 ms
+decode 491/576 sample 3/3: 35.62 ms
+decode 492/576 sample 1/3: 34.27 ms
+decode 492/576 sample 2/3: 34.83 ms
+decode 492/576 sample 3/3: 34.83 ms
+decode 493/576 sample 1/3: 33.49 ms
+decode 493/576 sample 2/3: 33.94 ms
+decode 493/576 sample 3/3: 34.16 ms
+decode 494/576 sample 1/3: 33.15 ms
+decode 494/576 sample 2/3: 33.05 ms
+decode 494/576 sample 3/3: 32.69 ms
+decode 495/576 sample 1/3: 35.09 ms
+decode 495/576 sample 2/3: 34.62 ms
+decode 495/576 sample 3/3: 34.44 ms
+decode 496/576 sample 1/3: 25.22 ms
+decode 496/576 sample 2/3: 24.46 ms
+decode 496/576 sample 3/3: 23.67 ms
+decode 497/576 sample 1/3: 33.65 ms
+decode 497/576 sample 2/3: 33.27 ms
+decode 497/576 sample 3/3: 32.69 ms
+decode 498/576 sample 1/3: 29.49 ms
+decode 498/576 sample 2/3: 29.22 ms
+decode 498/576 sample 3/3: 28.96 ms
+decode 499/576 sample 1/3: 26.02 ms
+decode 499/576 sample 2/3: 25.65 ms
+decode 499/576 sample 3/3: 26.74 ms
+decode 500/576 sample 1/3: 31.93 ms
+decode 500/576 sample 2/3: 31.87 ms
+decode 500/576 sample 3/3: 31.05 ms
+decode 501/576 sample 1/3: 79.90 ms
+decode 501/576 sample 2/3: 79.90 ms
+decode 501/576 sample 3/3: 79.45 ms
+decode 502/576 sample 1/3: 31.73 ms
+decode 502/576 sample 2/3: 31.55 ms
+decode 502/576 sample 3/3: 32.03 ms
+decode 503/576 sample 1/3: 28.40 ms
+decode 503/576 sample 2/3: 28.00 ms
+decode 503/576 sample 3/3: 28.46 ms
+decode 504/576 sample 1/3: 27.52 ms
+decode 504/576 sample 2/3: 27.47 ms
+decode 504/576 sample 3/3: 27.79 ms
+decode 505/576 sample 1/3: 28.55 ms
+decode 505/576 sample 2/3: 28.21 ms
+decode 505/576 sample 3/3: 27.72 ms
+decode 506/576 sample 1/3: 29.91 ms
+decode 506/576 sample 2/3: 30.66 ms
+decode 506/576 sample 3/3: 29.89 ms
+decode 507/576 sample 1/3: 31.60 ms
+decode 507/576 sample 2/3: 30.89 ms
+decode 507/576 sample 3/3: 30.80 ms
+decode 508/576 sample 1/3: 27.20 ms
+decode 508/576 sample 2/3: 27.14 ms
+decode 508/576 sample 3/3: 27.52 ms
+decode 509/576 sample 1/3: 24.21 ms
+decode 509/576 sample 2/3: 23.91 ms
+decode 509/576 sample 3/3: 24.59 ms
+decode 510/576 sample 1/3: 25.73 ms
+decode 510/576 sample 2/3: 26.04 ms
+decode 510/576 sample 3/3: 25.57 ms
+decode 511/576 sample 1/3: 29.33 ms
+decode 511/576 sample 2/3: 28.89 ms
+decode 511/576 sample 3/3: 28.74 ms
+decode 512/576 sample 1/3: 22.64 ms
+decode 512/576 sample 2/3: 22.69 ms
+decode 512/576 sample 3/3: 22.02 ms
+decode 513/576 sample 1/3: 26.63 ms
+decode 513/576 sample 2/3: 27.28 ms
+decode 513/576 sample 3/3: 27.90 ms
+decode 514/576 sample 1/3: 28.69 ms
+decode 514/576 sample 2/3: 28.06 ms
+decode 514/576 sample 3/3: 28.60 ms
+decode 515/576 sample 1/3: 77.12 ms
+decode 515/576 sample 2/3: 80.69 ms
+decode 515/576 sample 3/3: 81.73 ms
+decode 516/576 sample 1/3: 32.20 ms
+decode 516/576 sample 2/3: 31.65 ms
+decode 516/576 sample 3/3: 32.19 ms
+decode 517/576 sample 1/3: 79.60 ms
+decode 517/576 sample 2/3: 79.44 ms
+decode 517/576 sample 3/3: 80.06 ms
+decode 518/576 sample 1/3: 31.22 ms
+decode 518/576 sample 2/3: 31.90 ms
+decode 518/576 sample 3/3: 31.79 ms
+decode 519/576 sample 1/3: 26.95 ms
+decode 519/576 sample 2/3: 26.68 ms
+decode 519/576 sample 3/3: 26.21 ms
+decode 520/576 sample 1/3: 25.91 ms
+decode 520/576 sample 2/3: 26.32 ms
+decode 520/576 sample 3/3: 25.87 ms
+decode 521/576 sample 1/3: 81.19 ms
+decode 521/576 sample 2/3: 81.63 ms
+decode 521/576 sample 3/3: 80.59 ms
+decode 522/576 sample 1/3: 29.29 ms
+decode 522/576 sample 2/3: 29.76 ms
+decode 522/576 sample 3/3: 30.01 ms
+decode 523/576 sample 1/3: 33.76 ms
+decode 523/576 sample 2/3: 33.61 ms
+decode 523/576 sample 3/3: 33.25 ms
+decode 524/576 sample 1/3: 31.27 ms
+decode 524/576 sample 2/3: 31.80 ms
+decode 524/576 sample 3/3: 32.12 ms
+decode 525/576 sample 1/3: 25.65 ms
+decode 525/576 sample 2/3: 25.04 ms
+decode 525/576 sample 3/3: 25.36 ms
+decode 526/576 sample 1/3: 26.05 ms
+decode 526/576 sample 2/3: 26.11 ms
+decode 526/576 sample 3/3: 25.66 ms
+decode 527/576 sample 1/3: 79.27 ms
+decode 527/576 sample 2/3: 81.16 ms
+decode 527/576 sample 3/3: 80.78 ms
+decode 528/576 sample 1/3: 30.34 ms
+decode 528/576 sample 2/3: 29.77 ms
+decode 528/576 sample 3/3: 29.60 ms
+decode 529/576 sample 1/3: 79.05 ms
+decode 529/576 sample 2/3: 79.60 ms
+decode 529/576 sample 3/3: 79.61 ms
+decode 530/576 sample 1/3: 29.32 ms
+decode 530/576 sample 2/3: 29.07 ms
+decode 530/576 sample 3/3: 28.75 ms
+decode 531/576 sample 1/3: 80.47 ms
+decode 531/576 sample 2/3: 79.14 ms
+decode 531/576 sample 3/3: 79.12 ms
+decode 532/576 sample 1/3: 40.73 ms
+decode 532/576 sample 2/3: 40.68 ms
+decode 532/576 sample 3/3: 41.22 ms
+decode 533/576 sample 1/3: 83.98 ms
+decode 533/576 sample 2/3: 81.05 ms
+decode 533/576 sample 3/3: 81.36 ms
+decode 534/576 sample 1/3: 82.05 ms
+decode 534/576 sample 2/3: 79.98 ms
+decode 534/576 sample 3/3: 79.22 ms
+decode 535/576 sample 1/3: 30.16 ms
+decode 535/576 sample 2/3: 30.10 ms
+decode 535/576 sample 3/3: 29.99 ms
+decode 536/576 sample 1/3: 24.08 ms
+decode 536/576 sample 2/3: 24.20 ms
+decode 536/576 sample 3/3: 24.48 ms
+decode 537/576 sample 1/3: 29.00 ms
+decode 537/576 sample 2/3: 29.00 ms
+decode 537/576 sample 3/3: 29.27 ms
+decode 538/576 sample 1/3: 35.25 ms
+decode 538/576 sample 2/3: 35.34 ms
+decode 538/576 sample 3/3: 34.70 ms
+decode 539/576 sample 1/3: 79.03 ms
+decode 539/576 sample 2/3: 78.52 ms
+decode 539/576 sample 3/3: 78.35 ms
+decode 540/576 sample 1/3: 30.49 ms
+decode 540/576 sample 2/3: 30.44 ms
+decode 540/576 sample 3/3: 31.11 ms
+decode 541/576 sample 1/3: 30.24 ms
+decode 541/576 sample 2/3: 29.66 ms
+decode 541/576 sample 3/3: 29.50 ms
+decode 542/576 sample 1/3: 83.16 ms
+decode 542/576 sample 2/3: 79.96 ms
+decode 542/576 sample 3/3: 82.55 ms
+decode 543/576 sample 1/3: 23.80 ms
+decode 543/576 sample 2/3: 24.74 ms
+decode 543/576 sample 3/3: 24.23 ms
+decode 544/576 sample 1/3: 28.51 ms
+decode 544/576 sample 2/3: 28.92 ms
+decode 544/576 sample 3/3: 28.76 ms
+decode 545/576 sample 1/3: 32.40 ms
+decode 545/576 sample 2/3: 31.79 ms
+decode 545/576 sample 3/3: 32.38 ms
+decode 546/576 sample 1/3: 79.76 ms
+decode 546/576 sample 2/3: 79.92 ms
+decode 546/576 sample 3/3: 82.58 ms
+decode 547/576 sample 1/3: 33.74 ms
+decode 547/576 sample 2/3: 33.50 ms
+decode 547/576 sample 3/3: 33.25 ms
+decode 548/576 sample 1/3: 31.19 ms
+decode 548/576 sample 2/3: 31.62 ms
+decode 548/576 sample 3/3: 31.17 ms
+decode 549/576 sample 1/3: 79.54 ms
+decode 549/576 sample 2/3: 79.26 ms
+decode 549/576 sample 3/3: 77.90 ms
+decode 550/576 sample 1/3: 81.08 ms
+decode 550/576 sample 2/3: 80.95 ms
+decode 550/576 sample 3/3: 79.80 ms
+decode 551/576 sample 1/3: 26.91 ms
+decode 551/576 sample 2/3: 26.88 ms
+decode 551/576 sample 3/3: 26.82 ms
+decode 552/576 sample 1/3: 22.78 ms
+decode 552/576 sample 2/3: 22.96 ms
+decode 552/576 sample 3/3: 22.67 ms
+decode 553/576 sample 1/3: 29.03 ms
+decode 553/576 sample 2/3: 28.41 ms
+decode 553/576 sample 3/3: 28.84 ms
+decode 554/576 sample 1/3: 29.84 ms
+decode 554/576 sample 2/3: 29.62 ms
+decode 554/576 sample 3/3: 29.06 ms
+decode 555/576 sample 1/3: 26.00 ms
+decode 555/576 sample 2/3: 26.39 ms
+decode 555/576 sample 3/3: 26.31 ms
+decode 556/576 sample 1/3: 30.60 ms
+decode 556/576 sample 2/3: 31.02 ms
+decode 556/576 sample 3/3: 30.50 ms
+decode 557/576 sample 1/3: 79.15 ms
+decode 557/576 sample 2/3: 78.42 ms
+decode 557/576 sample 3/3: 77.45 ms
+decode 558/576 sample 1/3: 23.66 ms
+decode 558/576 sample 2/3: 22.45 ms
+decode 558/576 sample 3/3: 23.82 ms
+decode 559/576 sample 1/3: 28.23 ms
+decode 559/576 sample 2/3: 27.44 ms
+decode 559/576 sample 3/3: 28.06 ms
+decode 560/576 sample 1/3: 81.85 ms
+decode 560/576 sample 2/3: 79.58 ms
+decode 560/576 sample 3/3: 81.93 ms
+decode 561/576 sample 1/3: 26.90 ms
+decode 561/576 sample 2/3: 26.94 ms
+decode 561/576 sample 3/3: 26.07 ms
+decode 562/576 sample 1/3: 33.00 ms
+decode 562/576 sample 2/3: 33.24 ms
+decode 562/576 sample 3/3: 32.32 ms
+decode 563/576 sample 1/3: 82.73 ms
+decode 563/576 sample 2/3: 82.55 ms
+decode 563/576 sample 3/3: 82.22 ms
+decode 564/576 sample 1/3: 79.71 ms
+decode 564/576 sample 2/3: 80.82 ms
+decode 564/576 sample 3/3: 80.28 ms
+decode 565/576 sample 1/3: 26.27 ms
+decode 565/576 sample 2/3: 26.69 ms
+decode 565/576 sample 3/3: 26.16 ms
+decode 566/576 sample 1/3: 81.19 ms
+decode 566/576 sample 2/3: 82.16 ms
+decode 566/576 sample 3/3: 80.14 ms
+decode 567/576 sample 1/3: 32.55 ms
+decode 567/576 sample 2/3: 32.17 ms
+decode 567/576 sample 3/3: 31.96 ms
+decode 568/576 sample 1/3: 28.37 ms
+decode 568/576 sample 2/3: 28.87 ms
+decode 568/576 sample 3/3: 27.92 ms
+decode 569/576 sample 1/3: 27.09 ms
+decode 569/576 sample 2/3: 27.20 ms
+decode 569/576 sample 3/3: 27.54 ms
+decode 570/576 sample 1/3: 26.24 ms
+decode 570/576 sample 2/3: 24.92 ms
+decode 570/576 sample 3/3: 25.33 ms
+decode 571/576 sample 1/3: 77.69 ms
+decode 571/576 sample 2/3: 77.52 ms
+decode 571/576 sample 3/3: 78.07 ms
+decode 572/576 sample 1/3: 30.31 ms
+decode 572/576 sample 2/3: 30.04 ms
+decode 572/576 sample 3/3: 30.54 ms
+decode 573/576 sample 1/3: 26.83 ms
+decode 573/576 sample 2/3: 27.02 ms
+decode 573/576 sample 3/3: 26.11 ms
+decode 574/576 sample 1/3: 80.77 ms
+decode 574/576 sample 2/3: 81.72 ms
+decode 574/576 sample 3/3: 80.40 ms
+decode 575/576 sample 1/3: 78.50 ms
+decode 575/576 sample 2/3: 76.52 ms
+decode 575/576 sample 3/3: 77.93 ms
+decode 576/576 sample 1/3: 23.94 ms
+decode 576/576 sample 2/3: 24.66 ms
+decode 576/576 sample 3/3: 24.32 ms

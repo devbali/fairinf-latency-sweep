@@ -1,0 +1,2404 @@
+sglang       0.0.0.dev0, source 66697235d3bb
+sgl_kernel   0.4.10
+flashinfer   0.7.2
+transformers 5.19.0
+torch        2.14.1+cu130 cuda 13.0
+gpu          NVIDIA A100-SXM4-80GB
+command: PYTHONPATH=/home/devbali/fairinf-experiments/external/fairinf-sglang/python CUDA_VISIBLE_DEVICES=0,1,2,3 /home/devbali/final-venv/bin/python src/runner.py --model-path /mnt/ram/gpt-oss-120b-bf16 --dtype bfloat16 --sampling-backend pytorch --tp 4 --batches /home/devbali/fairinf-experiments/vm/latency_check/decode_large_120b-tp4.json --out /home/devbali/fairinf-experiments/experiments/latency-models/results/gptoss-120b-tp4-decode-large-final-setup/results.jsonl
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:36:53] Detected GPT-OSS model, enabling triton_kernels MOE kernel.
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:37:06] Init parallel begin.
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:37:45] sglang is using nccl==2.30.7
+[2026-11-24 22:37:49] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-4b9d3524794e47d2836eceb7b286254c
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:37:52] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-804465fd480f4e75bd5b58a64917b8e7
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:37:55] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-9e7ca450166a494b9f861a8d3950af82
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:37:58] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-408e3afca0384a7089a6312d85a0af43
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:37:58] Init parallel ends. elapsed=51.89 s
+[2026-11-24 22:37:58] Memory baseline taken. mem usage=0.00 GB
+[2026-11-24 22:37:59] Load weight begin. avail mem=77.93 GB
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+Multi-thread loading shards:   0% Completed | 0/36 [00:00<?, ?it/s]Multi-thread loading shards: 100% Completed | 36/36 [00:00<00:00, 688.26it/s]
+[2026-11-24 22:39:52] Load weight end. elapsed=112.89 s, type=GptOssForCausalLM, avail mem=23.31 GB, mem usage=54.62 GB.
+[2026-11-24 22:39:53] Use sliding window memory pool. full_layer_tokens=587876, swa_layer_tokens=470300
+[2026-11-24 22:39:53] Full KV Cache is allocated. dtype: torch.bfloat16, #tokens: 587876, K size: 2.52 GB, V size: 2.52 GB
+[2026-11-24 22:39:53] SWA KV Cache is allocated. dtype: torch.bfloat16, #tokens: 470300, K size: 2.02 GB, V size: 2.02 GB
+[2026-11-24 22:39:53] SWAKVPool mem usage: 9.08 GB, swa size: 470300, full size: 587876
+[2026-11-24 22:39:53] Memory pool end. avail mem=13.06 GB
+[2026-11-24 22:39:53] Capture target prefill CUDA graph begin. backend=breakable, num_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096, 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192], avail mem=13.01 GB
+  0%|          | 0/58 [00:00<?, ?it/s]Capturing prefill shape (num_tokens=8192 avail_mem=13.01 GB):   0%|          | 0/58 [00:00<?, ?it/s]Capturing prefill shape (num_tokens=8192 avail_mem=13.01 GB):   2%|▏         | 1/58 [00:03<03:18,  3.48s/it]Capturing prefill shape (num_tokens=7680 avail_mem=11.68 GB):   2%|▏         | 1/58 [00:03<03:18,  3.48s/it]Capturing prefill shape (num_tokens=7680 avail_mem=11.68 GB):   3%|▎         | 2/58 [00:03<01:35,  1.70s/it]Capturing prefill shape (num_tokens=7168 avail_mem=11.66 GB):   3%|▎         | 2/58 [00:03<01:35,  1.70s/it]Capturing prefill shape (num_tokens=7168 avail_mem=11.66 GB):   5%|▌         | 3/58 [00:04<01:02,  1.13s/it]Capturing prefill shape (num_tokens=6656 avail_mem=11.64 GB):   5%|▌         | 3/58 [00:04<01:02,  1.13s/it]Capturing prefill shape (num_tokens=6656 avail_mem=11.64 GB):   7%|▋         | 4/58 [00:04<00:45,  1.18it/s]Capturing prefill shape (num_tokens=6144 avail_mem=11.62 GB):   7%|▋         | 4/58 [00:04<00:45,  1.18it/s]Capturing prefill shape (num_tokens=6144 avail_mem=11.62 GB):   9%|▊         | 5/58 [00:05<00:36,  1.46it/s]Capturing prefill shape (num_tokens=5632 avail_mem=11.61 GB):   9%|▊         | 5/58 [00:05<00:36,  1.46it/s]Capturing prefill shape (num_tokens=5632 avail_mem=11.61 GB):  10%|█         | 6/58 [00:05<00:30,  1.70it/s]Capturing prefill shape (num_tokens=5120 avail_mem=11.59 GB):  10%|█         | 6/58 [00:05<00:30,  1.70it/s]Capturing prefill shape (num_tokens=5120 avail_mem=11.59 GB):  12%|█▏        | 7/58 [00:05<00:26,  1.90it/s]Capturing prefill shape (num_tokens=4608 avail_mem=11.57 GB):  12%|█▏        | 7/58 [00:05<00:26,  1.90it/s]Capturing prefill shape (num_tokens=4608 avail_mem=11.57 GB):  14%|█▍        | 8/58 [00:06<00:24,  2.07it/s]Capturing prefill shape (num_tokens=4096 avail_mem=11.55 GB):  14%|█▍        | 8/58 [00:06<00:24,  2.07it/s]Capturing prefill shape (num_tokens=4096 avail_mem=11.55 GB):  16%|█▌        | 9/58 [00:06<00:22,  2.21it/s]Capturing prefill shape (num_tokens=3840 avail_mem=11.53 GB):  16%|█▌        | 9/58 [00:06<00:22,  2.21it/s]Capturing prefill shape (num_tokens=3840 avail_mem=11.53 GB):  17%|█▋        | 10/58 [00:07<00:20,  2.30it/s]Capturing prefill shape (num_tokens=3584 avail_mem=11.51 GB):  17%|█▋        | 10/58 [00:07<00:20,  2.30it/s]Capturing prefill shape (num_tokens=3584 avail_mem=11.51 GB):  19%|█▉        | 11/58 [00:07<00:19,  2.36it/s]Capturing prefill shape (num_tokens=3328 avail_mem=11.49 GB):  19%|█▉        | 11/58 [00:07<00:19,  2.36it/s]Capturing prefill shape (num_tokens=3328 avail_mem=11.49 GB):  21%|██        | 12/58 [00:07<00:18,  2.42it/s]Capturing prefill shape (num_tokens=3072 avail_mem=11.47 GB):  21%|██        | 12/58 [00:07<00:18,  2.42it/s]Capturing prefill shape (num_tokens=3072 avail_mem=11.47 GB):  22%|██▏       | 13/58 [00:08<00:18,  2.46it/s]Capturing prefill shape (num_tokens=2816 avail_mem=11.45 GB):  22%|██▏       | 13/58 [00:08<00:18,  2.46it/s]Capturing prefill shape (num_tokens=2816 avail_mem=11.45 GB):  24%|██▍       | 14/58 [00:08<00:17,  2.48it/s]Capturing prefill shape (num_tokens=2560 avail_mem=11.43 GB):  24%|██▍       | 14/58 [00:08<00:17,  2.48it/s]Capturing prefill shape (num_tokens=2560 avail_mem=11.43 GB):  26%|██▌       | 15/58 [00:09<00:17,  2.51it/s]Capturing prefill shape (num_tokens=2304 avail_mem=11.42 GB):  26%|██▌       | 15/58 [00:09<00:17,  2.51it/s]Capturing prefill shape (num_tokens=2304 avail_mem=11.42 GB):  28%|██▊       | 16/58 [00:09<00:16,  2.52it/s]Capturing prefill shape (num_tokens=2048 avail_mem=11.40 GB):  28%|██▊       | 16/58 [00:09<00:16,  2.52it/s]Capturing prefill shape (num_tokens=2048 avail_mem=11.40 GB):  29%|██▉       | 17/58 [00:09<00:16,  2.52it/s]Capturing prefill shape (num_tokens=1792 avail_mem=11.38 GB):  29%|██▉       | 17/58 [00:09<00:16,  2.52it/s]Capturing prefill shape (num_tokens=1792 avail_mem=11.38 GB):  31%|███       | 18/58 [00:10<00:15,  2.52it/s]Capturing prefill shape (num_tokens=1536 avail_mem=11.36 GB):  31%|███       | 18/58 [00:10<00:15,  2.52it/s]Capturing prefill shape (num_tokens=1536 avail_mem=11.36 GB):  33%|███▎      | 19/58 [00:10<00:15,  2.53it/s]Capturing prefill shape (num_tokens=1280 avail_mem=11.34 GB):  33%|███▎      | 19/58 [00:10<00:15,  2.53it/s]Capturing prefill shape (num_tokens=1280 avail_mem=11.34 GB):  34%|███▍      | 20/58 [00:11<00:14,  2.53it/s]Capturing prefill shape (num_tokens=1024 avail_mem=11.32 GB):  34%|███▍      | 20/58 [00:11<00:14,  2.53it/s]Capturing prefill shape (num_tokens=1024 avail_mem=11.32 GB):  36%|███▌      | 21/58 [00:11<00:14,  2.50it/s]Capturing prefill shape (num_tokens=960 avail_mem=11.30 GB):  36%|███▌      | 21/58 [00:11<00:14,  2.50it/s] Capturing prefill shape (num_tokens=960 avail_mem=11.30 GB):  38%|███▊      | 22/58 [00:11<00:14,  2.50it/s]Capturing prefill shape (num_tokens=896 avail_mem=11.28 GB):  38%|███▊      | 22/58 [00:11<00:14,  2.50it/s]Capturing prefill shape (num_tokens=896 avail_mem=11.28 GB):  40%|███▉      | 23/58 [00:12<00:14,  2.50it/s]Capturing prefill shape (num_tokens=832 avail_mem=11.26 GB):  40%|███▉      | 23/58 [00:12<00:14,  2.50it/s]Capturing prefill shape (num_tokens=832 avail_mem=11.26 GB):  41%|████▏     | 24/58 [00:12<00:13,  2.52it/s]Capturing prefill shape (num_tokens=768 avail_mem=11.24 GB):  41%|████▏     | 24/58 [00:12<00:13,  2.52it/s]Capturing prefill shape (num_tokens=768 avail_mem=11.24 GB):  43%|████▎     | 25/58 [00:13<00:13,  2.53it/s]Capturing prefill shape (num_tokens=704 avail_mem=11.23 GB):  43%|████▎     | 25/58 [00:13<00:13,  2.53it/s]Capturing prefill shape (num_tokens=704 avail_mem=11.23 GB):  45%|████▍     | 26/58 [00:13<00:12,  2.53it/s]Capturing prefill shape (num_tokens=640 avail_mem=11.21 GB):  45%|████▍     | 26/58 [00:13<00:12,  2.53it/s]Capturing prefill shape (num_tokens=640 avail_mem=11.21 GB):  47%|████▋     | 27/58 [00:13<00:12,  2.53it/s]Capturing prefill shape (num_tokens=576 avail_mem=11.19 GB):  47%|████▋     | 27/58 [00:13<00:12,  2.53it/s]Capturing prefill shape (num_tokens=576 avail_mem=11.19 GB):  48%|████▊     | 28/58 [00:14<00:11,  2.53it/s]Capturing prefill shape (num_tokens=512 avail_mem=11.17 GB):  48%|████▊     | 28/58 [00:14<00:11,  2.53it/s]Capturing prefill shape (num_tokens=512 avail_mem=11.17 GB):  50%|█████     | 29/58 [00:14<00:11,  2.52it/s]Capturing prefill shape (num_tokens=480 avail_mem=11.15 GB):  50%|█████     | 29/58 [00:14<00:11,  2.52it/s]Capturing prefill shape (num_tokens=480 avail_mem=11.15 GB):  52%|█████▏    | 30/58 [00:15<00:11,  2.52it/s]Capturing prefill shape (num_tokens=448 avail_mem=11.13 GB):  52%|█████▏    | 30/58 [00:15<00:11,  2.52it/s]Capturing prefill shape (num_tokens=448 avail_mem=11.13 GB):  53%|█████▎    | 31/58 [00:15<00:10,  2.53it/s]Capturing prefill shape (num_tokens=416 avail_mem=11.11 GB):  53%|█████▎    | 31/58 [00:15<00:10,  2.53it/s]Capturing prefill shape (num_tokens=416 avail_mem=11.11 GB):  55%|█████▌    | 32/58 [00:15<00:10,  2.51it/s]Capturing prefill shape (num_tokens=384 avail_mem=11.09 GB):  55%|█████▌    | 32/58 [00:15<00:10,  2.51it/s]Capturing prefill shape (num_tokens=384 avail_mem=11.09 GB):  57%|█████▋    | 33/58 [00:16<00:09,  2.51it/s]Capturing prefill shape (num_tokens=352 avail_mem=11.07 GB):  57%|█████▋    | 33/58 [00:16<00:09,  2.51it/s]Capturing prefill shape (num_tokens=352 avail_mem=11.07 GB):  59%|█████▊    | 34/58 [00:16<00:09,  2.51it/s]Capturing prefill shape (num_tokens=320 avail_mem=11.05 GB):  59%|█████▊    | 34/58 [00:16<00:09,  2.51it/s]Capturing prefill shape (num_tokens=320 avail_mem=11.05 GB):  60%|██████    | 35/58 [00:17<00:09,  2.50it/s]Capturing prefill shape (num_tokens=288 avail_mem=11.04 GB):  60%|██████    | 35/58 [00:17<00:09,  2.50it/s]Capturing prefill shape (num_tokens=288 avail_mem=11.04 GB):  62%|██████▏   | 36/58 [00:17<00:08,  2.46it/s]Capturing prefill shape (num_tokens=256 avail_mem=11.02 GB):  62%|██████▏   | 36/58 [00:17<00:08,  2.46it/s]Capturing prefill shape (num_tokens=256 avail_mem=11.02 GB):  64%|██████▍   | 37/58 [00:17<00:08,  2.46it/s]Capturing prefill shape (num_tokens=240 avail_mem=11.00 GB):  64%|██████▍   | 37/58 [00:17<00:08,  2.46it/s]Capturing prefill shape (num_tokens=240 avail_mem=11.00 GB):  66%|██████▌   | 38/58 [00:18<00:08,  2.49it/s]Capturing prefill shape (num_tokens=224 avail_mem=10.98 GB):  66%|██████▌   | 38/58 [00:18<00:08,  2.49it/s]Capturing prefill shape (num_tokens=224 avail_mem=10.98 GB):  67%|██████▋   | 39/58 [00:18<00:07,  2.49it/s]Capturing prefill shape (num_tokens=208 avail_mem=10.96 GB):  67%|██████▋   | 39/58 [00:18<00:07,  2.49it/s]Capturing prefill shape (num_tokens=208 avail_mem=10.96 GB):  69%|██████▉   | 40/58 [00:19<00:07,  2.52it/s]Capturing prefill shape (num_tokens=192 avail_mem=10.94 GB):  69%|██████▉   | 40/58 [00:19<00:07,  2.52it/s]Capturing prefill shape (num_tokens=192 avail_mem=10.94 GB):  71%|███████   | 41/58 [00:19<00:06,  2.52it/s]Capturing prefill shape (num_tokens=176 avail_mem=10.92 GB):  71%|███████   | 41/58 [00:19<00:06,  2.52it/s]Capturing prefill shape (num_tokens=176 avail_mem=10.92 GB):  72%|███████▏  | 42/58 [00:19<00:06,  2.54it/s]Capturing prefill shape (num_tokens=160 avail_mem=10.90 GB):  72%|███████▏  | 42/58 [00:19<00:06,  2.54it/s]Capturing prefill shape (num_tokens=160 avail_mem=10.90 GB):  74%|███████▍  | 43/58 [00:20<00:05,  2.53it/s]Capturing prefill shape (num_tokens=144 avail_mem=10.88 GB):  74%|███████▍  | 43/58 [00:20<00:05,  2.53it/s]Capturing prefill shape (num_tokens=144 avail_mem=10.88 GB):  76%|███████▌  | 44/58 [00:20<00:05,  2.54it/s]Capturing prefill shape (num_tokens=128 avail_mem=10.86 GB):  76%|███████▌  | 44/58 [00:20<00:05,  2.54it/s]Capturing prefill shape (num_tokens=128 avail_mem=10.86 GB):  78%|███████▊  | 45/58 [00:21<00:05,  2.55it/s]Capturing prefill shape (num_tokens=112 avail_mem=10.84 GB):  78%|███████▊  | 45/58 [00:21<00:05,  2.55it/s]Capturing prefill shape (num_tokens=112 avail_mem=10.84 GB):  79%|███████▉  | 46/58 [00:21<00:04,  2.56it/s]Capturing prefill shape (num_tokens=96 avail_mem=10.82 GB):  79%|███████▉  | 46/58 [00:21<00:04,  2.56it/s] Capturing prefill shape (num_tokens=96 avail_mem=10.82 GB):  81%|████████  | 47/58 [00:21<00:04,  2.56it/s]Capturing prefill shape (num_tokens=80 avail_mem=10.80 GB):  81%|████████  | 47/58 [00:21<00:04,  2.56it/s]Capturing prefill shape (num_tokens=80 avail_mem=10.80 GB):  83%|████████▎ | 48/58 [00:22<00:03,  2.57it/s]Capturing prefill shape (num_tokens=64 avail_mem=10.78 GB):  83%|████████▎ | 48/58 [00:22<00:03,  2.57it/s]Capturing prefill shape (num_tokens=64 avail_mem=10.78 GB):  84%|████████▍ | 49/58 [00:22<00:03,  2.57it/s]Capturing prefill shape (num_tokens=48 avail_mem=10.77 GB):  84%|████████▍ | 49/58 [00:22<00:03,  2.57it/s]Capturing prefill shape (num_tokens=48 avail_mem=10.77 GB):  86%|████████▌ | 50/58 [00:22<00:03,  2.57it/s]Capturing prefill shape (num_tokens=32 avail_mem=10.75 GB):  86%|████████▌ | 50/58 [00:22<00:03,  2.57it/s]Capturing prefill shape (num_tokens=32 avail_mem=10.75 GB):  88%|████████▊ | 51/58 [00:23<00:02,  2.47it/s]Capturing prefill shape (num_tokens=28 avail_mem=10.73 GB):  88%|████████▊ | 51/58 [00:23<00:02,  2.47it/s]Capturing prefill shape (num_tokens=28 avail_mem=10.73 GB):  90%|████████▉ | 52/58 [00:23<00:02,  2.44it/s]Capturing prefill shape (num_tokens=24 avail_mem=10.71 GB):  90%|████████▉ | 52/58 [00:23<00:02,  2.44it/s]Capturing prefill shape (num_tokens=24 avail_mem=10.71 GB):  91%|█████████▏| 53/58 [00:24<00:02,  2.41it/s]Capturing prefill shape (num_tokens=20 avail_mem=10.69 GB):  91%|█████████▏| 53/58 [00:24<00:02,  2.41it/s]Capturing prefill shape (num_tokens=20 avail_mem=10.69 GB):  93%|█████████▎| 54/58 [00:24<00:01,  2.40it/s]Capturing prefill shape (num_tokens=16 avail_mem=10.67 GB):  93%|█████████▎| 54/58 [00:24<00:01,  2.40it/s]Capturing prefill shape (num_tokens=16 avail_mem=10.67 GB):  95%|█████████▍| 55/58 [00:25<00:01,  2.39it/s]Capturing prefill shape (num_tokens=12 avail_mem=10.65 GB):  95%|█████████▍| 55/58 [00:25<00:01,  2.39it/s]Capturing prefill shape (num_tokens=12 avail_mem=10.65 GB):  97%|█████████▋| 56/58 [00:25<00:00,  2.39it/s]Capturing prefill shape (num_tokens=8 avail_mem=10.63 GB):  97%|█████████▋| 56/58 [00:25<00:00,  2.39it/s] Capturing prefill shape (num_tokens=8 avail_mem=10.63 GB):  98%|█████████▊| 57/58 [00:25<00:00,  2.39it/s]Capturing prefill shape (num_tokens=4 avail_mem=10.61 GB):  98%|█████████▊| 57/58 [00:25<00:00,  2.39it/s]Capturing prefill shape (num_tokens=4 avail_mem=10.61 GB): 100%|██████████| 58/58 [00:26<00:00,  2.40it/s]Capturing prefill shape (num_tokens=4 avail_mem=10.61 GB): 100%|██████████| 58/58 [00:26<00:00,  2.20it/s]
+[2026-11-24 22:40:21] Capture target prefill CUDA graph end. elapsed=27.43 s, mem usage=1.94 GB, avail mem=11.07 GB.
+[2026-11-24 22:40:21] Capture target decode CUDA graph begin. backend=full, num_tokens_per_req=1, avail mem=11.07 GB
+  0%|          | 0/52 [00:00<?, ?it/s]Capturing batches (bs=512 avail_mem=10.55 GB):   0%|          | 0/52 [00:00<?, ?it/s][2026-11-24 22:40:21] multimem all-gather disabled (no multicast for world_size=4)
+[2026-11-24 22:40:21] multimem all-gather disabled (no multicast for world_size=4)
+[2026-11-24 22:40:21] multimem all-gather disabled (no multicast for world_size=4)
+[2026-11-24 22:40:21] multimem all-gather disabled (no multicast for world_size=4)
+Capturing batches (bs=512 avail_mem=10.55 GB):   2%|▏         | 1/52 [00:00<00:24,  2.08it/s]Capturing batches (bs=496 avail_mem=10.15 GB):   2%|▏         | 1/52 [00:00<00:24,  2.08it/s]Capturing batches (bs=496 avail_mem=10.15 GB):   4%|▍         | 2/52 [00:00<00:21,  2.33it/s]Capturing batches (bs=480 avail_mem=10.14 GB):   4%|▍         | 2/52 [00:00<00:21,  2.33it/s]Capturing batches (bs=480 avail_mem=10.14 GB):   6%|▌         | 3/52 [00:01<00:20,  2.43it/s]Capturing batches (bs=464 avail_mem=10.13 GB):   6%|▌         | 3/52 [00:01<00:20,  2.43it/s]Capturing batches (bs=464 avail_mem=10.13 GB):   8%|▊         | 4/52 [00:01<00:19,  2.46it/s]Capturing batches (bs=448 avail_mem=10.11 GB):   8%|▊         | 4/52 [00:01<00:19,  2.46it/s]Capturing batches (bs=448 avail_mem=10.11 GB):  10%|▉         | 5/52 [00:02<00:18,  2.51it/s]Capturing batches (bs=432 avail_mem=10.10 GB):  10%|▉         | 5/52 [00:02<00:18,  2.51it/s]Capturing batches (bs=432 avail_mem=10.10 GB):  12%|█▏        | 6/52 [00:02<00:18,  2.53it/s]Capturing batches (bs=416 avail_mem=10.08 GB):  12%|█▏        | 6/52 [00:02<00:18,  2.53it/s]Capturing batches (bs=416 avail_mem=10.08 GB):  13%|█▎        | 7/52 [00:02<00:17,  2.55it/s]Capturing batches (bs=400 avail_mem=10.07 GB):  13%|█▎        | 7/52 [00:02<00:17,  2.55it/s]Capturing batches (bs=400 avail_mem=10.07 GB):  15%|█▌        | 8/52 [00:03<00:17,  2.56it/s]Capturing batches (bs=384 avail_mem=10.06 GB):  15%|█▌        | 8/52 [00:03<00:17,  2.56it/s]Capturing batches (bs=384 avail_mem=10.06 GB):  17%|█▋        | 9/52 [00:03<00:16,  2.57it/s]Capturing batches (bs=368 avail_mem=10.04 GB):  17%|█▋        | 9/52 [00:03<00:16,  2.57it/s]Capturing batches (bs=368 avail_mem=10.04 GB):  19%|█▉        | 10/52 [00:03<00:16,  2.57it/s]Capturing batches (bs=352 avail_mem=10.03 GB):  19%|█▉        | 10/52 [00:03<00:16,  2.57it/s]Capturing batches (bs=352 avail_mem=10.03 GB):  21%|██        | 11/52 [00:04<00:15,  2.58it/s]Capturing batches (bs=336 avail_mem=10.02 GB):  21%|██        | 11/52 [00:04<00:15,  2.58it/s]Capturing batches (bs=336 avail_mem=10.02 GB):  23%|██▎       | 12/52 [00:04<00:15,  2.58it/s]Capturing batches (bs=320 avail_mem=10.00 GB):  23%|██▎       | 12/52 [00:04<00:15,  2.58it/s]Capturing batches (bs=320 avail_mem=10.00 GB):  25%|██▌       | 13/52 [00:05<00:15,  2.57it/s]Capturing batches (bs=304 avail_mem=9.99 GB):  25%|██▌       | 13/52 [00:05<00:15,  2.57it/s] Capturing batches (bs=304 avail_mem=9.99 GB):  27%|██▋       | 14/52 [00:05<00:14,  2.57it/s]Capturing batches (bs=288 avail_mem=9.97 GB):  27%|██▋       | 14/52 [00:05<00:14,  2.57it/s]Capturing batches (bs=288 avail_mem=9.97 GB):  29%|██▉       | 15/52 [00:05<00:14,  2.58it/s]Capturing batches (bs=272 avail_mem=9.96 GB):  29%|██▉       | 15/52 [00:05<00:14,  2.58it/s]Capturing batches (bs=272 avail_mem=9.96 GB):  31%|███       | 16/52 [00:06<00:13,  2.58it/s]Capturing batches (bs=256 avail_mem=9.95 GB):  31%|███       | 16/52 [00:06<00:13,  2.58it/s]Capturing batches (bs=256 avail_mem=9.95 GB):  33%|███▎      | 17/52 [00:06<00:13,  2.57it/s]Capturing batches (bs=248 avail_mem=9.93 GB):  33%|███▎      | 17/52 [00:06<00:13,  2.57it/s]Capturing batches (bs=248 avail_mem=9.93 GB):  35%|███▍      | 18/52 [00:07<00:13,  2.56it/s]Capturing batches (bs=240 avail_mem=9.92 GB):  35%|███▍      | 18/52 [00:07<00:13,  2.56it/s]Capturing batches (bs=240 avail_mem=9.92 GB):  37%|███▋      | 19/52 [00:07<00:12,  2.56it/s]Capturing batches (bs=232 avail_mem=9.91 GB):  37%|███▋      | 19/52 [00:07<00:12,  2.56it/s]Capturing batches (bs=232 avail_mem=9.91 GB):  38%|███▊      | 20/52 [00:07<00:12,  2.56it/s]Capturing batches (bs=224 avail_mem=9.89 GB):  38%|███▊      | 20/52 [00:07<00:12,  2.56it/s]Capturing batches (bs=224 avail_mem=9.89 GB):  40%|████      | 21/52 [00:08<00:12,  2.56it/s]Capturing batches (bs=216 avail_mem=9.88 GB):  40%|████      | 21/52 [00:08<00:12,  2.56it/s]Capturing batches (bs=216 avail_mem=9.88 GB):  42%|████▏     | 22/52 [00:08<00:11,  2.55it/s]Capturing batches (bs=208 avail_mem=9.86 GB):  42%|████▏     | 22/52 [00:08<00:11,  2.55it/s]Capturing batches (bs=208 avail_mem=9.86 GB):  44%|████▍     | 23/52 [00:09<00:11,  2.56it/s]Capturing batches (bs=200 avail_mem=9.85 GB):  44%|████▍     | 23/52 [00:09<00:11,  2.56it/s]Capturing batches (bs=200 avail_mem=9.85 GB):  46%|████▌     | 24/52 [00:09<00:10,  2.57it/s]Capturing batches (bs=192 avail_mem=9.84 GB):  46%|████▌     | 24/52 [00:09<00:10,  2.57it/s]Capturing batches (bs=192 avail_mem=9.84 GB):  48%|████▊     | 25/52 [00:09<00:10,  2.57it/s]Capturing batches (bs=184 avail_mem=9.82 GB):  48%|████▊     | 25/52 [00:09<00:10,  2.57it/s]Capturing batches (bs=184 avail_mem=9.82 GB):  50%|█████     | 26/52 [00:10<00:10,  2.57it/s]Capturing batches (bs=176 avail_mem=9.81 GB):  50%|█████     | 26/52 [00:10<00:10,  2.57it/s]Capturing batches (bs=176 avail_mem=9.81 GB):  52%|█████▏    | 27/52 [00:10<00:09,  2.57it/s]Capturing batches (bs=168 avail_mem=9.80 GB):  52%|█████▏    | 27/52 [00:10<00:09,  2.57it/s]Capturing batches (bs=168 avail_mem=9.80 GB):  54%|█████▍    | 28/52 [00:10<00:09,  2.57it/s]Capturing batches (bs=160 avail_mem=9.78 GB):  54%|█████▍    | 28/52 [00:10<00:09,  2.57it/s]Capturing batches (bs=160 avail_mem=9.78 GB):  56%|█████▌    | 29/52 [00:11<00:08,  2.57it/s]Capturing batches (bs=152 avail_mem=9.77 GB):  56%|█████▌    | 29/52 [00:11<00:08,  2.57it/s]Capturing batches (bs=152 avail_mem=9.77 GB):  58%|█████▊    | 30/52 [00:11<00:08,  2.55it/s]Capturing batches (bs=144 avail_mem=9.75 GB):  58%|█████▊    | 30/52 [00:11<00:08,  2.55it/s]Capturing batches (bs=144 avail_mem=9.75 GB):  60%|█████▉    | 31/52 [00:12<00:08,  2.55it/s]Capturing batches (bs=136 avail_mem=9.74 GB):  60%|█████▉    | 31/52 [00:12<00:08,  2.55it/s]Capturing batches (bs=136 avail_mem=9.74 GB):  62%|██████▏   | 32/52 [00:12<00:07,  2.55it/s]Capturing batches (bs=128 avail_mem=9.73 GB):  62%|██████▏   | 32/52 [00:12<00:07,  2.55it/s]Capturing batches (bs=128 avail_mem=9.73 GB):  63%|██████▎   | 33/52 [00:12<00:07,  2.55it/s]Capturing batches (bs=120 avail_mem=9.71 GB):  63%|██████▎   | 33/52 [00:12<00:07,  2.55it/s]Capturing batches (bs=120 avail_mem=9.71 GB):  65%|██████▌   | 34/52 [00:13<00:07,  2.55it/s]Capturing batches (bs=112 avail_mem=9.70 GB):  65%|██████▌   | 34/52 [00:13<00:07,  2.55it/s]Capturing batches (bs=112 avail_mem=9.70 GB):  67%|██████▋   | 35/52 [00:13<00:06,  2.56it/s]Capturing batches (bs=104 avail_mem=9.69 GB):  67%|██████▋   | 35/52 [00:13<00:06,  2.56it/s]Capturing batches (bs=104 avail_mem=9.69 GB):  69%|██████▉   | 36/52 [00:14<00:06,  2.55it/s]Capturing batches (bs=96 avail_mem=9.67 GB):  69%|██████▉   | 36/52 [00:14<00:06,  2.55it/s] Capturing batches (bs=96 avail_mem=9.67 GB):  71%|███████   | 37/52 [00:14<00:05,  2.56it/s]Capturing batches (bs=88 avail_mem=9.66 GB):  71%|███████   | 37/52 [00:14<00:05,  2.56it/s]Capturing batches (bs=88 avail_mem=9.66 GB):  73%|███████▎  | 38/52 [00:14<00:05,  2.56it/s]Capturing batches (bs=80 avail_mem=9.64 GB):  73%|███████▎  | 38/52 [00:14<00:05,  2.56it/s]Capturing batches (bs=80 avail_mem=9.64 GB):  75%|███████▌  | 39/52 [00:15<00:05,  2.56it/s]Capturing batches (bs=72 avail_mem=9.63 GB):  75%|███████▌  | 39/52 [00:15<00:05,  2.56it/s]Capturing batches (bs=72 avail_mem=9.63 GB):  77%|███████▋  | 40/52 [00:15<00:04,  2.56it/s]Capturing batches (bs=64 avail_mem=9.61 GB):  77%|███████▋  | 40/52 [00:15<00:04,  2.56it/s]Capturing batches (bs=64 avail_mem=9.61 GB):  79%|███████▉  | 41/52 [00:16<00:04,  2.56it/s]Capturing batches (bs=56 avail_mem=9.60 GB):  79%|███████▉  | 41/52 [00:16<00:04,  2.56it/s]Capturing batches (bs=56 avail_mem=9.60 GB):  81%|████████  | 42/52 [00:16<00:03,  2.55it/s]Capturing batches (bs=48 avail_mem=9.58 GB):  81%|████████  | 42/52 [00:16<00:03,  2.55it/s]Capturing batches (bs=48 avail_mem=9.58 GB):  83%|████████▎ | 43/52 [00:16<00:03,  2.55it/s]Capturing batches (bs=40 avail_mem=9.57 GB):  83%|████████▎ | 43/52 [00:16<00:03,  2.55it/s]Capturing batches (bs=40 avail_mem=9.57 GB):  85%|████████▍ | 44/52 [00:17<00:03,  2.56it/s]Capturing batches (bs=32 avail_mem=9.55 GB):  85%|████████▍ | 44/52 [00:17<00:03,  2.56it/s]Capturing batches (bs=32 avail_mem=9.55 GB):  87%|████████▋ | 45/52 [00:17<00:02,  2.51it/s]Capturing batches (bs=24 avail_mem=9.54 GB):  87%|████████▋ | 45/52 [00:17<00:02,  2.51it/s]Capturing batches (bs=24 avail_mem=9.54 GB):  88%|████████▊ | 46/52 [00:18<00:02,  2.47it/s]Capturing batches (bs=16 avail_mem=9.52 GB):  88%|████████▊ | 46/52 [00:18<00:02,  2.47it/s]Capturing batches (bs=16 avail_mem=9.52 GB):  90%|█████████ | 47/52 [00:18<00:02,  2.46it/s]Capturing batches (bs=12 avail_mem=9.51 GB):  90%|█████████ | 47/52 [00:18<00:02,  2.46it/s]Capturing batches (bs=12 avail_mem=9.51 GB):  92%|█████████▏| 48/52 [00:18<00:01,  2.45it/s]Capturing batches (bs=8 avail_mem=9.49 GB):  92%|█████████▏| 48/52 [00:18<00:01,  2.45it/s] Capturing batches (bs=8 avail_mem=9.49 GB):  94%|█████████▍| 49/52 [00:19<00:01,  2.44it/s]Capturing batches (bs=4 avail_mem=9.48 GB):  94%|█████████▍| 49/52 [00:19<00:01,  2.44it/s]Capturing batches (bs=4 avail_mem=9.48 GB):  96%|█████████▌| 50/52 [00:19<00:00,  2.44it/s]Capturing batches (bs=2 avail_mem=9.46 GB):  96%|█████████▌| 50/52 [00:19<00:00,  2.44it/s]Capturing batches (bs=2 avail_mem=9.46 GB):  98%|█████████▊| 51/52 [00:20<00:00,  2.43it/s]Capturing batches (bs=1 avail_mem=9.45 GB):  98%|█████████▊| 51/52 [00:20<00:00,  2.43it/s]Capturing batches (bs=1 avail_mem=9.45 GB): 100%|██████████| 52/52 [00:20<00:00,  2.35it/s]Capturing batches (bs=1 avail_mem=9.45 GB): 100%|██████████| 52/52 [00:20<00:00,  2.52it/s]
+[2026-11-24 22:40:42] Capture target decode CUDA graph end. bs=[1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], elapsed=21.69 s, mem usage=1.64 GB, avail mem=9.43 GB.
+/home/devbali/final-venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[rank0]:[W1124 22:40:51.794341110 ProcessGroupNCCL.cpp:5310] Guessing device ID based on global rank. This can cause a hang if rank to GPU mapping is heterogeneous. You can specify device_id in init_process_group()
+Process TP3:
+Process TP2:
+Process TP0:
+Process TP1:
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 288, in time_plan
+    time_fn(model_runner, batch)
+  File "/home/devbali/.local/share/uv/python/cpython-3.12.16-linux-x86_64-gnu/lib/python3.12/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 288, in time_plan
+    time_fn(model_runner, batch)
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 288, in time_plan
+    time_fn(model_runner, batch)
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 198, in time_decode
+    batch = decode_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 288, in time_plan
+    time_fn(model_runner, batch)
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 198, in time_decode
+    batch = decode_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 137, in decode_batch
+    batch = fake_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 198, in time_decode
+    batch = decode_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 198, in time_decode
+    batch = decode_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 137, in decode_batch
+    batch = fake_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 87, in fake_batch
+    assert tokens <= free, f"batch needs {tokens} KV slots, {free} are free"
+           ^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 137, in decode_batch
+    batch = fake_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 137, in decode_batch
+    batch = fake_batch(model_runner, lens)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 87, in fake_batch
+    assert tokens <= free, f"batch needs {tokens} KV slots, {free} are free"
+           ^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 87, in fake_batch
+    assert tokens <= free, f"batch needs {tokens} KV slots, {free} are free"
+           ^^^^^^^^^^^^^^
+  File "/home/devbali/fairinf-experiments/external/fairinf-latency-sweep/src/runner.py", line 87, in fake_batch
+    assert tokens <= free, f"batch needs {tokens} KV slots, {free} are free"
+           ^^^^^^^^^^^^^^
+AssertionError: batch needs 510016 KV slots, 470300 are free
+AssertionError: batch needs 510016 KV slots, 470300 are free
+AssertionError: batch needs 510016 KV slots, 470300 are free
+AssertionError: batch needs 510016 KV slots, 470300 are free
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+max_total_num_tokens=587876
+decode 1/708 sample 1/3: 30.70 ms
+decode 1/708 sample 2/3: 30.75 ms
+decode 1/708 sample 3/3: 32.30 ms
+decode 2/708 sample 1/3: 30.01 ms
+decode 2/708 sample 2/3: 30.12 ms
+decode 2/708 sample 3/3: 30.18 ms
+decode 3/708 sample 1/3: 28.41 ms
+decode 3/708 sample 2/3: 27.97 ms
+decode 3/708 sample 3/3: 27.39 ms
+decode 4/708 sample 1/3: 30.71 ms
+decode 4/708 sample 2/3: 29.68 ms
+decode 4/708 sample 3/3: 30.92 ms
+decode 5/708 sample 1/3: 28.80 ms
+decode 5/708 sample 2/3: 28.70 ms
+decode 5/708 sample 3/3: 28.54 ms
+decode 6/708 sample 1/3: 30.44 ms
+decode 6/708 sample 2/3: 30.78 ms
+decode 6/708 sample 3/3: 30.85 ms
+decode 7/708 sample 1/3: 43.19 ms
+decode 7/708 sample 2/3: 43.52 ms
+decode 7/708 sample 3/3: 42.70 ms
+decode 8/708 sample 1/3: 28.10 ms
+decode 8/708 sample 2/3: 28.84 ms
+decode 8/708 sample 3/3: 27.85 ms
+decode 9/708 sample 1/3: 31.76 ms
+decode 9/708 sample 2/3: 31.80 ms
+decode 9/708 sample 3/3: 31.18 ms
+decode 10/708 sample 1/3: 42.22 ms
+decode 10/708 sample 2/3: 41.86 ms
+decode 10/708 sample 3/3: 43.07 ms
+decode 11/708 sample 1/3: 29.55 ms
+decode 11/708 sample 2/3: 28.63 ms
+decode 11/708 sample 3/3: 29.41 ms
+decode 12/708 sample 1/3: 30.53 ms
+decode 12/708 sample 2/3: 32.10 ms
+decode 12/708 sample 3/3: 31.83 ms
+decode 13/708 sample 1/3: 41.69 ms
+decode 13/708 sample 2/3: 42.14 ms
+decode 13/708 sample 3/3: 42.19 ms
+decode 14/708 sample 1/3: 28.86 ms
+decode 14/708 sample 2/3: 29.41 ms
+decode 14/708 sample 3/3: 29.86 ms
+decode 15/708 sample 1/3: 31.65 ms
+decode 15/708 sample 2/3: 31.26 ms
+decode 15/708 sample 3/3: 31.32 ms
+decode 16/708 sample 1/3: 42.73 ms
+decode 16/708 sample 2/3: 42.24 ms
+decode 16/708 sample 3/3: 42.71 ms
+decode 17/708 sample 1/3: 30.02 ms
+decode 17/708 sample 2/3: 29.55 ms
+decode 17/708 sample 3/3: 29.31 ms
+decode 18/708 sample 1/3: 32.37 ms
+decode 18/708 sample 2/3: 32.28 ms
+decode 18/708 sample 3/3: 32.51 ms
+decode 19/708 sample 1/3: 42.02 ms
+decode 19/708 sample 2/3: 42.46 ms
+decode 19/708 sample 3/3: 42.73 ms
+decode 20/708 sample 1/3: 30.19 ms
+decode 20/708 sample 2/3: 29.72 ms
+decode 20/708 sample 3/3: 31.09 ms
+decode 21/708 sample 1/3: 32.30 ms
+decode 21/708 sample 2/3: 32.27 ms
+decode 21/708 sample 3/3: 32.85 ms
+decode 22/708 sample 1/3: 43.58 ms
+decode 22/708 sample 2/3: 43.44 ms
+decode 22/708 sample 3/3: 42.99 ms
+TP0 exited with code 1
+sglang       0.0.0.dev0, source 66697235d3bb
+sgl_kernel   0.4.10
+flashinfer   0.7.2
+transformers 5.19.0
+torch        2.14.1+cu130 cuda 13.0
+gpu          NVIDIA A100-SXM4-80GB
+command: PYTHONPATH=/home/devbali/fairinf-experiments/external/fairinf-sglang/python CUDA_VISIBLE_DEVICES=0,1,2,3 /home/devbali/final-venv/bin/python src/runner.py --model-path /mnt/ram/gpt-oss-120b-bf16 --dtype bfloat16 --sampling-backend pytorch --tp 4 --batches /home/devbali/fairinf-experiments/vm/latency_check/decode_large_120b-tp4.json --out /home/devbali/fairinf-experiments/experiments/latency-models/results/gptoss-120b-tp4-decode-large-final-setup/results.jsonl
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:51:08] Detected GPT-OSS model, enabling triton_kernels MOE kernel.
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:51:22] Init parallel begin.
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/srt/cache_hooks/tau_fair_policy.py:38: UserWarning: _tau_fair_cython module not available. Build it with: cd cache_hooks/cython && python3 setup.py build_ext --inplace
+  warnings.warn(
+[2026-11-24 22:52:02] sglang is using nccl==2.30.7
+[2026-11-24 22:52:05] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-442f7328e34246ca951e3de6480cd74a
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:52:08] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-2384de0fb8e84b4ca5fd28ab51599d28
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:52:11] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-01b7c2c1c40548f9a9b92044d9188fce
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:52:15] Setup Custom allreduce failed with Failed to build JIT module sgl_kernel_jit_communicator in /home/devbali/.cache/sglang/jit/sm80/sgl_kernel_jit_communicator/build-faec33840f8d0724/.staging-a0a74c3c6baf40e8a2221114f72420d4
+stdout:
+[1/2] /usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+FAILED: cuda_0.o 
+/usr/local/cuda/bin/nvcc -MD -MF "cuda_0.o.d" -Xcompiler -fPIC -gencode=arch=compute_80,code=sm_80 -DSGL_CUDA_ARCH=800 -std=c++20 -O3 --expt-relaxed-constexpr -I/home/devbali/final-venv/lib/python3.12/site-packages/tvm_ffi/include -I/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include -c "cuda.cu" -o "cuda_0.o"
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(122): error: identifier "assert" is undefined
+    assert(false && "multimem load is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(157): error: identifier "assert" is undefined
+    assert(false && "multimem store is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(223): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+/home/devbali/fairinf-experiments/external/fairinf-sglang/python/sglang/kernels/jit/include/sgl_kernel/distributed/ptx.cuh(231): error: identifier "assert" is undefined
+    assert(false && "multimem red is only supported on Hopper or later architecture");
+    ^
+
+4 errors detected in the compilation of "cuda.cu".
+ninja: build stopped: subcommand failed.
+
+stderr:
+. To silence this warning, specify --disable-custom-all-reduce explicitly.
+[2026-11-24 22:52:15] Init parallel ends. elapsed=52.94 s
+[2026-11-24 22:52:15] Memory baseline taken. mem usage=0.00 GB
+[2026-11-24 22:52:16] Load weight begin. avail mem=77.93 GB
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+Multi-thread loading shards:   0% Completed | 0/36 [00:00<?, ?it/s]Multi-thread loading shards: 100% Completed | 36/36 [00:00<00:00, 731.22it/s]
+[2026-11-24 22:54:09] Load weight end. elapsed=112.74 s, type=GptOssForCausalLM, avail mem=23.31 GB, mem usage=54.62 GB.
+[2026-11-24 22:54:09] Use sliding window memory pool. full_layer_tokens=587876, swa_layer_tokens=470300
+[2026-11-24 22:54:09] Full KV Cache is allocated. dtype: torch.bfloat16, #tokens: 587876, K size: 2.52 GB, V size: 2.52 GB
+[2026-11-24 22:54:09] SWA KV Cache is allocated. dtype: torch.bfloat16, #tokens: 470300, K size: 2.02 GB, V size: 2.02 GB
+[2026-11-24 22:54:09] SWAKVPool mem usage: 9.08 GB, swa size: 470300, full size: 587876
+[2026-11-24 22:54:09] Memory pool end. avail mem=13.06 GB
+[2026-11-24 22:54:10] Capture target prefill CUDA graph begin. backend=breakable, num_tokens=[4, 8, 12, 16, 20, 24, 28, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256, 288, 320, 352, 384, 416, 448, 480, 512, 576, 640, 704, 768, 832, 896, 960, 1024, 1280, 1536, 1792, 2048, 2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096, 4608, 5120, 5632, 6144, 6656, 7168, 7680, 8192], avail mem=13.01 GB
+  0%|          | 0/58 [00:00<?, ?it/s]Capturing prefill shape (num_tokens=8192 avail_mem=13.01 GB):   0%|          | 0/58 [00:00<?, ?it/s]Capturing prefill shape (num_tokens=8192 avail_mem=13.01 GB):   2%|▏         | 1/58 [00:03<03:20,  3.51s/it]Capturing prefill shape (num_tokens=7680 avail_mem=11.68 GB):   2%|▏         | 1/58 [00:03<03:20,  3.51s/it]Capturing prefill shape (num_tokens=7680 avail_mem=11.68 GB):   3%|▎         | 2/58 [00:03<01:36,  1.72s/it]Capturing prefill shape (num_tokens=7168 avail_mem=11.66 GB):   3%|▎         | 2/58 [00:03<01:36,  1.72s/it]Capturing prefill shape (num_tokens=7168 avail_mem=11.66 GB):   5%|▌         | 3/58 [00:04<01:02,  1.14s/it]Capturing prefill shape (num_tokens=6656 avail_mem=11.64 GB):   5%|▌         | 3/58 [00:04<01:02,  1.14s/it]Capturing prefill shape (num_tokens=6656 avail_mem=11.64 GB):   7%|▋         | 4/58 [00:04<00:46,  1.17it/s]Capturing prefill shape (num_tokens=6144 avail_mem=11.62 GB):   7%|▋         | 4/58 [00:04<00:46,  1.17it/s]Capturing prefill shape (num_tokens=6144 avail_mem=11.62 GB):   9%|▊         | 5/58 [00:05<00:36,  1.44it/s]Capturing prefill shape (num_tokens=5632 avail_mem=11.61 GB):   9%|▊         | 5/58 [00:05<00:36,  1.44it/s]Capturing prefill shape (num_tokens=5632 avail_mem=11.61 GB):  10%|█         | 6/58 [00:05<00:30,  1.68it/s]Capturing prefill shape (num_tokens=5120 avail_mem=11.59 GB):  10%|█         | 6/58 [00:05<00:30,  1.68it/s]Capturing prefill shape (num_tokens=5120 avail_mem=11.59 GB):  12%|█▏        | 7/58 [00:06<00:27,  1.88it/s]Capturing prefill shape (num_tokens=4608 avail_mem=11.57 GB):  12%|█▏        | 7/58 [00:06<00:27,  1.88it/s]Capturing prefill shape (num_tokens=4608 avail_mem=11.57 GB):  14%|█▍        | 8/58 [00:06<00:24,  2.05it/s]Capturing prefill shape (num_tokens=4096 avail_mem=11.55 GB):  14%|█▍        | 8/58 [00:06<00:24,  2.05it/s]Capturing prefill shape (num_tokens=4096 avail_mem=11.55 GB):  16%|█▌        | 9/58 [00:06<00:22,  2.18it/s]Capturing prefill shape (num_tokens=3840 avail_mem=11.53 GB):  16%|█▌        | 9/58 [00:06<00:22,  2.18it/s]Capturing prefill shape (num_tokens=3840 avail_mem=11.53 GB):  17%|█▋        | 10/58 [00:07<00:21,  2.27it/s]Capturing prefill shape (num_tokens=3584 avail_mem=11.51 GB):  17%|█▋        | 10/58 [00:07<00:21,  2.27it/s]Capturing prefill shape (num_tokens=3584 avail_mem=11.51 GB):  19%|█▉        | 11/58 [00:07<00:19,  2.35it/s]Capturing prefill shape (num_tokens=3328 avail_mem=11.49 GB):  19%|█▉        | 11/58 [00:07<00:19,  2.35it/s]Capturing prefill shape (num_tokens=3328 avail_mem=11.49 GB):  21%|██        | 12/58 [00:08<00:19,  2.41it/s]Capturing prefill shape (num_tokens=3072 avail_mem=11.47 GB):  21%|██        | 12/58 [00:08<00:19,  2.41it/s]Capturing prefill shape (num_tokens=3072 avail_mem=11.47 GB):  22%|██▏       | 13/58 [00:08<00:18,  2.45it/s]Capturing prefill shape (num_tokens=2816 avail_mem=11.45 GB):  22%|██▏       | 13/58 [00:08<00:18,  2.45it/s]Capturing prefill shape (num_tokens=2816 avail_mem=11.45 GB):  24%|██▍       | 14/58 [00:08<00:17,  2.48it/s]Capturing prefill shape (num_tokens=2560 avail_mem=11.43 GB):  24%|██▍       | 14/58 [00:08<00:17,  2.48it/s]Capturing prefill shape (num_tokens=2560 avail_mem=11.43 GB):  26%|██▌       | 15/58 [00:09<00:17,  2.50it/s]Capturing prefill shape (num_tokens=2304 avail_mem=11.42 GB):  26%|██▌       | 15/58 [00:09<00:17,  2.50it/s]Capturing prefill shape (num_tokens=2304 avail_mem=11.42 GB):  28%|██▊       | 16/58 [00:09<00:16,  2.50it/s]Capturing prefill shape (num_tokens=2048 avail_mem=11.40 GB):  28%|██▊       | 16/58 [00:09<00:16,  2.50it/s]Capturing prefill shape (num_tokens=2048 avail_mem=11.40 GB):  29%|██▉       | 17/58 [00:10<00:16,  2.47it/s]Capturing prefill shape (num_tokens=1792 avail_mem=11.38 GB):  29%|██▉       | 17/58 [00:10<00:16,  2.47it/s]Capturing prefill shape (num_tokens=1792 avail_mem=11.38 GB):  31%|███       | 18/58 [00:10<00:16,  2.47it/s]Capturing prefill shape (num_tokens=1536 avail_mem=11.36 GB):  31%|███       | 18/58 [00:10<00:16,  2.47it/s]Capturing prefill shape (num_tokens=1536 avail_mem=11.36 GB):  33%|███▎      | 19/58 [00:10<00:15,  2.47it/s]Capturing prefill shape (num_tokens=1280 avail_mem=11.34 GB):  33%|███▎      | 19/58 [00:10<00:15,  2.47it/s]Capturing prefill shape (num_tokens=1280 avail_mem=11.34 GB):  34%|███▍      | 20/58 [00:11<00:15,  2.49it/s]Capturing prefill shape (num_tokens=1024 avail_mem=11.32 GB):  34%|███▍      | 20/58 [00:11<00:15,  2.49it/s]Capturing prefill shape (num_tokens=1024 avail_mem=11.32 GB):  36%|███▌      | 21/58 [00:11<00:15,  2.47it/s]Capturing prefill shape (num_tokens=960 avail_mem=11.30 GB):  36%|███▌      | 21/58 [00:11<00:15,  2.47it/s] Capturing prefill shape (num_tokens=960 avail_mem=11.30 GB):  38%|███▊      | 22/58 [00:12<00:14,  2.46it/s]Capturing prefill shape (num_tokens=896 avail_mem=11.28 GB):  38%|███▊      | 22/58 [00:12<00:14,  2.46it/s]Capturing prefill shape (num_tokens=896 avail_mem=11.28 GB):  40%|███▉      | 23/58 [00:12<00:14,  2.45it/s]Capturing prefill shape (num_tokens=832 avail_mem=11.26 GB):  40%|███▉      | 23/58 [00:12<00:14,  2.45it/s]Capturing prefill shape (num_tokens=832 avail_mem=11.26 GB):  41%|████▏     | 24/58 [00:12<00:13,  2.45it/s]Capturing prefill shape (num_tokens=768 avail_mem=11.24 GB):  41%|████▏     | 24/58 [00:12<00:13,  2.45it/s]Capturing prefill shape (num_tokens=768 avail_mem=11.24 GB):  43%|████▎     | 25/58 [00:13<00:13,  2.46it/s]Capturing prefill shape (num_tokens=704 avail_mem=11.23 GB):  43%|████▎     | 25/58 [00:13<00:13,  2.46it/s]Capturing prefill shape (num_tokens=704 avail_mem=11.23 GB):  45%|████▍     | 26/58 [00:13<00:12,  2.47it/s]Capturing prefill shape (num_tokens=640 avail_mem=11.21 GB):  45%|████▍     | 26/58 [00:13<00:12,  2.47it/s]Capturing prefill shape (num_tokens=640 avail_mem=11.21 GB):  47%|████▋     | 27/58 [00:14<00:12,  2.48it/s]Capturing prefill shape (num_tokens=576 avail_mem=11.19 GB):  47%|████▋     | 27/58 [00:14<00:12,  2.48it/s]Capturing prefill shape (num_tokens=576 avail_mem=11.19 GB):  48%|████▊     | 28/58 [00:14<00:12,  2.48it/s]Capturing prefill shape (num_tokens=512 avail_mem=11.17 GB):  48%|████▊     | 28/58 [00:14<00:12,  2.48it/s]Capturing prefill shape (num_tokens=512 avail_mem=11.17 GB):  50%|█████     | 29/58 [00:14<00:11,  2.47it/s]Capturing prefill shape (num_tokens=480 avail_mem=11.15 GB):  50%|█████     | 29/58 [00:14<00:11,  2.47it/s]Capturing prefill shape (num_tokens=480 avail_mem=11.15 GB):  52%|█████▏    | 30/58 [00:15<00:11,  2.47it/s]Capturing prefill shape (num_tokens=448 avail_mem=11.13 GB):  52%|█████▏    | 30/58 [00:15<00:11,  2.47it/s]Capturing prefill shape (num_tokens=448 avail_mem=11.13 GB):  53%|█████▎    | 31/58 [00:15<00:10,  2.48it/s]Capturing prefill shape (num_tokens=416 avail_mem=11.11 GB):  53%|█████▎    | 31/58 [00:15<00:10,  2.48it/s]Capturing prefill shape (num_tokens=416 avail_mem=11.11 GB):  55%|█████▌    | 32/58 [00:16<00:10,  2.46it/s]Capturing prefill shape (num_tokens=384 avail_mem=11.09 GB):  55%|█████▌    | 32/58 [00:16<00:10,  2.46it/s]Capturing prefill shape (num_tokens=384 avail_mem=11.09 GB):  57%|█████▋    | 33/58 [00:16<00:10,  2.47it/s]Capturing prefill shape (num_tokens=352 avail_mem=11.07 GB):  57%|█████▋    | 33/58 [00:16<00:10,  2.47it/s]Capturing prefill shape (num_tokens=352 avail_mem=11.07 GB):  59%|█████▊    | 34/58 [00:16<00:09,  2.48it/s]Capturing prefill shape (num_tokens=320 avail_mem=11.05 GB):  59%|█████▊    | 34/58 [00:16<00:09,  2.48it/s]Capturing prefill shape (num_tokens=320 avail_mem=11.05 GB):  60%|██████    | 35/58 [00:17<00:09,  2.47it/s]Capturing prefill shape (num_tokens=288 avail_mem=11.04 GB):  60%|██████    | 35/58 [00:17<00:09,  2.47it/s]Capturing prefill shape (num_tokens=288 avail_mem=11.04 GB):  62%|██████▏   | 36/58 [00:17<00:09,  2.41it/s]Capturing prefill shape (num_tokens=256 avail_mem=11.02 GB):  62%|██████▏   | 36/58 [00:17<00:09,  2.41it/s]Capturing prefill shape (num_tokens=256 avail_mem=11.02 GB):  64%|██████▍   | 37/58 [00:18<00:08,  2.40it/s]Capturing prefill shape (num_tokens=240 avail_mem=11.00 GB):  64%|██████▍   | 37/58 [00:18<00:08,  2.40it/s]Capturing prefill shape (num_tokens=240 avail_mem=11.00 GB):  66%|██████▌   | 38/58 [00:18<00:08,  2.42it/s]Capturing prefill shape (num_tokens=224 avail_mem=10.98 GB):  66%|██████▌   | 38/58 [00:18<00:08,  2.42it/s]Capturing prefill shape (num_tokens=224 avail_mem=10.98 GB):  67%|██████▋   | 39/58 [00:18<00:07,  2.42it/s]Capturing prefill shape (num_tokens=208 avail_mem=10.96 GB):  67%|██████▋   | 39/58 [00:18<00:07,  2.42it/s]Capturing prefill shape (num_tokens=208 avail_mem=10.96 GB):  69%|██████▉   | 40/58 [00:19<00:07,  2.44it/s]Capturing prefill shape (num_tokens=192 avail_mem=10.94 GB):  69%|██████▉   | 40/58 [00:19<00:07,  2.44it/s]Capturing prefill shape (num_tokens=192 avail_mem=10.94 GB):  71%|███████   | 41/58 [00:19<00:06,  2.44it/s]Capturing prefill shape (num_tokens=176 avail_mem=10.92 GB):  71%|███████   | 41/58 [00:19<00:06,  2.44it/s]Capturing prefill shape (num_tokens=176 avail_mem=10.92 GB):  72%|███████▏  | 42/58 [00:20<00:06,  2.45it/s]Capturing prefill shape (num_tokens=160 avail_mem=10.90 GB):  72%|███████▏  | 42/58 [00:20<00:06,  2.45it/s]Capturing prefill shape (num_tokens=160 avail_mem=10.90 GB):  74%|███████▍  | 43/58 [00:20<00:06,  2.44it/s]Capturing prefill shape (num_tokens=144 avail_mem=10.88 GB):  74%|███████▍  | 43/58 [00:20<00:06,  2.44it/s]Capturing prefill shape (num_tokens=144 avail_mem=10.88 GB):  76%|███████▌  | 44/58 [00:21<00:05,  2.44it/s]Capturing prefill shape (num_tokens=128 avail_mem=10.86 GB):  76%|███████▌  | 44/58 [00:21<00:05,  2.44it/s]Capturing prefill shape (num_tokens=128 avail_mem=10.86 GB):  78%|███████▊  | 45/58 [00:21<00:05,  2.45it/s]Capturing prefill shape (num_tokens=112 avail_mem=10.84 GB):  78%|███████▊  | 45/58 [00:21<00:05,  2.45it/s]Capturing prefill shape (num_tokens=112 avail_mem=10.84 GB):  79%|███████▉  | 46/58 [00:21<00:04,  2.47it/s]Capturing prefill shape (num_tokens=96 avail_mem=10.82 GB):  79%|███████▉  | 46/58 [00:21<00:04,  2.47it/s] Capturing prefill shape (num_tokens=96 avail_mem=10.82 GB):  81%|████████  | 47/58 [00:22<00:04,  2.47it/s]Capturing prefill shape (num_tokens=80 avail_mem=10.80 GB):  81%|████████  | 47/58 [00:22<00:04,  2.47it/s]Capturing prefill shape (num_tokens=80 avail_mem=10.80 GB):  83%|████████▎ | 48/58 [00:22<00:04,  2.49it/s]Capturing prefill shape (num_tokens=64 avail_mem=10.78 GB):  83%|████████▎ | 48/58 [00:22<00:04,  2.49it/s]Capturing prefill shape (num_tokens=64 avail_mem=10.78 GB):  84%|████████▍ | 49/58 [00:23<00:03,  2.51it/s]Capturing prefill shape (num_tokens=48 avail_mem=10.77 GB):  84%|████████▍ | 49/58 [00:23<00:03,  2.51it/s]Capturing prefill shape (num_tokens=48 avail_mem=10.77 GB):  86%|████████▌ | 50/58 [00:23<00:03,  2.52it/s]Capturing prefill shape (num_tokens=32 avail_mem=10.75 GB):  86%|████████▌ | 50/58 [00:23<00:03,  2.52it/s]Capturing prefill shape (num_tokens=32 avail_mem=10.75 GB):  88%|████████▊ | 51/58 [00:23<00:02,  2.42it/s]Capturing prefill shape (num_tokens=28 avail_mem=10.73 GB):  88%|████████▊ | 51/58 [00:23<00:02,  2.42it/s]Capturing prefill shape (num_tokens=28 avail_mem=10.73 GB):  90%|████████▉ | 52/58 [00:24<00:02,  2.40it/s]Capturing prefill shape (num_tokens=24 avail_mem=10.71 GB):  90%|████████▉ | 52/58 [00:24<00:02,  2.40it/s]Capturing prefill shape (num_tokens=24 avail_mem=10.71 GB):  91%|█████████▏| 53/58 [00:24<00:02,  2.38it/s]Capturing prefill shape (num_tokens=20 avail_mem=10.69 GB):  91%|█████████▏| 53/58 [00:24<00:02,  2.38it/s]Capturing prefill shape (num_tokens=20 avail_mem=10.69 GB):  93%|█████████▎| 54/58 [00:25<00:01,  2.36it/s]Capturing prefill shape (num_tokens=16 avail_mem=10.67 GB):  93%|█████████▎| 54/58 [00:25<00:01,  2.36it/s]Capturing prefill shape (num_tokens=16 avail_mem=10.67 GB):  95%|█████████▍| 55/58 [00:25<00:01,  2.34it/s]Capturing prefill shape (num_tokens=12 avail_mem=10.65 GB):  95%|█████████▍| 55/58 [00:25<00:01,  2.34it/s]Capturing prefill shape (num_tokens=12 avail_mem=10.65 GB):  97%|█████████▋| 56/58 [00:26<00:00,  2.32it/s]Capturing prefill shape (num_tokens=8 avail_mem=10.63 GB):  97%|█████████▋| 56/58 [00:26<00:00,  2.32it/s] Capturing prefill shape (num_tokens=8 avail_mem=10.63 GB):  98%|█████████▊| 57/58 [00:26<00:00,  2.30it/s]Capturing prefill shape (num_tokens=4 avail_mem=10.61 GB):  98%|█████████▊| 57/58 [00:26<00:00,  2.30it/s]Capturing prefill shape (num_tokens=4 avail_mem=10.61 GB): 100%|██████████| 58/58 [00:26<00:00,  2.30it/s]Capturing prefill shape (num_tokens=4 avail_mem=10.61 GB): 100%|██████████| 58/58 [00:26<00:00,  2.16it/s]
+[2026-11-24 22:54:38] Capture target prefill CUDA graph end. elapsed=28.00 s, mem usage=1.94 GB, avail mem=11.07 GB.
+[2026-11-24 22:54:38] Capture target decode CUDA graph begin. backend=full, num_tokens_per_req=1, avail mem=11.07 GB
+  0%|          | 0/52 [00:00<?, ?it/s]Capturing batches (bs=512 avail_mem=10.55 GB):   0%|          | 0/52 [00:00<?, ?it/s][2026-11-24 22:54:38] multimem all-gather disabled (no multicast for world_size=4)
+[2026-11-24 22:54:38] multimem all-gather disabled (no multicast for world_size=4)
+[2026-11-24 22:54:38] multimem all-gather disabled (no multicast for world_size=4)
+[2026-11-24 22:54:38] multimem all-gather disabled (no multicast for world_size=4)
+Capturing batches (bs=512 avail_mem=10.55 GB):   2%|▏         | 1/52 [00:00<00:24,  2.04it/s]Capturing batches (bs=496 avail_mem=10.15 GB):   2%|▏         | 1/52 [00:00<00:24,  2.04it/s]Capturing batches (bs=496 avail_mem=10.15 GB):   4%|▍         | 2/52 [00:00<00:21,  2.28it/s]Capturing batches (bs=480 avail_mem=10.14 GB):   4%|▍         | 2/52 [00:00<00:21,  2.28it/s]Capturing batches (bs=480 avail_mem=10.14 GB):   6%|▌         | 3/52 [00:01<00:20,  2.38it/s]Capturing batches (bs=464 avail_mem=10.13 GB):   6%|▌         | 3/52 [00:01<00:20,  2.38it/s]Capturing batches (bs=464 avail_mem=10.13 GB):   8%|▊         | 4/52 [00:01<00:20,  2.40it/s]Capturing batches (bs=448 avail_mem=10.11 GB):   8%|▊         | 4/52 [00:01<00:20,  2.40it/s]Capturing batches (bs=448 avail_mem=10.11 GB):  10%|▉         | 5/52 [00:02<00:19,  2.43it/s]Capturing batches (bs=432 avail_mem=10.10 GB):  10%|▉         | 5/52 [00:02<00:19,  2.43it/s]Capturing batches (bs=432 avail_mem=10.10 GB):  12%|█▏        | 6/52 [00:02<00:18,  2.46it/s]Capturing batches (bs=416 avail_mem=10.08 GB):  12%|█▏        | 6/52 [00:02<00:18,  2.46it/s]Capturing batches (bs=416 avail_mem=10.08 GB):  13%|█▎        | 7/52 [00:02<00:18,  2.48it/s]Capturing batches (bs=400 avail_mem=10.07 GB):  13%|█▎        | 7/52 [00:02<00:18,  2.48it/s]Capturing batches (bs=400 avail_mem=10.07 GB):  15%|█▌        | 8/52 [00:03<00:17,  2.48it/s]Capturing batches (bs=384 avail_mem=10.06 GB):  15%|█▌        | 8/52 [00:03<00:17,  2.48it/s]Capturing batches (bs=384 avail_mem=10.06 GB):  17%|█▋        | 9/52 [00:03<00:17,  2.48it/s]Capturing batches (bs=368 avail_mem=10.04 GB):  17%|█▋        | 9/52 [00:03<00:17,  2.48it/s]Capturing batches (bs=368 avail_mem=10.04 GB):  19%|█▉        | 10/52 [00:04<00:16,  2.48it/s]Capturing batches (bs=352 avail_mem=10.03 GB):  19%|█▉        | 10/52 [00:04<00:16,  2.48it/s]Capturing batches (bs=352 avail_mem=10.03 GB):  21%|██        | 11/52 [00:04<00:16,  2.50it/s]Capturing batches (bs=336 avail_mem=10.02 GB):  21%|██        | 11/52 [00:04<00:16,  2.50it/s]Capturing batches (bs=336 avail_mem=10.02 GB):  23%|██▎       | 12/52 [00:04<00:16,  2.50it/s]Capturing batches (bs=320 avail_mem=10.00 GB):  23%|██▎       | 12/52 [00:04<00:16,  2.50it/s]Capturing batches (bs=320 avail_mem=10.00 GB):  25%|██▌       | 13/52 [00:05<00:15,  2.49it/s]Capturing batches (bs=304 avail_mem=9.99 GB):  25%|██▌       | 13/52 [00:05<00:15,  2.49it/s] Capturing batches (bs=304 avail_mem=9.99 GB):  27%|██▋       | 14/52 [00:05<00:15,  2.49it/s]Capturing batches (bs=288 avail_mem=9.97 GB):  27%|██▋       | 14/52 [00:05<00:15,  2.49it/s]Capturing batches (bs=288 avail_mem=9.97 GB):  29%|██▉       | 15/52 [00:06<00:14,  2.49it/s]Capturing batches (bs=272 avail_mem=9.96 GB):  29%|██▉       | 15/52 [00:06<00:14,  2.49it/s]Capturing batches (bs=272 avail_mem=9.96 GB):  31%|███       | 16/52 [00:06<00:14,  2.49it/s]Capturing batches (bs=256 avail_mem=9.95 GB):  31%|███       | 16/52 [00:06<00:14,  2.49it/s]Capturing batches (bs=256 avail_mem=9.95 GB):  33%|███▎      | 17/52 [00:06<00:14,  2.49it/s]Capturing batches (bs=248 avail_mem=9.93 GB):  33%|███▎      | 17/52 [00:06<00:14,  2.49it/s]Capturing batches (bs=248 avail_mem=9.93 GB):  35%|███▍      | 18/52 [00:07<00:13,  2.48it/s]Capturing batches (bs=240 avail_mem=9.92 GB):  35%|███▍      | 18/52 [00:07<00:13,  2.48it/s]Capturing batches (bs=240 avail_mem=9.92 GB):  37%|███▋      | 19/52 [00:07<00:13,  2.49it/s]Capturing batches (bs=232 avail_mem=9.91 GB):  37%|███▋      | 19/52 [00:07<00:13,  2.49it/s]Capturing batches (bs=232 avail_mem=9.91 GB):  38%|███▊      | 20/52 [00:08<00:12,  2.49it/s]Capturing batches (bs=224 avail_mem=9.89 GB):  38%|███▊      | 20/52 [00:08<00:12,  2.49it/s]Capturing batches (bs=224 avail_mem=9.89 GB):  40%|████      | 21/52 [00:08<00:12,  2.50it/s]Capturing batches (bs=216 avail_mem=9.88 GB):  40%|████      | 21/52 [00:08<00:12,  2.50it/s]Capturing batches (bs=216 avail_mem=9.88 GB):  42%|████▏     | 22/52 [00:08<00:12,  2.49it/s]Capturing batches (bs=208 avail_mem=9.86 GB):  42%|████▏     | 22/52 [00:08<00:12,  2.49it/s]Capturing batches (bs=208 avail_mem=9.86 GB):  44%|████▍     | 23/52 [00:09<00:11,  2.49it/s]Capturing batches (bs=200 avail_mem=9.85 GB):  44%|████▍     | 23/52 [00:09<00:11,  2.49it/s]Capturing batches (bs=200 avail_mem=9.85 GB):  46%|████▌     | 24/52 [00:09<00:11,  2.49it/s]Capturing batches (bs=192 avail_mem=9.84 GB):  46%|████▌     | 24/52 [00:09<00:11,  2.49it/s]Capturing batches (bs=192 avail_mem=9.84 GB):  48%|████▊     | 25/52 [00:10<00:10,  2.50it/s]Capturing batches (bs=184 avail_mem=9.82 GB):  48%|████▊     | 25/52 [00:10<00:10,  2.50it/s]Capturing batches (bs=184 avail_mem=9.82 GB):  50%|█████     | 26/52 [00:10<00:10,  2.48it/s]Capturing batches (bs=176 avail_mem=9.81 GB):  50%|█████     | 26/52 [00:10<00:10,  2.48it/s]Capturing batches (bs=176 avail_mem=9.81 GB):  52%|█████▏    | 27/52 [00:10<00:10,  2.48it/s]Capturing batches (bs=168 avail_mem=9.80 GB):  52%|█████▏    | 27/52 [00:10<00:10,  2.48it/s]Capturing batches (bs=168 avail_mem=9.80 GB):  54%|█████▍    | 28/52 [00:11<00:09,  2.49it/s]Capturing batches (bs=160 avail_mem=9.78 GB):  54%|█████▍    | 28/52 [00:11<00:09,  2.49it/s]Capturing batches (bs=160 avail_mem=9.78 GB):  56%|█████▌    | 29/52 [00:11<00:09,  2.49it/s]Capturing batches (bs=152 avail_mem=9.77 GB):  56%|█████▌    | 29/52 [00:11<00:09,  2.49it/s]Capturing batches (bs=152 avail_mem=9.77 GB):  58%|█████▊    | 30/52 [00:12<00:08,  2.48it/s]Capturing batches (bs=144 avail_mem=9.75 GB):  58%|█████▊    | 30/52 [00:12<00:08,  2.48it/s]Capturing batches (bs=144 avail_mem=9.75 GB):  60%|█████▉    | 31/52 [00:12<00:08,  2.49it/s]Capturing batches (bs=136 avail_mem=9.74 GB):  60%|█████▉    | 31/52 [00:12<00:08,  2.49it/s]Capturing batches (bs=136 avail_mem=9.74 GB):  62%|██████▏   | 32/52 [00:12<00:08,  2.50it/s]Capturing batches (bs=128 avail_mem=9.73 GB):  62%|██████▏   | 32/52 [00:12<00:08,  2.50it/s]Capturing batches (bs=128 avail_mem=9.73 GB):  63%|██████▎   | 33/52 [00:13<00:07,  2.50it/s]Capturing batches (bs=120 avail_mem=9.71 GB):  63%|██████▎   | 33/52 [00:13<00:07,  2.50it/s]Capturing batches (bs=120 avail_mem=9.71 GB):  65%|██████▌   | 34/52 [00:13<00:07,  2.49it/s]Capturing batches (bs=112 avail_mem=9.70 GB):  65%|██████▌   | 34/52 [00:13<00:07,  2.49it/s]Capturing batches (bs=112 avail_mem=9.70 GB):  67%|██████▋   | 35/52 [00:14<00:06,  2.50it/s]Capturing batches (bs=104 avail_mem=9.69 GB):  67%|██████▋   | 35/52 [00:14<00:06,  2.50it/s]Capturing batches (bs=104 avail_mem=9.69 GB):  69%|██████▉   | 36/52 [00:14<00:06,  2.50it/s]Capturing batches (bs=96 avail_mem=9.67 GB):  69%|██████▉   | 36/52 [00:14<00:06,  2.50it/s] Capturing batches (bs=96 avail_mem=9.67 GB):  71%|███████   | 37/52 [00:14<00:05,  2.51it/s]Capturing batches (bs=88 avail_mem=9.66 GB):  71%|███████   | 37/52 [00:14<00:05,  2.51it/s]Capturing batches (bs=88 avail_mem=9.66 GB):  73%|███████▎  | 38/52 [00:15<00:05,  2.51it/s]Capturing batches (bs=80 avail_mem=9.64 GB):  73%|███████▎  | 38/52 [00:15<00:05,  2.51it/s]Capturing batches (bs=80 avail_mem=9.64 GB):  75%|███████▌  | 39/52 [00:15<00:05,  2.52it/s]Capturing batches (bs=72 avail_mem=9.63 GB):  75%|███████▌  | 39/52 [00:15<00:05,  2.52it/s]Capturing batches (bs=72 avail_mem=9.63 GB):  77%|███████▋  | 40/52 [00:16<00:04,  2.51it/s]Capturing batches (bs=64 avail_mem=9.61 GB):  77%|███████▋  | 40/52 [00:16<00:04,  2.51it/s]Capturing batches (bs=64 avail_mem=9.61 GB):  79%|███████▉  | 41/52 [00:16<00:04,  2.51it/s]Capturing batches (bs=56 avail_mem=9.60 GB):  79%|███████▉  | 41/52 [00:16<00:04,  2.51it/s]Capturing batches (bs=56 avail_mem=9.60 GB):  81%|████████  | 42/52 [00:16<00:04,  2.50it/s]Capturing batches (bs=48 avail_mem=9.58 GB):  81%|████████  | 42/52 [00:16<00:04,  2.50it/s]Capturing batches (bs=48 avail_mem=9.58 GB):  83%|████████▎ | 43/52 [00:17<00:03,  2.50it/s]Capturing batches (bs=40 avail_mem=9.57 GB):  83%|████████▎ | 43/52 [00:17<00:03,  2.50it/s]Capturing batches (bs=40 avail_mem=9.57 GB):  85%|████████▍ | 44/52 [00:17<00:03,  2.50it/s]Capturing batches (bs=32 avail_mem=9.55 GB):  85%|████████▍ | 44/52 [00:17<00:03,  2.50it/s]Capturing batches (bs=32 avail_mem=9.55 GB):  87%|████████▋ | 45/52 [00:18<00:02,  2.46it/s]Capturing batches (bs=24 avail_mem=9.54 GB):  87%|████████▋ | 45/52 [00:18<00:02,  2.46it/s]Capturing batches (bs=24 avail_mem=9.54 GB):  88%|████████▊ | 46/52 [00:18<00:02,  2.43it/s]Capturing batches (bs=16 avail_mem=9.52 GB):  88%|████████▊ | 46/52 [00:18<00:02,  2.43it/s]Capturing batches (bs=16 avail_mem=9.52 GB):  90%|█████████ | 47/52 [00:18<00:02,  2.41it/s]Capturing batches (bs=12 avail_mem=9.51 GB):  90%|█████████ | 47/52 [00:18<00:02,  2.41it/s]Capturing batches (bs=12 avail_mem=9.51 GB):  92%|█████████▏| 48/52 [00:19<00:01,  2.40it/s]Capturing batches (bs=8 avail_mem=9.49 GB):  92%|█████████▏| 48/52 [00:19<00:01,  2.40it/s] Capturing batches (bs=8 avail_mem=9.49 GB):  94%|█████████▍| 49/52 [00:19<00:01,  2.39it/s]Capturing batches (bs=4 avail_mem=9.48 GB):  94%|█████████▍| 49/52 [00:19<00:01,  2.39it/s]Capturing batches (bs=4 avail_mem=9.48 GB):  96%|█████████▌| 50/52 [00:20<00:00,  2.39it/s]Capturing batches (bs=2 avail_mem=9.46 GB):  96%|█████████▌| 50/52 [00:20<00:00,  2.39it/s]Capturing batches (bs=2 avail_mem=9.46 GB):  98%|█████████▊| 51/52 [00:20<00:00,  2.38it/s]Capturing batches (bs=1 avail_mem=9.45 GB):  98%|█████████▊| 51/52 [00:20<00:00,  2.38it/s]Capturing batches (bs=1 avail_mem=9.45 GB): 100%|██████████| 52/52 [00:21<00:00,  2.31it/s]Capturing batches (bs=1 avail_mem=9.45 GB): 100%|██████████| 52/52 [00:21<00:00,  2.46it/s]
+[2026-11-24 22:55:00] Capture target decode CUDA graph end. bs=[1, 2, 4, 8, 12, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], elapsed=22.25 s, mem usage=1.64 GB, avail mem=9.43 GB.
+/home/devbali/final-venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[rank0]:[W1124 22:55:09.751272250 ProcessGroupNCCL.cpp:5310] Guessing device ID based on global rank. This can cause a hang if rank to GPU mapping is heterogeneous. You can specify device_id in init_process_group()
+max_total_num_tokens=587876
+decode 23/675 sample 1/3: 34.93 ms
+decode 23/675 sample 2/3: 34.40 ms
+decode 23/675 sample 3/3: 34.55 ms
+decode 24/675 sample 1/3: 37.07 ms
+decode 24/675 sample 2/3: 36.83 ms
+decode 24/675 sample 3/3: 35.19 ms
+decode 25/675 sample 1/3: 43.08 ms
+decode 25/675 sample 2/3: 42.67 ms
+decode 25/675 sample 3/3: 43.87 ms
+decode 26/675 sample 1/3: 30.58 ms
+decode 26/675 sample 2/3: 31.14 ms
+decode 26/675 sample 3/3: 31.29 ms
+decode 27/675 sample 1/3: 34.60 ms
+decode 27/675 sample 2/3: 34.33 ms
+decode 27/675 sample 3/3: 35.21 ms
+decode 28/675 sample 1/3: 32.43 ms
+decode 28/675 sample 2/3: 31.26 ms
+decode 28/675 sample 3/3: 31.12 ms
+decode 29/675 sample 1/3: 35.06 ms
+decode 29/675 sample 2/3: 35.47 ms
+decode 29/675 sample 3/3: 34.74 ms
+decode 30/675 sample 1/3: 32.39 ms
+decode 30/675 sample 2/3: 31.85 ms
+decode 30/675 sample 3/3: 32.16 ms
+decode 31/675 sample 1/3: 34.96 ms
+decode 31/675 sample 2/3: 36.35 ms
+decode 31/675 sample 3/3: 35.62 ms
+decode 32/675 sample 1/3: 45.64 ms
+decode 32/675 sample 2/3: 46.11 ms
+decode 32/675 sample 3/3: 45.82 ms
+decode 33/675 sample 1/3: 32.66 ms
+decode 33/675 sample 2/3: 32.59 ms
+decode 33/675 sample 3/3: 32.85 ms
+decode 34/675 sample 1/3: 35.53 ms
+decode 34/675 sample 2/3: 34.92 ms
+decode 34/675 sample 3/3: 35.84 ms
+decode 35/675 sample 1/3: 45.47 ms
+decode 35/675 sample 2/3: 46.97 ms
+decode 35/675 sample 3/3: 46.25 ms
+decode 36/675 sample 1/3: 33.13 ms
+decode 36/675 sample 2/3: 33.34 ms
+decode 36/675 sample 3/3: 33.60 ms
+decode 37/675 sample 1/3: 36.43 ms
+decode 37/675 sample 2/3: 35.71 ms
+decode 37/675 sample 3/3: 36.43 ms
+decode 38/675 sample 1/3: 46.21 ms
+decode 38/675 sample 2/3: 46.72 ms
+decode 38/675 sample 3/3: 45.57 ms
+decode 39/675 sample 1/3: 33.96 ms
+decode 39/675 sample 2/3: 32.97 ms
+decode 39/675 sample 3/3: 33.30 ms
+decode 40/675 sample 1/3: 35.40 ms
+decode 40/675 sample 2/3: 36.27 ms
+decode 40/675 sample 3/3: 36.39 ms
+decode 41/675 sample 1/3: 46.56 ms
+decode 41/675 sample 2/3: 46.45 ms
+decode 41/675 sample 3/3: 46.79 ms
+decode 42/675 sample 1/3: 34.05 ms
+decode 42/675 sample 2/3: 34.19 ms
+decode 42/675 sample 3/3: 33.02 ms
+decode 43/675 sample 1/3: 36.36 ms
+decode 43/675 sample 2/3: 36.90 ms
+decode 43/675 sample 3/3: 35.96 ms
+decode 44/675 sample 1/3: 47.88 ms
+decode 44/675 sample 2/3: 48.48 ms
+decode 44/675 sample 3/3: 47.61 ms
+decode 45/675 sample 1/3: 34.27 ms
+decode 45/675 sample 2/3: 34.75 ms
+decode 45/675 sample 3/3: 35.59 ms
+decode 46/675 sample 1/3: 38.19 ms
+decode 46/675 sample 2/3: 36.35 ms
+decode 46/675 sample 3/3: 38.13 ms
+decode 47/675 sample 1/3: 48.00 ms
+decode 47/675 sample 2/3: 46.90 ms
+decode 47/675 sample 3/3: 47.23 ms
+decode 48/675 sample 1/3: 35.04 ms
+decode 48/675 sample 2/3: 34.48 ms
+decode 48/675 sample 3/3: 35.32 ms
+decode 49/675 sample 1/3: 36.93 ms
+decode 49/675 sample 2/3: 36.80 ms
+decode 49/675 sample 3/3: 36.90 ms
+decode 50/675 sample 1/3: 48.97 ms
+decode 50/675 sample 2/3: 47.60 ms
+decode 50/675 sample 3/3: 48.61 ms
+decode 51/675 sample 1/3: 35.08 ms
+decode 51/675 sample 2/3: 34.78 ms
+decode 51/675 sample 3/3: 33.90 ms
+decode 52/675 sample 1/3: 37.72 ms
+decode 52/675 sample 2/3: 38.37 ms
+decode 52/675 sample 3/3: 37.74 ms
+decode 53/675 sample 1/3: 35.34 ms
+decode 53/675 sample 2/3: 35.28 ms
+decode 53/675 sample 3/3: 35.26 ms
+decode 54/675 sample 1/3: 39.06 ms
+decode 54/675 sample 2/3: 39.11 ms
+decode 54/675 sample 3/3: 39.37 ms
+decode 55/675 sample 1/3: 35.66 ms
+decode 55/675 sample 2/3: 35.90 ms
+decode 55/675 sample 3/3: 35.65 ms
+decode 56/675 sample 1/3: 39.55 ms
+decode 56/675 sample 2/3: 38.69 ms
+decode 56/675 sample 3/3: 39.36 ms
+decode 57/675 sample 1/3: 50.11 ms
+decode 57/675 sample 2/3: 50.00 ms
+decode 57/675 sample 3/3: 50.20 ms
+decode 58/675 sample 1/3: 35.90 ms
+decode 58/675 sample 2/3: 36.29 ms
+decode 58/675 sample 3/3: 36.81 ms
+decode 59/675 sample 1/3: 39.77 ms
+decode 59/675 sample 2/3: 39.54 ms
+decode 59/675 sample 3/3: 39.90 ms
+decode 60/675 sample 1/3: 49.82 ms
+decode 60/675 sample 2/3: 50.19 ms
+decode 60/675 sample 3/3: 49.93 ms
+decode 61/675 sample 1/3: 36.99 ms
+decode 61/675 sample 2/3: 36.95 ms
+decode 61/675 sample 3/3: 36.91 ms
+decode 62/675 sample 1/3: 39.16 ms
+decode 62/675 sample 2/3: 39.55 ms
+decode 62/675 sample 3/3: 39.83 ms
+decode 63/675 sample 1/3: 50.86 ms
+decode 63/675 sample 2/3: 51.15 ms
+decode 63/675 sample 3/3: 50.47 ms
+decode 64/675 sample 1/3: 36.53 ms
+decode 64/675 sample 2/3: 36.43 ms
+decode 64/675 sample 3/3: 37.52 ms
+decode 65/675 sample 1/3: 39.10 ms
+decode 65/675 sample 2/3: 39.73 ms
+decode 65/675 sample 3/3: 40.90 ms
+decode 66/675 sample 1/3: 50.79 ms
+decode 66/675 sample 2/3: 50.38 ms
+decode 66/675 sample 3/3: 51.19 ms
+decode 67/675 sample 1/3: 38.32 ms
+decode 67/675 sample 2/3: 38.14 ms
+decode 67/675 sample 3/3: 37.60 ms
+decode 68/675 sample 1/3: 39.74 ms
+decode 68/675 sample 2/3: 40.01 ms
+decode 68/675 sample 3/3: 40.79 ms
+decode 69/675 sample 1/3: 51.28 ms
+decode 69/675 sample 2/3: 51.07 ms
+decode 69/675 sample 3/3: 51.31 ms
+decode 70/675 sample 1/3: 38.97 ms
+decode 70/675 sample 2/3: 38.91 ms
+decode 70/675 sample 3/3: 38.77 ms
+decode 71/675 sample 1/3: 40.62 ms
+decode 71/675 sample 2/3: 40.40 ms
+decode 71/675 sample 3/3: 40.61 ms
+decode 72/675 sample 1/3: 51.43 ms
+decode 72/675 sample 2/3: 51.53 ms
+decode 72/675 sample 3/3: 51.46 ms
+decode 73/675 sample 1/3: 38.62 ms
+decode 73/675 sample 2/3: 39.07 ms
+decode 73/675 sample 3/3: 39.06 ms
+decode 74/675 sample 1/3: 40.48 ms
+decode 74/675 sample 2/3: 41.02 ms
+decode 74/675 sample 3/3: 40.45 ms
+decode 75/675 sample 1/3: 51.67 ms
+decode 75/675 sample 2/3: 51.27 ms
+decode 75/675 sample 3/3: 51.51 ms
+decode 76/675 sample 1/3: 38.27 ms
+decode 76/675 sample 2/3: 38.60 ms
+decode 76/675 sample 3/3: 38.29 ms
+decode 77/675 sample 1/3: 42.27 ms
+decode 77/675 sample 2/3: 41.67 ms
+decode 77/675 sample 3/3: 41.64 ms
+decode 78/675 sample 1/3: 39.42 ms
+decode 78/675 sample 2/3: 38.44 ms
+decode 78/675 sample 3/3: 38.91 ms
+decode 79/675 sample 1/3: 41.44 ms
+decode 79/675 sample 2/3: 42.02 ms
+decode 79/675 sample 3/3: 41.85 ms
+decode 80/675 sample 1/3: 40.57 ms
+decode 80/675 sample 2/3: 38.94 ms
+decode 80/675 sample 3/3: 40.20 ms
+decode 81/675 sample 1/3: 42.57 ms
+decode 81/675 sample 2/3: 42.31 ms
+decode 81/675 sample 3/3: 43.05 ms
+decode 82/675 sample 1/3: 53.15 ms
+decode 82/675 sample 2/3: 53.37 ms
+decode 82/675 sample 3/3: 53.08 ms
+decode 83/675 sample 1/3: 40.29 ms
+decode 83/675 sample 2/3: 40.12 ms
+decode 83/675 sample 3/3: 40.59 ms
+decode 84/675 sample 1/3: 43.12 ms
+decode 84/675 sample 2/3: 42.59 ms
+decode 84/675 sample 3/3: 43.17 ms
+decode 85/675 sample 1/3: 53.43 ms
+decode 85/675 sample 2/3: 53.08 ms
+decode 85/675 sample 3/3: 52.80 ms
+decode 86/675 sample 1/3: 40.41 ms
+decode 86/675 sample 2/3: 41.19 ms
+decode 86/675 sample 3/3: 40.81 ms
+decode 87/675 sample 1/3: 43.40 ms
+decode 87/675 sample 2/3: 43.83 ms
+decode 87/675 sample 3/3: 43.77 ms
+decode 88/675 sample 1/3: 53.87 ms
+decode 88/675 sample 2/3: 54.09 ms
+decode 88/675 sample 3/3: 55.71 ms
+decode 89/675 sample 1/3: 41.88 ms
+decode 89/675 sample 2/3: 41.79 ms
+decode 89/675 sample 3/3: 40.64 ms
+decode 90/675 sample 1/3: 43.10 ms
+decode 90/675 sample 2/3: 43.52 ms
+decode 90/675 sample 3/3: 44.06 ms
+decode 91/675 sample 1/3: 53.36 ms
+decode 91/675 sample 2/3: 53.95 ms
+decode 91/675 sample 3/3: 54.15 ms
+decode 92/675 sample 1/3: 41.75 ms
+decode 92/675 sample 2/3: 42.22 ms
+decode 92/675 sample 3/3: 42.34 ms
+decode 93/675 sample 1/3: 43.98 ms
+decode 93/675 sample 2/3: 44.15 ms
+decode 93/675 sample 3/3: 44.04 ms
+decode 94/675 sample 1/3: 55.05 ms
+decode 94/675 sample 2/3: 55.71 ms
+decode 94/675 sample 3/3: 55.24 ms
+decode 95/675 sample 1/3: 42.60 ms
+decode 95/675 sample 2/3: 43.39 ms
+decode 95/675 sample 3/3: 42.72 ms
+decode 96/675 sample 1/3: 44.95 ms
+decode 96/675 sample 2/3: 44.63 ms
+decode 96/675 sample 3/3: 44.08 ms
+decode 97/675 sample 1/3: 55.55 ms
+decode 97/675 sample 2/3: 55.50 ms
+decode 97/675 sample 3/3: 55.46 ms
+decode 98/675 sample 1/3: 43.00 ms
+decode 98/675 sample 2/3: 43.54 ms
+decode 98/675 sample 3/3: 43.23 ms
+decode 99/675 sample 1/3: 44.85 ms
+decode 99/675 sample 2/3: 44.40 ms
+decode 99/675 sample 3/3: 44.46 ms
+decode 100/675 sample 1/3: 56.29 ms
+decode 100/675 sample 2/3: 55.98 ms
+decode 100/675 sample 3/3: 54.73 ms
+decode 101/675 sample 1/3: 41.94 ms
+decode 101/675 sample 2/3: 41.92 ms
+decode 101/675 sample 3/3: 41.83 ms
+decode 102/675 sample 1/3: 44.31 ms
+decode 102/675 sample 2/3: 45.14 ms
+decode 102/675 sample 3/3: 44.66 ms
+decode 103/675 sample 1/3: 42.06 ms
+decode 103/675 sample 2/3: 42.32 ms
+decode 103/675 sample 3/3: 42.26 ms
+decode 104/675 sample 1/3: 45.30 ms
+decode 104/675 sample 2/3: 45.08 ms
+decode 104/675 sample 3/3: 45.71 ms
+decode 105/675 sample 1/3: 43.22 ms
+decode 105/675 sample 2/3: 43.37 ms
+decode 105/675 sample 3/3: 42.72 ms
+decode 106/675 sample 1/3: 46.20 ms
+decode 106/675 sample 2/3: 46.67 ms
+decode 106/675 sample 3/3: 46.09 ms
+decode 107/675 sample 1/3: 56.33 ms
+decode 107/675 sample 2/3: 57.04 ms
+decode 107/675 sample 3/3: 56.67 ms
+decode 108/675 sample 1/3: 43.14 ms
+decode 108/675 sample 2/3: 43.89 ms
+decode 108/675 sample 3/3: 43.69 ms
+decode 109/675 sample 1/3: 46.96 ms
+decode 109/675 sample 2/3: 46.74 ms
+decode 109/675 sample 3/3: 46.20 ms
+decode 110/675 sample 1/3: 57.42 ms
+decode 110/675 sample 2/3: 57.08 ms
+decode 110/675 sample 3/3: 57.10 ms
+decode 111/675 sample 1/3: 44.28 ms
+decode 111/675 sample 2/3: 44.02 ms
+decode 111/675 sample 3/3: 44.19 ms
+decode 112/675 sample 1/3: 47.28 ms
+decode 112/675 sample 2/3: 47.42 ms
+decode 112/675 sample 3/3: 46.96 ms
+decode 113/675 sample 1/3: 58.37 ms
+decode 113/675 sample 2/3: 58.33 ms
+decode 113/675 sample 3/3: 58.59 ms
+decode 114/675 sample 1/3: 44.90 ms
+decode 114/675 sample 2/3: 44.62 ms
+decode 114/675 sample 3/3: 44.57 ms
+decode 115/675 sample 1/3: 47.51 ms
+decode 115/675 sample 2/3: 47.25 ms
+decode 115/675 sample 3/3: 47.19 ms
+decode 116/675 sample 1/3: 58.83 ms
+decode 116/675 sample 2/3: 59.07 ms
+decode 116/675 sample 3/3: 58.57 ms
+decode 117/675 sample 1/3: 44.70 ms
+decode 117/675 sample 2/3: 44.68 ms
+decode 117/675 sample 3/3: 44.50 ms
+decode 118/675 sample 1/3: 46.91 ms
+decode 118/675 sample 2/3: 47.63 ms
+decode 118/675 sample 3/3: 47.10 ms
+decode 119/675 sample 1/3: 58.18 ms
+decode 119/675 sample 2/3: 58.10 ms
+decode 119/675 sample 3/3: 58.12 ms
+decode 120/675 sample 1/3: 45.96 ms
+decode 120/675 sample 2/3: 45.17 ms
+decode 120/675 sample 3/3: 45.35 ms
+decode 121/675 sample 1/3: 47.43 ms
+decode 121/675 sample 2/3: 48.28 ms
+decode 121/675 sample 3/3: 47.53 ms
+decode 122/675 sample 1/3: 58.61 ms
+decode 122/675 sample 2/3: 59.00 ms
+decode 122/675 sample 3/3: 58.72 ms
+decode 123/675 sample 1/3: 45.06 ms
+decode 123/675 sample 2/3: 45.50 ms
+decode 123/675 sample 3/3: 45.35 ms
+decode 124/675 sample 1/3: 47.75 ms
+decode 124/675 sample 2/3: 47.57 ms
+decode 124/675 sample 3/3: 46.90 ms
+decode 125/675 sample 1/3: 58.98 ms
+decode 125/675 sample 2/3: 59.53 ms
+decode 125/675 sample 3/3: 58.46 ms
+decode 126/675 sample 1/3: 44.18 ms
+decode 126/675 sample 2/3: 44.47 ms
+decode 126/675 sample 3/3: 44.37 ms
+decode 127/675 sample 1/3: 48.17 ms
+decode 127/675 sample 2/3: 48.08 ms
+decode 127/675 sample 3/3: 48.02 ms
+decode 128/675 sample 1/3: 44.98 ms
+decode 128/675 sample 2/3: 45.20 ms
+decode 128/675 sample 3/3: 46.34 ms
+decode 129/675 sample 1/3: 48.88 ms
+decode 129/675 sample 2/3: 49.07 ms
+decode 129/675 sample 3/3: 49.60 ms
+decode 130/675 sample 1/3: 45.82 ms
+decode 130/675 sample 2/3: 45.94 ms
+decode 130/675 sample 3/3: 45.86 ms
+decode 131/675 sample 1/3: 49.95 ms
+decode 131/675 sample 2/3: 49.75 ms
+decode 131/675 sample 3/3: 49.51 ms
+decode 132/675 sample 1/3: 60.34 ms
+decode 132/675 sample 2/3: 60.16 ms
+decode 132/675 sample 3/3: 60.15 ms
+decode 133/675 sample 1/3: 47.38 ms
+decode 133/675 sample 2/3: 46.13 ms
+decode 133/675 sample 3/3: 48.63 ms
+decode 134/675 sample 1/3: 49.78 ms
+decode 134/675 sample 2/3: 49.46 ms
+decode 134/675 sample 3/3: 49.44 ms
+decode 135/675 sample 1/3: 62.48 ms
+decode 135/675 sample 2/3: 61.23 ms
+decode 135/675 sample 3/3: 60.93 ms
+decode 136/675 sample 1/3: 47.60 ms
+decode 136/675 sample 2/3: 46.62 ms
+decode 136/675 sample 3/3: 46.69 ms
+decode 137/675 sample 1/3: 50.06 ms
+decode 137/675 sample 2/3: 49.53 ms
+decode 137/675 sample 3/3: 49.87 ms
+decode 138/675 sample 1/3: 61.74 ms
+decode 138/675 sample 2/3: 60.50 ms
+decode 138/675 sample 3/3: 61.70 ms
+decode 139/675 sample 1/3: 47.17 ms
+decode 139/675 sample 2/3: 46.95 ms
+decode 139/675 sample 3/3: 587.76 ms
+decode 140/675 sample 1/3: 49.85 ms
+decode 140/675 sample 2/3: 49.79 ms
+decode 140/675 sample 3/3: 49.75 ms
+decode 141/675 sample 1/3: 61.55 ms
+decode 141/675 sample 2/3: 61.47 ms
+decode 141/675 sample 3/3: 62.00 ms
+decode 142/675 sample 1/3: 47.21 ms
+decode 142/675 sample 2/3: 48.14 ms
+decode 142/675 sample 3/3: 47.02 ms
+decode 143/675 sample 1/3: 50.66 ms
+decode 143/675 sample 2/3: 49.08 ms
+decode 143/675 sample 3/3: 50.48 ms
+decode 144/675 sample 1/3: 62.43 ms
+decode 144/675 sample 2/3: 61.40 ms
+decode 144/675 sample 3/3: 61.62 ms
+decode 145/675 sample 1/3: 48.52 ms
+decode 145/675 sample 2/3: 48.25 ms
+decode 145/675 sample 3/3: 47.88 ms
+decode 146/675 sample 1/3: 50.75 ms
+decode 146/675 sample 2/3: 50.91 ms
+decode 146/675 sample 3/3: 50.37 ms
+decode 147/675 sample 1/3: 61.84 ms
+decode 147/675 sample 2/3: 61.86 ms
+decode 147/675 sample 3/3: 62.04 ms
+decode 148/675 sample 1/3: 48.19 ms
+decode 148/675 sample 2/3: 48.84 ms
+decode 148/675 sample 3/3: 47.92 ms
+decode 149/675 sample 1/3: 50.34 ms
+decode 149/675 sample 2/3: 50.08 ms
+decode 149/675 sample 3/3: 50.66 ms
+decode 150/675 sample 1/3: 62.68 ms
+decode 150/675 sample 2/3: 61.46 ms
+decode 150/675 sample 3/3: 61.72 ms
+decode 151/675 sample 1/3: 48.76 ms
+decode 151/675 sample 2/3: 48.03 ms
+decode 151/675 sample 3/3: 48.40 ms
+decode 152/675 sample 1/3: 50.90 ms
+decode 152/675 sample 2/3: 51.46 ms
+decode 152/675 sample 3/3: 51.00 ms
+decode 153/675 sample 1/3: 48.99 ms
+decode 153/675 sample 2/3: 48.78 ms
+decode 153/675 sample 3/3: 49.28 ms
+decode 154/675 sample 1/3: 52.74 ms
+decode 154/675 sample 2/3: 52.60 ms
+decode 154/675 sample 3/3: 52.60 ms
+decode 155/675 sample 1/3: 49.75 ms
+decode 155/675 sample 2/3: 49.95 ms
+decode 155/675 sample 3/3: 50.09 ms
+decode 156/675 sample 1/3: 52.99 ms
+decode 156/675 sample 2/3: 53.21 ms
+decode 156/675 sample 3/3: 55.12 ms
+decode 157/675 sample 1/3: 64.19 ms
+decode 157/675 sample 2/3: 63.97 ms
+decode 157/675 sample 3/3: 63.13 ms
+decode 158/675 sample 1/3: 50.33 ms
+decode 158/675 sample 2/3: 50.27 ms
+decode 158/675 sample 3/3: 50.55 ms
+decode 159/675 sample 1/3: 53.03 ms
+decode 159/675 sample 2/3: 53.59 ms
+decode 159/675 sample 3/3: 53.24 ms
+decode 160/675 sample 1/3: 65.04 ms
+decode 160/675 sample 2/3: 65.03 ms
+decode 160/675 sample 3/3: 64.74 ms
+decode 161/675 sample 1/3: 51.33 ms
+decode 161/675 sample 2/3: 50.18 ms
+decode 161/675 sample 3/3: 51.46 ms
+decode 162/675 sample 1/3: 53.66 ms
+decode 162/675 sample 2/3: 53.13 ms
+decode 162/675 sample 3/3: 53.17 ms
+decode 163/675 sample 1/3: 64.67 ms
+decode 163/675 sample 2/3: 63.68 ms
+decode 163/675 sample 3/3: 63.72 ms
+decode 164/675 sample 1/3: 51.52 ms
+decode 164/675 sample 2/3: 51.38 ms
+decode 164/675 sample 3/3: 50.81 ms
+decode 165/675 sample 1/3: 53.28 ms
+decode 165/675 sample 2/3: 53.91 ms
+decode 165/675 sample 3/3: 53.76 ms
+decode 166/675 sample 1/3: 64.67 ms
+decode 166/675 sample 2/3: 65.02 ms
+decode 166/675 sample 3/3: 64.34 ms
+decode 167/675 sample 1/3: 52.38 ms
+decode 167/675 sample 2/3: 51.83 ms
+decode 167/675 sample 3/3: 51.33 ms
+decode 168/675 sample 1/3: 54.74 ms
+decode 168/675 sample 2/3: 54.24 ms
+decode 168/675 sample 3/3: 54.55 ms
+decode 169/675 sample 1/3: 65.11 ms
+decode 169/675 sample 2/3: 65.35 ms
+decode 169/675 sample 3/3: 64.86 ms
+decode 170/675 sample 1/3: 51.81 ms
+decode 170/675 sample 2/3: 52.11 ms
+decode 170/675 sample 3/3: 52.14 ms
+decode 171/675 sample 1/3: 54.79 ms
+decode 171/675 sample 2/3: 53.93 ms
+decode 171/675 sample 3/3: 54.32 ms
+decode 172/675 sample 1/3: 64.93 ms
+decode 172/675 sample 2/3: 65.14 ms
+decode 172/675 sample 3/3: 65.08 ms
+decode 173/675 sample 1/3: 53.20 ms
+decode 173/675 sample 2/3: 53.14 ms
+decode 173/675 sample 3/3: 53.30 ms
+decode 174/675 sample 1/3: 54.68 ms
+decode 174/675 sample 2/3: 54.54 ms
+decode 174/675 sample 3/3: 54.33 ms
+decode 175/675 sample 1/3: 65.49 ms
+decode 175/675 sample 2/3: 64.99 ms
+decode 175/675 sample 3/3: 65.56 ms
+decode 176/675 sample 1/3: 42.55 ms
+decode 176/675 sample 2/3: 40.36 ms
+decode 176/675 sample 3/3: 40.72 ms
+decode 177/675 sample 1/3: 43.78 ms
+decode 177/675 sample 2/3: 43.53 ms
+decode 177/675 sample 3/3: 43.39 ms
+decode 178/675 sample 1/3: 41.36 ms
+decode 178/675 sample 2/3: 41.89 ms
+decode 178/675 sample 3/3: 41.27 ms
+decode 179/675 sample 1/3: 44.49 ms
+decode 179/675 sample 2/3: 44.68 ms
+decode 179/675 sample 3/3: 44.22 ms
+decode 180/675 sample 1/3: 41.66 ms
+decode 180/675 sample 2/3: 41.48 ms
+decode 180/675 sample 3/3: 41.28 ms
+decode 181/675 sample 1/3: 45.25 ms
+decode 181/675 sample 2/3: 45.39 ms
+decode 181/675 sample 3/3: 45.39 ms
+decode 182/675 sample 1/3: 54.77 ms
+decode 182/675 sample 2/3: 55.15 ms
+decode 182/675 sample 3/3: 54.86 ms
+decode 183/675 sample 1/3: 42.72 ms
+decode 183/675 sample 2/3: 43.07 ms
+decode 183/675 sample 3/3: 42.16 ms
+decode 184/675 sample 1/3: 45.86 ms
+decode 184/675 sample 2/3: 45.30 ms
+decode 184/675 sample 3/3: 44.89 ms
+decode 185/675 sample 1/3: 66.96 ms
+decode 185/675 sample 2/3: 56.24 ms
+decode 185/675 sample 3/3: 55.74 ms
+decode 186/675 sample 1/3: 42.94 ms
+decode 186/675 sample 2/3: 42.65 ms
+decode 186/675 sample 3/3: 42.45 ms
+decode 187/675 sample 1/3: 45.43 ms
+decode 187/675 sample 2/3: 45.51 ms
+decode 187/675 sample 3/3: 45.71 ms
+decode 188/675 sample 1/3: 56.93 ms
+decode 188/675 sample 2/3: 56.60 ms
+decode 188/675 sample 3/3: 57.72 ms
+decode 189/675 sample 1/3: 43.07 ms
+decode 189/675 sample 2/3: 43.71 ms
+decode 189/675 sample 3/3: 43.19 ms
+decode 190/675 sample 1/3: 46.29 ms
+decode 190/675 sample 2/3: 46.81 ms
+decode 190/675 sample 3/3: 46.46 ms
+decode 191/675 sample 1/3: 57.87 ms
+decode 191/675 sample 2/3: 57.37 ms
+decode 191/675 sample 3/3: 56.68 ms
+decode 192/675 sample 1/3: 44.42 ms
+decode 192/675 sample 2/3: 43.84 ms
+decode 192/675 sample 3/3: 44.17 ms
+decode 193/675 sample 1/3: 46.23 ms
+decode 193/675 sample 2/3: 46.29 ms
+decode 193/675 sample 3/3: 46.87 ms
+decode 194/675 sample 1/3: 56.99 ms
+decode 194/675 sample 2/3: 56.87 ms
+decode 194/675 sample 3/3: 57.37 ms
+decode 195/675 sample 1/3: 43.74 ms
+decode 195/675 sample 2/3: 43.47 ms
+decode 195/675 sample 3/3: 44.17 ms
+decode 196/675 sample 1/3: 46.53 ms
+decode 196/675 sample 2/3: 46.22 ms
+decode 196/675 sample 3/3: 47.07 ms
+decode 197/675 sample 1/3: 57.62 ms
+decode 197/675 sample 2/3: 56.88 ms
+decode 197/675 sample 3/3: 57.15 ms
+decode 198/675 sample 1/3: 45.28 ms
+decode 198/675 sample 2/3: 43.95 ms
+decode 198/675 sample 3/3: 44.64 ms
+decode 199/675 sample 1/3: 46.65 ms
+decode 199/675 sample 2/3: 46.47 ms
+decode 199/675 sample 3/3: 46.43 ms
+decode 200/675 sample 1/3: 57.95 ms
+decode 200/675 sample 2/3: 57.99 ms
+decode 200/675 sample 3/3: 57.24 ms
+decode 201/675 sample 1/3: 42.62 ms
+decode 201/675 sample 2/3: 43.10 ms
+decode 201/675 sample 3/3: 42.84 ms
+decode 202/675 sample 1/3: 45.46 ms
+decode 202/675 sample 2/3: 45.52 ms
+decode 202/675 sample 3/3: 44.98 ms
+decode 203/675 sample 1/3: 43.41 ms
+decode 203/675 sample 2/3: 43.21 ms
+decode 203/675 sample 3/3: 43.20 ms
+decode 204/675 sample 1/3: 46.63 ms
+decode 204/675 sample 2/3: 46.77 ms
+decode 204/675 sample 3/3: 48.98 ms
+decode 205/675 sample 1/3: 43.98 ms
+decode 205/675 sample 2/3: 43.94 ms
+decode 205/675 sample 3/3: 45.12 ms
+decode 206/675 sample 1/3: 47.16 ms
+decode 206/675 sample 2/3: 47.28 ms
+decode 206/675 sample 3/3: 47.19 ms
+decode 207/675 sample 1/3: 57.97 ms
+decode 207/675 sample 2/3: 57.39 ms
+decode 207/675 sample 3/3: 57.40 ms
+decode 208/675 sample 1/3: 44.03 ms
+decode 208/675 sample 2/3: 44.47 ms
+decode 208/675 sample 3/3: 44.04 ms
+decode 209/675 sample 1/3: 47.68 ms
+decode 209/675 sample 2/3: 47.51 ms
+decode 209/675 sample 3/3: 48.11 ms
+decode 210/675 sample 1/3: 58.46 ms
+decode 210/675 sample 2/3: 58.40 ms
+decode 210/675 sample 3/3: 58.66 ms
+decode 211/675 sample 1/3: 44.91 ms
+decode 211/675 sample 2/3: 44.89 ms
+decode 211/675 sample 3/3: 44.81 ms
+decode 212/675 sample 1/3: 47.97 ms
+decode 212/675 sample 2/3: 47.75 ms
+decode 212/675 sample 3/3: 48.25 ms
+decode 213/675 sample 1/3: 59.84 ms
+decode 213/675 sample 2/3: 60.14 ms
+decode 213/675 sample 3/3: 59.19 ms
+decode 214/675 sample 1/3: 45.29 ms
+decode 214/675 sample 2/3: 44.87 ms
+decode 214/675 sample 3/3: 44.88 ms
+decode 215/675 sample 1/3: 48.70 ms
+decode 215/675 sample 2/3: 48.03 ms
+decode 215/675 sample 3/3: 48.21 ms
+decode 216/675 sample 1/3: 59.55 ms
+decode 216/675 sample 2/3: 58.79 ms
+decode 216/675 sample 3/3: 59.69 ms
+decode 217/675 sample 1/3: 46.61 ms
+decode 217/675 sample 2/3: 46.10 ms
+decode 217/675 sample 3/3: 45.75 ms
+decode 218/675 sample 1/3: 49.05 ms
+decode 218/675 sample 2/3: 48.90 ms
+decode 218/675 sample 3/3: 48.69 ms
+decode 219/675 sample 1/3: 59.77 ms
+decode 219/675 sample 2/3: 59.03 ms
+decode 219/675 sample 3/3: 59.19 ms
+decode 220/675 sample 1/3: 46.26 ms
+decode 220/675 sample 2/3: 46.13 ms
+decode 220/675 sample 3/3: 46.21 ms
+decode 221/675 sample 1/3: 49.80 ms
+decode 221/675 sample 2/3: 49.33 ms
+decode 221/675 sample 3/3: 48.94 ms
+decode 222/675 sample 1/3: 60.12 ms
+decode 222/675 sample 2/3: 63.18 ms
+decode 222/675 sample 3/3: 59.25 ms
+decode 223/675 sample 1/3: 46.22 ms
+decode 223/675 sample 2/3: 46.52 ms
+decode 223/675 sample 3/3: 46.11 ms
+decode 224/675 sample 1/3: 49.57 ms
+decode 224/675 sample 2/3: 49.25 ms
+decode 224/675 sample 3/3: 49.06 ms
+decode 225/675 sample 1/3: 60.67 ms
+decode 225/675 sample 2/3: 60.67 ms
+decode 225/675 sample 3/3: 60.34 ms
+decode 226/675 sample 1/3: 46.15 ms
+decode 226/675 sample 2/3: 44.91 ms
+decode 226/675 sample 3/3: 44.32 ms
+decode 227/675 sample 1/3: 47.81 ms
+decode 227/675 sample 2/3: 48.41 ms
+decode 227/675 sample 3/3: 47.75 ms
+decode 228/675 sample 1/3: 45.63 ms
+decode 228/675 sample 2/3: 45.80 ms
+decode 228/675 sample 3/3: 45.81 ms
+decode 229/675 sample 1/3: 49.55 ms
+decode 229/675 sample 2/3: 49.43 ms
+decode 229/675 sample 3/3: 49.38 ms
+decode 230/675 sample 1/3: 46.51 ms
+decode 230/675 sample 2/3: 46.32 ms
+decode 230/675 sample 3/3: 46.14 ms
+decode 231/675 sample 1/3: 49.75 ms
+decode 231/675 sample 2/3: 49.74 ms
+decode 231/675 sample 3/3: 50.42 ms
+decode 232/675 sample 1/3: 60.40 ms
+decode 232/675 sample 2/3: 60.43 ms
+decode 232/675 sample 3/3: 60.05 ms
+decode 233/675 sample 1/3: 46.98 ms
+decode 233/675 sample 2/3: 46.76 ms
+decode 233/675 sample 3/3: 46.81 ms
+decode 234/675 sample 1/3: 50.46 ms
+decode 234/675 sample 2/3: 50.03 ms
+decode 234/675 sample 3/3: 50.13 ms
+decode 235/675 sample 1/3: 61.05 ms
+decode 235/675 sample 2/3: 61.31 ms
+decode 235/675 sample 3/3: 60.87 ms
+decode 236/675 sample 1/3: 47.00 ms
+decode 236/675 sample 2/3: 46.90 ms
+decode 236/675 sample 3/3: 46.95 ms
+decode 237/675 sample 1/3: 51.02 ms
+decode 237/675 sample 2/3: 50.81 ms
+decode 237/675 sample 3/3: 50.40 ms
+decode 238/675 sample 1/3: 62.73 ms
+decode 238/675 sample 2/3: 61.98 ms
+decode 238/675 sample 3/3: 62.07 ms
+decode 239/675 sample 1/3: 47.45 ms
+decode 239/675 sample 2/3: 47.13 ms
+decode 239/675 sample 3/3: 47.32 ms
+decode 240/675 sample 1/3: 50.58 ms
+decode 240/675 sample 2/3: 50.47 ms
+decode 240/675 sample 3/3: 55.76 ms
+decode 241/675 sample 1/3: 61.65 ms
+decode 241/675 sample 2/3: 62.87 ms
+decode 241/675 sample 3/3: 62.50 ms
+decode 242/675 sample 1/3: 47.94 ms
+decode 242/675 sample 2/3: 48.44 ms
+decode 242/675 sample 3/3: 49.04 ms
+decode 243/675 sample 1/3: 51.85 ms
+decode 243/675 sample 2/3: 51.04 ms
+decode 243/675 sample 3/3: 51.60 ms
+decode 244/675 sample 1/3: 62.33 ms
+decode 244/675 sample 2/3: 62.70 ms
+decode 244/675 sample 3/3: 62.07 ms
+decode 245/675 sample 1/3: 48.46 ms
+decode 245/675 sample 2/3: 48.64 ms
+decode 245/675 sample 3/3: 48.24 ms
+decode 246/675 sample 1/3: 51.56 ms
+decode 246/675 sample 2/3: 52.08 ms
+decode 246/675 sample 3/3: 52.13 ms
+decode 247/675 sample 1/3: 62.67 ms
+decode 247/675 sample 2/3: 62.62 ms
+decode 247/675 sample 3/3: 62.97 ms
+decode 248/675 sample 1/3: 49.06 ms
+decode 248/675 sample 2/3: 48.80 ms
+decode 248/675 sample 3/3: 49.21 ms
+decode 249/675 sample 1/3: 51.87 ms
+decode 249/675 sample 2/3: 52.11 ms
+decode 249/675 sample 3/3: 51.51 ms
+decode 250/675 sample 1/3: 62.46 ms
+decode 250/675 sample 2/3: 63.44 ms
+decode 250/675 sample 3/3: 62.29 ms
+decode 251/675 sample 1/3: 47.33 ms
+decode 251/675 sample 2/3: 47.52 ms
+decode 251/675 sample 3/3: 47.18 ms
+decode 252/675 sample 1/3: 50.01 ms
+decode 252/675 sample 2/3: 50.14 ms
+decode 252/675 sample 3/3: 49.97 ms
+decode 253/675 sample 1/3: 47.93 ms
+decode 253/675 sample 2/3: 48.32 ms
+decode 253/675 sample 3/3: 48.68 ms
+decode 254/675 sample 1/3: 52.16 ms
+decode 254/675 sample 2/3: 51.77 ms
+decode 254/675 sample 3/3: 51.69 ms
+decode 255/675 sample 1/3: 48.92 ms
+decode 255/675 sample 2/3: 48.46 ms
+decode 255/675 sample 3/3: 48.55 ms
+decode 256/675 sample 1/3: 52.14 ms
+decode 256/675 sample 2/3: 52.28 ms
+decode 256/675 sample 3/3: 53.12 ms
+decode 257/675 sample 1/3: 64.23 ms
+decode 257/675 sample 2/3: 64.04 ms
+decode 257/675 sample 3/3: 64.43 ms
+decode 258/675 sample 1/3: 49.36 ms
+decode 258/675 sample 2/3: 49.38 ms
+decode 258/675 sample 3/3: 49.17 ms
+decode 259/675 sample 1/3: 52.67 ms
+decode 259/675 sample 2/3: 52.71 ms
+decode 259/675 sample 3/3: 52.54 ms
+decode 260/675 sample 1/3: 64.44 ms
+decode 260/675 sample 2/3: 64.80 ms
+decode 260/675 sample 3/3: 64.53 ms
+decode 261/675 sample 1/3: 49.76 ms
+decode 261/675 sample 2/3: 49.96 ms
+decode 261/675 sample 3/3: 49.56 ms
+decode 262/675 sample 1/3: 52.82 ms
+decode 262/675 sample 2/3: 53.24 ms
+decode 262/675 sample 3/3: 53.04 ms
+decode 263/675 sample 1/3: 64.72 ms
+decode 263/675 sample 2/3: 64.45 ms
+decode 263/675 sample 3/3: 64.89 ms
+decode 264/675 sample 1/3: 50.09 ms
+decode 264/675 sample 2/3: 50.09 ms
+decode 264/675 sample 3/3: 50.16 ms
+decode 265/675 sample 1/3: 53.63 ms
+decode 265/675 sample 2/3: 53.20 ms
+decode 265/675 sample 3/3: 53.28 ms
+decode 266/675 sample 1/3: 65.08 ms
+decode 266/675 sample 2/3: 65.00 ms
+decode 266/675 sample 3/3: 64.91 ms
+decode 267/675 sample 1/3: 50.95 ms
+decode 267/675 sample 2/3: 50.88 ms
+decode 267/675 sample 3/3: 50.64 ms
+decode 268/675 sample 1/3: 53.37 ms
+decode 268/675 sample 2/3: 53.59 ms
+decode 268/675 sample 3/3: 53.77 ms
+decode 269/675 sample 1/3: 65.29 ms
+decode 269/675 sample 2/3: 65.57 ms
+decode 269/675 sample 3/3: 65.13 ms
+decode 270/675 sample 1/3: 51.28 ms
+decode 270/675 sample 2/3: 51.10 ms
+decode 270/675 sample 3/3: 51.05 ms
+decode 271/675 sample 1/3: 53.80 ms
+decode 271/675 sample 2/3: 54.27 ms
+decode 271/675 sample 3/3: 54.06 ms
+decode 272/675 sample 1/3: 65.68 ms
+decode 272/675 sample 2/3: 64.62 ms
+decode 272/675 sample 3/3: 65.27 ms
+decode 273/675 sample 1/3: 51.13 ms
+decode 273/675 sample 2/3: 52.77 ms
+decode 273/675 sample 3/3: 51.81 ms
+decode 274/675 sample 1/3: 54.96 ms
+decode 274/675 sample 2/3: 55.00 ms
+decode 274/675 sample 3/3: 55.01 ms
+decode 275/675 sample 1/3: 65.23 ms
+decode 275/675 sample 2/3: 65.30 ms
+decode 275/675 sample 3/3: 64.78 ms
+decode 276/675 sample 1/3: 34.66 ms
+decode 276/675 sample 2/3: 35.15 ms
+decode 276/675 sample 3/3: 34.64 ms
+decode 277/675 sample 1/3: 43.14 ms
+decode 277/675 sample 2/3: 43.36 ms
+decode 277/675 sample 3/3: 43.94 ms
+decode 278/675 sample 1/3: 39.27 ms
+decode 278/675 sample 2/3: 38.91 ms
+decode 278/675 sample 3/3: 38.23 ms
+decode 279/675 sample 1/3: 41.54 ms
+decode 279/675 sample 2/3: 42.02 ms
+decode 279/675 sample 3/3: 41.74 ms
+decode 280/675 sample 1/3: 37.60 ms
+decode 280/675 sample 2/3: 37.03 ms
+decode 280/675 sample 3/3: 37.42 ms
+decode 281/675 sample 1/3: 36.56 ms
+decode 281/675 sample 2/3: 35.81 ms
+decode 281/675 sample 3/3: 36.63 ms
+decode 282/675 sample 1/3: 30.39 ms
+decode 282/675 sample 2/3: 29.73 ms
+decode 282/675 sample 3/3: 30.52 ms
+decode 283/675 sample 1/3: 29.64 ms
+decode 283/675 sample 2/3: 30.24 ms
+decode 283/675 sample 3/3: 29.43 ms
+decode 284/675 sample 1/3: 34.05 ms
+decode 284/675 sample 2/3: 35.25 ms
+decode 284/675 sample 3/3: 34.20 ms
+decode 285/675 sample 1/3: 31.53 ms
+decode 285/675 sample 2/3: 32.06 ms
+decode 285/675 sample 3/3: 30.97 ms
+decode 286/675 sample 1/3: 26.01 ms
+decode 286/675 sample 2/3: 24.53 ms
+decode 286/675 sample 3/3: 24.15 ms
+decode 287/675 sample 1/3: 38.99 ms
+decode 287/675 sample 2/3: 38.92 ms
+decode 287/675 sample 3/3: 39.24 ms
+decode 288/675 sample 1/3: 44.92 ms
+decode 288/675 sample 2/3: 45.07 ms
+decode 288/675 sample 3/3: 44.81 ms
+decode 289/675 sample 1/3: 49.06 ms
+decode 289/675 sample 2/3: 48.21 ms
+decode 289/675 sample 3/3: 48.60 ms
+decode 290/675 sample 1/3: 28.58 ms
+decode 290/675 sample 2/3: 28.56 ms
+decode 290/675 sample 3/3: 29.14 ms
+decode 291/675 sample 1/3: 32.80 ms
+decode 291/675 sample 2/3: 32.19 ms
+decode 291/675 sample 3/3: 31.38 ms
+decode 292/675 sample 1/3: 30.87 ms
+decode 292/675 sample 2/3: 31.09 ms
+decode 292/675 sample 3/3: 31.41 ms
+decode 293/675 sample 1/3: 27.60 ms
+decode 293/675 sample 2/3: 26.41 ms
+decode 293/675 sample 3/3: 26.48 ms
+decode 294/675 sample 1/3: 50.30 ms
+decode 294/675 sample 2/3: 49.98 ms
+decode 294/675 sample 3/3: 49.85 ms
+decode 295/675 sample 1/3: 31.06 ms
+decode 295/675 sample 2/3: 31.27 ms
+decode 295/675 sample 3/3: 30.21 ms
+decode 296/675 sample 1/3: 46.47 ms
+decode 296/675 sample 2/3: 46.88 ms
+decode 296/675 sample 3/3: 46.35 ms
+decode 297/675 sample 1/3: 28.88 ms
+decode 297/675 sample 2/3: 28.85 ms
+decode 297/675 sample 3/3: 29.46 ms
+decode 298/675 sample 1/3: 48.28 ms
+decode 298/675 sample 2/3: 47.65 ms
+decode 298/675 sample 3/3: 47.94 ms
+decode 299/675 sample 1/3: 53.17 ms
+decode 299/675 sample 2/3: 53.55 ms
+decode 299/675 sample 3/3: 52.73 ms
+decode 300/675 sample 1/3: 35.05 ms
+decode 300/675 sample 2/3: 34.92 ms
+decode 300/675 sample 3/3: 35.00 ms
+decode 301/675 sample 1/3: 31.90 ms
+decode 301/675 sample 2/3: 31.43 ms
+decode 301/675 sample 3/3: 31.14 ms
+decode 302/675 sample 1/3: 50.38 ms
+decode 302/675 sample 2/3: 59.02 ms
+decode 302/675 sample 3/3: 50.84 ms
+decode 303/675 sample 1/3: 42.04 ms
+decode 303/675 sample 2/3: 41.22 ms
+decode 303/675 sample 3/3: 41.34 ms
+decode 304/675 sample 1/3: 37.81 ms
+decode 304/675 sample 2/3: 38.84 ms
+decode 304/675 sample 3/3: 38.38 ms
+decode 305/675 sample 1/3: 45.15 ms
+decode 305/675 sample 2/3: 44.50 ms
+decode 305/675 sample 3/3: 44.71 ms
+decode 306/675 sample 1/3: 50.66 ms
+decode 306/675 sample 2/3: 50.95 ms
+decode 306/675 sample 3/3: 50.97 ms
+decode 307/675 sample 1/3: 39.82 ms
+decode 307/675 sample 2/3: 41.05 ms
+decode 307/675 sample 3/3: 40.97 ms
+decode 308/675 sample 1/3: 34.54 ms
+decode 308/675 sample 2/3: 34.81 ms
+decode 308/675 sample 3/3: 34.54 ms
+decode 309/675 sample 1/3: 43.55 ms
+decode 309/675 sample 2/3: 44.06 ms
+decode 309/675 sample 3/3: 43.79 ms
+decode 310/675 sample 1/3: 35.38 ms
+decode 310/675 sample 2/3: 36.28 ms
+decode 310/675 sample 3/3: 35.53 ms
+decode 311/675 sample 1/3: 26.34 ms
+decode 311/675 sample 2/3: 26.39 ms
+decode 311/675 sample 3/3: 26.16 ms
+decode 312/675 sample 1/3: 45.09 ms
+decode 312/675 sample 2/3: 45.00 ms
+decode 312/675 sample 3/3: 45.07 ms
+decode 313/675 sample 1/3: 39.96 ms
+decode 313/675 sample 2/3: 39.82 ms
+decode 313/675 sample 3/3: 40.42 ms
+decode 314/675 sample 1/3: 39.41 ms
+decode 314/675 sample 2/3: 39.57 ms
+decode 314/675 sample 3/3: 38.96 ms
+decode 315/675 sample 1/3: 49.32 ms
+decode 315/675 sample 2/3: 48.35 ms
+decode 315/675 sample 3/3: 48.71 ms
+decode 316/675 sample 1/3: 37.59 ms
+decode 316/675 sample 2/3: 37.01 ms
+decode 316/675 sample 3/3: 36.60 ms
+decode 317/675 sample 1/3: 31.75 ms
+decode 317/675 sample 2/3: 31.67 ms
+decode 317/675 sample 3/3: 30.13 ms
+decode 318/675 sample 1/3: 47.90 ms
+decode 318/675 sample 2/3: 48.40 ms
+decode 318/675 sample 3/3: 47.99 ms
+decode 319/675 sample 1/3: 48.81 ms
+decode 319/675 sample 2/3: 49.22 ms
+decode 319/675 sample 3/3: 49.05 ms
+decode 320/675 sample 1/3: 30.41 ms
+decode 320/675 sample 2/3: 30.31 ms
+decode 320/675 sample 3/3: 32.16 ms
+decode 321/675 sample 1/3: 38.02 ms
+decode 321/675 sample 2/3: 38.82 ms
+decode 321/675 sample 3/3: 38.41 ms
+decode 322/675 sample 1/3: 49.26 ms
+decode 322/675 sample 2/3: 49.51 ms
+decode 322/675 sample 3/3: 49.26 ms
+decode 323/675 sample 1/3: 26.34 ms
+decode 323/675 sample 2/3: 26.99 ms
+decode 323/675 sample 3/3: 26.65 ms
+decode 324/675 sample 1/3: 28.05 ms
+decode 324/675 sample 2/3: 28.55 ms
+decode 324/675 sample 3/3: 27.82 ms
+decode 325/675 sample 1/3: 51.86 ms
+decode 325/675 sample 2/3: 50.86 ms
+decode 325/675 sample 3/3: 51.51 ms
+decode 326/675 sample 1/3: 48.75 ms
+decode 326/675 sample 2/3: 48.11 ms
+decode 326/675 sample 3/3: 48.54 ms
+decode 327/675 sample 1/3: 45.17 ms
+decode 327/675 sample 2/3: 48.67 ms
+decode 327/675 sample 3/3: 45.33 ms
+decode 328/675 sample 1/3: 34.48 ms
+decode 328/675 sample 2/3: 34.63 ms
+decode 328/675 sample 3/3: 34.92 ms
+decode 329/675 sample 1/3: 27.55 ms
+decode 329/675 sample 2/3: 26.38 ms
+decode 329/675 sample 3/3: 26.79 ms
+decode 330/675 sample 1/3: 41.82 ms
+decode 330/675 sample 2/3: 42.42 ms
+decode 330/675 sample 3/3: 41.10 ms
+decode 331/675 sample 1/3: 36.21 ms
+decode 331/675 sample 2/3: 35.88 ms
+decode 331/675 sample 3/3: 37.28 ms
+decode 332/675 sample 1/3: 25.35 ms
+decode 332/675 sample 2/3: 25.68 ms
+decode 332/675 sample 3/3: 25.43 ms
+decode 333/675 sample 1/3: 49.74 ms
+decode 333/675 sample 2/3: 49.83 ms
+decode 333/675 sample 3/3: 49.49 ms
+decode 334/675 sample 1/3: 42.30 ms
+decode 334/675 sample 2/3: 41.99 ms
+decode 334/675 sample 3/3: 41.47 ms
+decode 335/675 sample 1/3: 42.23 ms
+decode 335/675 sample 2/3: 42.86 ms
+decode 335/675 sample 3/3: 42.58 ms
+decode 336/675 sample 1/3: 38.54 ms
+decode 336/675 sample 2/3: 37.68 ms
+decode 336/675 sample 3/3: 37.98 ms
+decode 337/675 sample 1/3: 47.03 ms
+decode 337/675 sample 2/3: 46.50 ms
+decode 337/675 sample 3/3: 47.33 ms
+decode 338/675 sample 1/3: 41.39 ms
+decode 338/675 sample 2/3: 41.41 ms
+decode 338/675 sample 3/3: 41.10 ms
+decode 339/675 sample 1/3: 43.02 ms
+decode 339/675 sample 2/3: 42.85 ms
+decode 339/675 sample 3/3: 43.13 ms
+decode 340/675 sample 1/3: 22.38 ms
+decode 340/675 sample 2/3: 23.66 ms
+decode 340/675 sample 3/3: 23.87 ms
+decode 341/675 sample 1/3: 32.46 ms
+decode 341/675 sample 2/3: 32.39 ms
+decode 341/675 sample 3/3: 32.29 ms
+decode 342/675 sample 1/3: 38.23 ms
+decode 342/675 sample 2/3: 38.11 ms
+decode 342/675 sample 3/3: 38.25 ms
+decode 343/675 sample 1/3: 30.81 ms
+decode 343/675 sample 2/3: 30.56 ms
+decode 343/675 sample 3/3: 30.81 ms
+decode 344/675 sample 1/3: 51.75 ms
+decode 344/675 sample 2/3: 51.37 ms
+decode 344/675 sample 3/3: 51.67 ms
+decode 345/675 sample 1/3: 26.22 ms
+decode 345/675 sample 2/3: 24.73 ms
+decode 345/675 sample 3/3: 24.63 ms
+decode 346/675 sample 1/3: 31.66 ms
+decode 346/675 sample 2/3: 31.08 ms
+decode 346/675 sample 3/3: 31.65 ms
+decode 347/675 sample 1/3: 39.57 ms
+decode 347/675 sample 2/3: 39.01 ms
+decode 347/675 sample 3/3: 38.57 ms
+decode 348/675 sample 1/3: 48.49 ms
+decode 348/675 sample 2/3: 47.95 ms
+decode 348/675 sample 3/3: 48.46 ms
+decode 349/675 sample 1/3: 42.30 ms
+decode 349/675 sample 2/3: 41.70 ms
+decode 349/675 sample 3/3: 41.83 ms
+decode 350/675 sample 1/3: 27.21 ms
+decode 350/675 sample 2/3: 25.52 ms
+decode 350/675 sample 3/3: 25.70 ms
+decode 351/675 sample 1/3: 46.81 ms
+decode 351/675 sample 2/3: 46.46 ms
+decode 351/675 sample 3/3: 46.57 ms
+decode 352/675 sample 1/3: 29.11 ms
+decode 352/675 sample 2/3: 29.66 ms
+decode 352/675 sample 3/3: 29.33 ms
+decode 353/675 sample 1/3: 38.93 ms
+decode 353/675 sample 2/3: 38.63 ms
+decode 353/675 sample 3/3: 39.17 ms
+decode 354/675 sample 1/3: 30.99 ms
+decode 354/675 sample 2/3: 29.75 ms
+decode 354/675 sample 3/3: 30.77 ms
+decode 355/675 sample 1/3: 36.17 ms
+decode 355/675 sample 2/3: 37.17 ms
+decode 355/675 sample 3/3: 36.54 ms
+decode 356/675 sample 1/3: 49.62 ms
+decode 356/675 sample 2/3: 49.39 ms
+decode 356/675 sample 3/3: 49.58 ms
+decode 357/675 sample 1/3: 26.31 ms
+decode 357/675 sample 2/3: 26.68 ms
+decode 357/675 sample 3/3: 26.47 ms
+decode 358/675 sample 1/3: 35.45 ms
+decode 358/675 sample 2/3: 35.23 ms
+decode 358/675 sample 3/3: 34.76 ms
+decode 359/675 sample 1/3: 43.23 ms
+decode 359/675 sample 2/3: 43.11 ms
+decode 359/675 sample 3/3: 43.09 ms
+decode 360/675 sample 1/3: 46.96 ms
+decode 360/675 sample 2/3: 47.18 ms
+decode 360/675 sample 3/3: 47.22 ms
+decode 361/675 sample 1/3: 39.88 ms
+decode 361/675 sample 2/3: 40.47 ms
+decode 361/675 sample 3/3: 40.31 ms
+decode 362/675 sample 1/3: 43.98 ms
+decode 362/675 sample 2/3: 44.23 ms
+decode 362/675 sample 3/3: 43.90 ms
+decode 363/675 sample 1/3: 25.63 ms
+decode 363/675 sample 2/3: 25.35 ms
+decode 363/675 sample 3/3: 26.03 ms
+decode 364/675 sample 1/3: 41.47 ms
+decode 364/675 sample 2/3: 41.63 ms
+decode 364/675 sample 3/3: 42.46 ms
+decode 365/675 sample 1/3: 26.07 ms
+decode 365/675 sample 2/3: 25.14 ms
+decode 365/675 sample 3/3: 26.26 ms
+decode 366/675 sample 1/3: 40.11 ms
+decode 366/675 sample 2/3: 40.55 ms
+decode 366/675 sample 3/3: 40.16 ms
+decode 367/675 sample 1/3: 35.02 ms
+decode 367/675 sample 2/3: 36.07 ms
+decode 367/675 sample 3/3: 35.74 ms
+decode 368/675 sample 1/3: 36.78 ms
+decode 368/675 sample 2/3: 36.39 ms
+decode 368/675 sample 3/3: 36.98 ms
+decode 369/675 sample 1/3: 44.58 ms
+decode 369/675 sample 2/3: 45.06 ms
+decode 369/675 sample 3/3: 44.25 ms
+decode 370/675 sample 1/3: 36.49 ms
+decode 370/675 sample 2/3: 35.94 ms
+decode 370/675 sample 3/3: 36.82 ms
+decode 371/675 sample 1/3: 31.19 ms
+decode 371/675 sample 2/3: 31.61 ms
+decode 371/675 sample 3/3: 30.91 ms
+decode 372/675 sample 1/3: 43.75 ms
+decode 372/675 sample 2/3: 43.52 ms
+decode 372/675 sample 3/3: 43.60 ms
+decode 373/675 sample 1/3: 48.48 ms
+decode 373/675 sample 2/3: 48.48 ms
+decode 373/675 sample 3/3: 48.47 ms
+decode 374/675 sample 1/3: 34.88 ms
+decode 374/675 sample 2/3: 35.26 ms
+decode 374/675 sample 3/3: 34.93 ms
+decode 375/675 sample 1/3: 39.42 ms
+decode 375/675 sample 2/3: 39.66 ms
+decode 375/675 sample 3/3: 38.53 ms
+decode 376/675 sample 1/3: 25.95 ms
+decode 376/675 sample 2/3: 26.60 ms
+decode 376/675 sample 3/3: 26.34 ms
+decode 377/675 sample 1/3: 37.29 ms
+decode 377/675 sample 2/3: 36.38 ms
+decode 377/675 sample 3/3: 36.62 ms
+decode 378/675 sample 1/3: 49.78 ms
+decode 378/675 sample 2/3: 50.14 ms
+decode 378/675 sample 3/3: 50.13 ms
+decode 379/675 sample 1/3: 51.24 ms
+decode 379/675 sample 2/3: 51.59 ms
+decode 379/675 sample 3/3: 52.02 ms
+decode 380/675 sample 1/3: 28.41 ms
+decode 380/675 sample 2/3: 28.28 ms
+decode 380/675 sample 3/3: 27.52 ms
+decode 381/675 sample 1/3: 23.64 ms
+decode 381/675 sample 2/3: 23.15 ms
+decode 381/675 sample 3/3: 24.01 ms
+decode 382/675 sample 1/3: 46.60 ms
+decode 382/675 sample 2/3: 46.73 ms
+decode 382/675 sample 3/3: 46.90 ms
+decode 383/675 sample 1/3: 28.12 ms
+decode 383/675 sample 2/3: 26.61 ms
+decode 383/675 sample 3/3: 27.45 ms
+decode 384/675 sample 1/3: 52.31 ms
+decode 384/675 sample 2/3: 52.66 ms
+decode 384/675 sample 3/3: 52.33 ms
+decode 385/675 sample 1/3: 49.09 ms
+decode 385/675 sample 2/3: 48.69 ms
+decode 385/675 sample 3/3: 50.31 ms
+decode 386/675 sample 1/3: 47.34 ms
+decode 386/675 sample 2/3: 47.59 ms
+decode 386/675 sample 3/3: 47.37 ms
+decode 387/675 sample 1/3: 28.99 ms
+decode 387/675 sample 2/3: 29.63 ms
+decode 387/675 sample 3/3: 29.66 ms
+decode 388/675 sample 1/3: 29.91 ms
+decode 388/675 sample 2/3: 29.87 ms
+decode 388/675 sample 3/3: 29.68 ms
+decode 389/675 sample 1/3: 34.72 ms
+decode 389/675 sample 2/3: 35.74 ms
+decode 389/675 sample 3/3: 34.55 ms
+decode 390/675 sample 1/3: 36.41 ms
+decode 390/675 sample 2/3: 35.92 ms
+decode 390/675 sample 3/3: 37.04 ms
+decode 391/675 sample 1/3: 32.56 ms
+decode 391/675 sample 2/3: 31.20 ms
+decode 391/675 sample 3/3: 31.75 ms
+decode 392/675 sample 1/3: 46.03 ms
+decode 392/675 sample 2/3: 46.19 ms
+decode 392/675 sample 3/3: 46.24 ms
+decode 393/675 sample 1/3: 48.40 ms
+decode 393/675 sample 2/3: 48.16 ms
+decode 393/675 sample 3/3: 48.06 ms
+decode 394/675 sample 1/3: 28.45 ms
+decode 394/675 sample 2/3: 28.40 ms
+decode 394/675 sample 3/3: 27.87 ms
+decode 395/675 sample 1/3: 45.05 ms
+decode 395/675 sample 2/3: 45.66 ms
+decode 395/675 sample 3/3: 45.74 ms
+decode 396/675 sample 1/3: 45.32 ms
+decode 396/675 sample 2/3: 44.34 ms
+decode 396/675 sample 3/3: 44.69 ms
+decode 397/675 sample 1/3: 41.37 ms
+decode 397/675 sample 2/3: 41.43 ms
+decode 397/675 sample 3/3: 42.00 ms
+decode 398/675 sample 1/3: 45.82 ms
+decode 398/675 sample 2/3: 45.55 ms
+decode 398/675 sample 3/3: 45.55 ms
+decode 399/675 sample 1/3: 40.98 ms
+decode 399/675 sample 2/3: 40.62 ms
+decode 399/675 sample 3/3: 40.54 ms
+decode 400/675 sample 1/3: 46.93 ms
+decode 400/675 sample 2/3: 46.87 ms
+decode 400/675 sample 3/3: 46.80 ms
+decode 401/675 sample 1/3: 40.77 ms
+decode 401/675 sample 2/3: 40.93 ms
+decode 401/675 sample 3/3: 40.37 ms
+decode 402/675 sample 1/3: 44.81 ms
+decode 402/675 sample 2/3: 44.41 ms
+decode 402/675 sample 3/3: 44.85 ms
+decode 403/675 sample 1/3: 31.83 ms
+decode 403/675 sample 2/3: 32.01 ms
+decode 403/675 sample 3/3: 32.23 ms
+decode 404/675 sample 1/3: 42.90 ms
+decode 404/675 sample 2/3: 43.68 ms
+decode 404/675 sample 3/3: 43.55 ms
+decode 405/675 sample 1/3: 46.54 ms
+decode 405/675 sample 2/3: 46.84 ms
+decode 405/675 sample 3/3: 46.32 ms
+decode 406/675 sample 1/3: 50.53 ms
+decode 406/675 sample 2/3: 50.94 ms
+decode 406/675 sample 3/3: 50.75 ms
+decode 407/675 sample 1/3: 44.44 ms
+decode 407/675 sample 2/3: 45.65 ms
+decode 407/675 sample 3/3: 44.25 ms
+decode 408/675 sample 1/3: 29.57 ms
+decode 408/675 sample 2/3: 28.16 ms
+decode 408/675 sample 3/3: 29.80 ms
+decode 409/675 sample 1/3: 38.54 ms
+decode 409/675 sample 2/3: 37.44 ms
+decode 409/675 sample 3/3: 37.91 ms
+decode 410/675 sample 1/3: 46.22 ms
+decode 410/675 sample 2/3: 46.70 ms
+decode 410/675 sample 3/3: 46.78 ms
+decode 411/675 sample 1/3: 49.10 ms
+decode 411/675 sample 2/3: 49.48 ms
+decode 411/675 sample 3/3: 48.64 ms
+decode 412/675 sample 1/3: 41.69 ms
+decode 412/675 sample 2/3: 42.43 ms
+decode 412/675 sample 3/3: 42.53 ms
+decode 413/675 sample 1/3: 25.13 ms
+decode 413/675 sample 2/3: 23.51 ms
+decode 413/675 sample 3/3: 24.32 ms
+decode 414/675 sample 1/3: 40.80 ms
+decode 414/675 sample 2/3: 40.76 ms
+decode 414/675 sample 3/3: 41.44 ms
+decode 415/675 sample 1/3: 35.26 ms
+decode 415/675 sample 2/3: 35.39 ms
+decode 415/675 sample 3/3: 35.24 ms
+decode 416/675 sample 1/3: 32.55 ms
+decode 416/675 sample 2/3: 32.42 ms
+decode 416/675 sample 3/3: 32.36 ms
+decode 417/675 sample 1/3: 27.83 ms
+decode 417/675 sample 2/3: 27.57 ms
+decode 417/675 sample 3/3: 27.65 ms
+decode 418/675 sample 1/3: 41.45 ms
+decode 418/675 sample 2/3: 41.52 ms
+decode 418/675 sample 3/3: 41.18 ms
+decode 419/675 sample 1/3: 43.64 ms
+decode 419/675 sample 2/3: 43.23 ms
+decode 419/675 sample 3/3: 42.88 ms
+decode 420/675 sample 1/3: 44.29 ms
+decode 420/675 sample 2/3: 43.87 ms
+decode 420/675 sample 3/3: 43.74 ms
+decode 421/675 sample 1/3: 45.97 ms
+decode 421/675 sample 2/3: 46.11 ms
+decode 421/675 sample 3/3: 45.50 ms
+decode 422/675 sample 1/3: 39.04 ms
+decode 422/675 sample 2/3: 39.34 ms
+decode 422/675 sample 3/3: 39.65 ms
+decode 423/675 sample 1/3: 39.09 ms
+decode 423/675 sample 2/3: 39.11 ms
+decode 423/675 sample 3/3: 39.01 ms
+decode 424/675 sample 1/3: 45.47 ms
+decode 424/675 sample 2/3: 45.74 ms
+decode 424/675 sample 3/3: 45.05 ms
+decode 425/675 sample 1/3: 49.01 ms
+decode 425/675 sample 2/3: 49.51 ms
+decode 425/675 sample 3/3: 48.16 ms
+decode 426/675 sample 1/3: 36.31 ms
+decode 426/675 sample 2/3: 35.91 ms
+decode 426/675 sample 3/3: 36.26 ms
+decode 427/675 sample 1/3: 51.97 ms
+decode 427/675 sample 2/3: 51.69 ms
+decode 427/675 sample 3/3: 51.30 ms
+decode 428/675 sample 1/3: 36.61 ms
+decode 428/675 sample 2/3: 35.97 ms
+decode 428/675 sample 3/3: 36.63 ms
+decode 429/675 sample 1/3: 29.75 ms
+decode 429/675 sample 2/3: 29.66 ms
+decode 429/675 sample 3/3: 29.25 ms
+decode 430/675 sample 1/3: 50.78 ms
+decode 430/675 sample 2/3: 51.17 ms
+decode 430/675 sample 3/3: 50.83 ms
+decode 431/675 sample 1/3: 54.27 ms
+decode 431/675 sample 2/3: 54.87 ms
+decode 431/675 sample 3/3: 55.04 ms
+decode 432/675 sample 1/3: 48.31 ms
+decode 432/675 sample 2/3: 47.96 ms
+decode 432/675 sample 3/3: 48.03 ms
+decode 433/675 sample 1/3: 50.34 ms
+decode 433/675 sample 2/3: 49.66 ms
+decode 433/675 sample 3/3: 50.50 ms
+decode 434/675 sample 1/3: 50.03 ms
+decode 434/675 sample 2/3: 49.68 ms
+decode 434/675 sample 3/3: 49.65 ms
+decode 435/675 sample 1/3: 42.55 ms
+decode 435/675 sample 2/3: 42.15 ms
+decode 435/675 sample 3/3: 42.32 ms
+decode 436/675 sample 1/3: 29.03 ms
+decode 436/675 sample 2/3: 28.27 ms
+decode 436/675 sample 3/3: 29.27 ms
+decode 437/675 sample 1/3: 30.53 ms
+decode 437/675 sample 2/3: 30.54 ms
+decode 437/675 sample 3/3: 30.50 ms
+decode 438/675 sample 1/3: 33.13 ms
+decode 438/675 sample 2/3: 32.17 ms
+decode 438/675 sample 3/3: 32.83 ms
+decode 439/675 sample 1/3: 37.44 ms
+decode 439/675 sample 2/3: 37.65 ms
+decode 439/675 sample 3/3: 38.84 ms
+decode 440/675 sample 1/3: 31.20 ms
+decode 440/675 sample 2/3: 32.13 ms
+decode 440/675 sample 3/3: 31.27 ms
+decode 441/675 sample 1/3: 33.48 ms
+decode 441/675 sample 2/3: 35.30 ms
+decode 441/675 sample 3/3: 33.81 ms
+decode 442/675 sample 1/3: 48.22 ms
+decode 442/675 sample 2/3: 49.01 ms
+decode 442/675 sample 3/3: 48.84 ms
+decode 443/675 sample 1/3: 42.77 ms
+decode 443/675 sample 2/3: 42.40 ms
+decode 443/675 sample 3/3: 42.93 ms
+decode 444/675 sample 1/3: 43.13 ms
+decode 444/675 sample 2/3: 42.76 ms
+decode 444/675 sample 3/3: 42.65 ms
+decode 445/675 sample 1/3: 27.69 ms
+decode 445/675 sample 2/3: 28.84 ms
+decode 445/675 sample 3/3: 28.11 ms
+decode 446/675 sample 1/3: 34.30 ms
+decode 446/675 sample 2/3: 33.39 ms
+decode 446/675 sample 3/3: 33.49 ms
+decode 447/675 sample 1/3: 44.03 ms
+decode 447/675 sample 2/3: 43.89 ms
+decode 447/675 sample 3/3: 44.02 ms
+decode 448/675 sample 1/3: 35.58 ms
+decode 448/675 sample 2/3: 35.65 ms
+decode 448/675 sample 3/3: 35.13 ms
+decode 449/675 sample 1/3: 45.57 ms
+decode 449/675 sample 2/3: 45.48 ms
+decode 449/675 sample 3/3: 45.35 ms
+decode 450/675 sample 1/3: 48.54 ms
+decode 450/675 sample 2/3: 48.68 ms
+decode 450/675 sample 3/3: 48.18 ms
+decode 451/675 sample 1/3: 30.47 ms
+decode 451/675 sample 2/3: 30.72 ms
+decode 451/675 sample 3/3: 30.22 ms
+decode 452/675 sample 1/3: 41.50 ms
+decode 452/675 sample 2/3: 41.01 ms
+decode 452/675 sample 3/3: 41.76 ms
+decode 453/675 sample 1/3: 37.91 ms
+decode 453/675 sample 2/3: 37.76 ms
+decode 453/675 sample 3/3: 37.74 ms
+decode 454/675 sample 1/3: 32.63 ms
+decode 454/675 sample 2/3: 32.02 ms
+decode 454/675 sample 3/3: 32.58 ms
+decode 455/675 sample 1/3: 46.03 ms
+decode 455/675 sample 2/3: 45.28 ms
+decode 455/675 sample 3/3: 45.62 ms
+decode 456/675 sample 1/3: 42.25 ms
+decode 456/675 sample 2/3: 41.94 ms
+decode 456/675 sample 3/3: 41.93 ms
+decode 457/675 sample 1/3: 31.67 ms
+decode 457/675 sample 2/3: 32.26 ms
+decode 457/675 sample 3/3: 32.18 ms
+decode 458/675 sample 1/3: 40.17 ms
+decode 458/675 sample 2/3: 39.44 ms
+decode 458/675 sample 3/3: 40.34 ms
+decode 459/675 sample 1/3: 42.95 ms
+decode 459/675 sample 2/3: 42.33 ms
+decode 459/675 sample 3/3: 42.54 ms
+decode 460/675 sample 1/3: 42.26 ms
+decode 460/675 sample 2/3: 41.34 ms
+decode 460/675 sample 3/3: 41.78 ms
+decode 461/675 sample 1/3: 26.26 ms
+decode 461/675 sample 2/3: 25.69 ms
+decode 461/675 sample 3/3: 25.57 ms
+decode 462/675 sample 1/3: 24.55 ms
+decode 462/675 sample 2/3: 24.63 ms
+decode 462/675 sample 3/3: 23.77 ms
+decode 463/675 sample 1/3: 25.95 ms
+decode 463/675 sample 2/3: 25.57 ms
+decode 463/675 sample 3/3: 25.51 ms
+decode 464/675 sample 1/3: 37.18 ms
+decode 464/675 sample 2/3: 37.52 ms
+decode 464/675 sample 3/3: 36.42 ms
+decode 465/675 sample 1/3: 31.80 ms
+decode 465/675 sample 2/3: 32.17 ms
+decode 465/675 sample 3/3: 32.32 ms
+decode 466/675 sample 1/3: 46.50 ms
+decode 466/675 sample 2/3: 47.26 ms
+decode 466/675 sample 3/3: 45.66 ms
+decode 467/675 sample 1/3: 46.96 ms
+decode 467/675 sample 2/3: 47.04 ms
+decode 467/675 sample 3/3: 51.00 ms
+decode 468/675 sample 1/3: 49.01 ms
+decode 468/675 sample 2/3: 48.45 ms
+decode 468/675 sample 3/3: 49.37 ms
+decode 469/675 sample 1/3: 28.01 ms
+decode 469/675 sample 2/3: 26.01 ms
+decode 469/675 sample 3/3: 27.09 ms
+decode 470/675 sample 1/3: 34.95 ms
+decode 470/675 sample 2/3: 35.37 ms
+decode 470/675 sample 3/3: 34.84 ms
+decode 471/675 sample 1/3: 52.15 ms
+decode 471/675 sample 2/3: 52.34 ms
+decode 471/675 sample 3/3: 51.88 ms
+decode 472/675 sample 1/3: 34.66 ms
+decode 472/675 sample 2/3: 34.79 ms
+decode 472/675 sample 3/3: 34.15 ms
+decode 473/675 sample 1/3: 32.15 ms
+decode 473/675 sample 2/3: 32.52 ms
+decode 473/675 sample 3/3: 32.79 ms
+decode 474/675 sample 1/3: 47.27 ms
+decode 474/675 sample 2/3: 47.35 ms
+decode 474/675 sample 3/3: 48.63 ms
+decode 475/675 sample 1/3: 46.18 ms
+decode 475/675 sample 2/3: 45.65 ms
+decode 475/675 sample 3/3: 45.73 ms
+decode 476/675 sample 1/3: 42.62 ms
+decode 476/675 sample 2/3: 42.80 ms
+decode 476/675 sample 3/3: 42.88 ms
+decode 477/675 sample 1/3: 32.78 ms
+decode 477/675 sample 2/3: 33.13 ms
+decode 477/675 sample 3/3: 32.65 ms
+decode 478/675 sample 1/3: 31.67 ms
+decode 478/675 sample 2/3: 31.13 ms
+decode 478/675 sample 3/3: 30.39 ms
+decode 479/675 sample 1/3: 45.57 ms
+decode 479/675 sample 2/3: 45.94 ms
+decode 479/675 sample 3/3: 45.52 ms
+decode 480/675 sample 1/3: 42.41 ms
+decode 480/675 sample 2/3: 42.60 ms
+decode 480/675 sample 3/3: 43.03 ms
+decode 481/675 sample 1/3: 32.73 ms
+decode 481/675 sample 2/3: 32.92 ms
+decode 481/675 sample 3/3: 33.16 ms
+decode 482/675 sample 1/3: 45.15 ms
+decode 482/675 sample 2/3: 43.30 ms
+decode 482/675 sample 3/3: 43.35 ms
+decode 483/675 sample 1/3: 28.94 ms
+decode 483/675 sample 2/3: 29.70 ms
+decode 483/675 sample 3/3: 29.53 ms
+decode 484/675 sample 1/3: 42.97 ms
+decode 484/675 sample 2/3: 43.24 ms
+decode 484/675 sample 3/3: 43.03 ms
+decode 485/675 sample 1/3: 39.99 ms
+decode 485/675 sample 2/3: 39.93 ms
+decode 485/675 sample 3/3: 39.82 ms
+decode 486/675 sample 1/3: 27.42 ms
+decode 486/675 sample 2/3: 29.67 ms
+decode 486/675 sample 3/3: 28.22 ms
+decode 487/675 sample 1/3: 35.71 ms
+decode 487/675 sample 2/3: 35.42 ms
+decode 487/675 sample 3/3: 35.46 ms
+decode 488/675 sample 1/3: 37.64 ms
+decode 488/675 sample 2/3: 37.77 ms
+decode 488/675 sample 3/3: 36.64 ms
+decode 489/675 sample 1/3: 25.63 ms
+decode 489/675 sample 2/3: 25.58 ms
+decode 489/675 sample 3/3: 25.19 ms
+decode 490/675 sample 1/3: 28.85 ms
+decode 490/675 sample 2/3: 29.53 ms
+decode 490/675 sample 3/3: 28.77 ms
+decode 491/675 sample 1/3: 27.06 ms
+decode 491/675 sample 2/3: 27.09 ms
+decode 491/675 sample 3/3: 25.26 ms
+decode 492/675 sample 1/3: 44.84 ms
+decode 492/675 sample 2/3: 45.10 ms
+decode 492/675 sample 3/3: 45.56 ms
+decode 493/675 sample 1/3: 30.17 ms
+decode 493/675 sample 2/3: 30.94 ms
+decode 493/675 sample 3/3: 30.12 ms
+decode 494/675 sample 1/3: 30.41 ms
+decode 494/675 sample 2/3: 30.20 ms
+decode 494/675 sample 3/3: 29.85 ms
+decode 495/675 sample 1/3: 50.10 ms
+decode 495/675 sample 2/3: 48.79 ms
+decode 495/675 sample 3/3: 51.29 ms
+decode 496/675 sample 1/3: 28.31 ms
+decode 496/675 sample 2/3: 28.24 ms
+decode 496/675 sample 3/3: 27.47 ms
+decode 497/675 sample 1/3: 42.79 ms
+decode 497/675 sample 2/3: 42.98 ms
+decode 497/675 sample 3/3: 42.67 ms
+decode 498/675 sample 1/3: 27.44 ms
+decode 498/675 sample 2/3: 26.43 ms
+decode 498/675 sample 3/3: 26.56 ms
+decode 499/675 sample 1/3: 29.56 ms
+decode 499/675 sample 2/3: 29.04 ms
+decode 499/675 sample 3/3: 29.17 ms
+decode 500/675 sample 1/3: 47.60 ms
+decode 500/675 sample 2/3: 47.54 ms
+decode 500/675 sample 3/3: 47.74 ms
+decode 501/675 sample 1/3: 40.66 ms
+decode 501/675 sample 2/3: 40.52 ms
+decode 501/675 sample 3/3: 40.98 ms
+decode 502/675 sample 1/3: 43.53 ms
+decode 502/675 sample 2/3: 44.77 ms
+decode 502/675 sample 3/3: 43.20 ms
+decode 503/675 sample 1/3: 47.83 ms
+decode 503/675 sample 2/3: 48.45 ms
+decode 503/675 sample 3/3: 47.39 ms
+decode 504/675 sample 1/3: 51.62 ms
+decode 504/675 sample 2/3: 51.43 ms
+decode 504/675 sample 3/3: 50.52 ms
+decode 505/675 sample 1/3: 50.19 ms
+decode 505/675 sample 2/3: 49.98 ms
+decode 505/675 sample 3/3: 51.32 ms
+decode 506/675 sample 1/3: 29.37 ms
+decode 506/675 sample 2/3: 27.92 ms
+decode 506/675 sample 3/3: 27.45 ms
+decode 507/675 sample 1/3: 34.83 ms
+decode 507/675 sample 2/3: 33.90 ms
+decode 507/675 sample 3/3: 35.19 ms
+decode 508/675 sample 1/3: 39.22 ms
+decode 508/675 sample 2/3: 39.10 ms
+decode 508/675 sample 3/3: 39.87 ms
+decode 509/675 sample 1/3: 47.22 ms
+decode 509/675 sample 2/3: 46.14 ms
+decode 509/675 sample 3/3: 45.60 ms
+decode 510/675 sample 1/3: 46.79 ms
+decode 510/675 sample 2/3: 46.68 ms
+decode 510/675 sample 3/3: 46.23 ms
+decode 511/675 sample 1/3: 27.11 ms
+decode 511/675 sample 2/3: 26.82 ms
+decode 511/675 sample 3/3: 26.48 ms
+decode 512/675 sample 1/3: 33.47 ms
+decode 512/675 sample 2/3: 32.44 ms
+decode 512/675 sample 3/3: 32.71 ms
+decode 513/675 sample 1/3: 32.33 ms
+decode 513/675 sample 2/3: 33.63 ms
+decode 513/675 sample 3/3: 32.22 ms
+decode 514/675 sample 1/3: 41.30 ms
+decode 514/675 sample 2/3: 40.23 ms
+decode 514/675 sample 3/3: 41.01 ms
+decode 515/675 sample 1/3: 44.68 ms
+decode 515/675 sample 2/3: 44.98 ms
+decode 515/675 sample 3/3: 44.60 ms
+decode 516/675 sample 1/3: 52.37 ms
+decode 516/675 sample 2/3: 52.22 ms
+decode 516/675 sample 3/3: 52.10 ms
+decode 517/675 sample 1/3: 48.21 ms
+decode 517/675 sample 2/3: 48.54 ms
+decode 517/675 sample 3/3: 47.97 ms
+decode 518/675 sample 1/3: 43.51 ms
+decode 518/675 sample 2/3: 43.51 ms
+decode 518/675 sample 3/3: 43.94 ms
+decode 519/675 sample 1/3: 43.13 ms
+decode 519/675 sample 2/3: 43.02 ms
+decode 519/675 sample 3/3: 43.27 ms
+decode 520/675 sample 1/3: 40.63 ms
+decode 520/675 sample 2/3: 40.30 ms
+decode 520/675 sample 3/3: 40.02 ms
+decode 521/675 sample 1/3: 31.06 ms
+decode 521/675 sample 2/3: 31.84 ms
+decode 521/675 sample 3/3: 32.08 ms
+decode 522/675 sample 1/3: 30.76 ms
+decode 522/675 sample 2/3: 31.24 ms
+decode 522/675 sample 3/3: 29.93 ms
+decode 523/675 sample 1/3: 28.14 ms
+decode 523/675 sample 2/3: 28.02 ms
+decode 523/675 sample 3/3: 28.18 ms
+decode 524/675 sample 1/3: 25.87 ms
+decode 524/675 sample 2/3: 25.28 ms
+decode 524/675 sample 3/3: 25.17 ms
+decode 525/675 sample 1/3: 37.74 ms
+decode 525/675 sample 2/3: 39.07 ms
+decode 525/675 sample 3/3: 37.86 ms
+decode 526/675 sample 1/3: 40.56 ms
+decode 526/675 sample 2/3: 40.26 ms
+decode 526/675 sample 3/3: 40.76 ms
+decode 527/675 sample 1/3: 46.88 ms
+decode 527/675 sample 2/3: 46.70 ms
+decode 527/675 sample 3/3: 47.22 ms
+decode 528/675 sample 1/3: 27.80 ms
+decode 528/675 sample 2/3: 27.73 ms
+decode 528/675 sample 3/3: 28.21 ms
+decode 529/675 sample 1/3: 53.74 ms
+decode 529/675 sample 2/3: 54.12 ms
+decode 529/675 sample 3/3: 53.31 ms
+decode 530/675 sample 1/3: 41.41 ms
+decode 530/675 sample 2/3: 41.24 ms
+decode 530/675 sample 3/3: 40.83 ms
+decode 531/675 sample 1/3: 27.40 ms
+decode 531/675 sample 2/3: 26.88 ms
+decode 531/675 sample 3/3: 28.31 ms
+decode 532/675 sample 1/3: 35.79 ms
+decode 532/675 sample 2/3: 36.45 ms
+decode 532/675 sample 3/3: 36.93 ms
+decode 533/675 sample 1/3: 42.13 ms
+decode 533/675 sample 2/3: 41.92 ms
+decode 533/675 sample 3/3: 43.22 ms
+decode 534/675 sample 1/3: 29.13 ms
+decode 534/675 sample 2/3: 29.60 ms
+decode 534/675 sample 3/3: 29.39 ms
+decode 535/675 sample 1/3: 30.46 ms
+decode 535/675 sample 2/3: 29.76 ms
+decode 535/675 sample 3/3: 31.19 ms
+decode 536/675 sample 1/3: 35.29 ms
+decode 536/675 sample 2/3: 35.56 ms
+decode 536/675 sample 3/3: 35.41 ms
+decode 537/675 sample 1/3: 35.00 ms
+decode 537/675 sample 2/3: 35.24 ms
+decode 537/675 sample 3/3: 34.78 ms
+decode 538/675 sample 1/3: 29.39 ms
+decode 538/675 sample 2/3: 28.97 ms
+decode 538/675 sample 3/3: 28.79 ms
+decode 539/675 sample 1/3: 30.63 ms
+decode 539/675 sample 2/3: 29.90 ms
+decode 539/675 sample 3/3: 30.82 ms
+decode 540/675 sample 1/3: 24.66 ms
+decode 540/675 sample 2/3: 24.80 ms
+decode 540/675 sample 3/3: 24.37 ms
+decode 541/675 sample 1/3: 31.24 ms
+decode 541/675 sample 2/3: 30.19 ms
+decode 541/675 sample 3/3: 29.73 ms
+decode 542/675 sample 1/3: 50.69 ms
+decode 542/675 sample 2/3: 50.66 ms
+decode 542/675 sample 3/3: 50.47 ms
+decode 543/675 sample 1/3: 31.76 ms
+decode 543/675 sample 2/3: 31.90 ms
+decode 543/675 sample 3/3: 32.39 ms
+decode 544/675 sample 1/3: 32.80 ms
+decode 544/675 sample 2/3: 32.56 ms
+decode 544/675 sample 3/3: 32.52 ms
+decode 545/675 sample 1/3: 33.33 ms
+decode 545/675 sample 2/3: 33.50 ms
+decode 545/675 sample 3/3: 33.67 ms
+decode 546/675 sample 1/3: 58.16 ms
+decode 546/675 sample 2/3: 58.86 ms
+decode 546/675 sample 3/3: 58.66 ms
+decode 547/675 sample 1/3: 45.47 ms
+decode 547/675 sample 2/3: 45.37 ms
+decode 547/675 sample 3/3: 45.16 ms
+decode 548/675 sample 1/3: 24.76 ms
+decode 548/675 sample 2/3: 26.00 ms
+decode 548/675 sample 3/3: 26.75 ms
+decode 549/675 sample 1/3: 40.34 ms
+decode 549/675 sample 2/3: 40.64 ms
+decode 549/675 sample 3/3: 40.76 ms
+decode 550/675 sample 1/3: 45.49 ms
+decode 550/675 sample 2/3: 45.26 ms
+decode 550/675 sample 3/3: 45.31 ms
+decode 551/675 sample 1/3: 45.61 ms
+decode 551/675 sample 2/3: 46.09 ms
+decode 551/675 sample 3/3: 45.92 ms
+decode 552/675 sample 1/3: 36.82 ms
+decode 552/675 sample 2/3: 36.84 ms
+decode 552/675 sample 3/3: 37.47 ms
+decode 553/675 sample 1/3: 48.42 ms
+decode 553/675 sample 2/3: 47.84 ms
+decode 553/675 sample 3/3: 47.89 ms
+decode 554/675 sample 1/3: 33.34 ms
+decode 554/675 sample 2/3: 32.61 ms
+decode 554/675 sample 3/3: 33.22 ms
+decode 555/675 sample 1/3: 30.84 ms
+decode 555/675 sample 2/3: 31.20 ms
+decode 555/675 sample 3/3: 31.91 ms
+decode 556/675 sample 1/3: 45.86 ms
+decode 556/675 sample 2/3: 46.28 ms
+decode 556/675 sample 3/3: 46.34 ms
+decode 557/675 sample 1/3: 47.48 ms
+decode 557/675 sample 2/3: 47.47 ms
+decode 557/675 sample 3/3: 47.19 ms
+decode 558/675 sample 1/3: 28.89 ms
+decode 558/675 sample 2/3: 28.78 ms
+decode 558/675 sample 3/3: 28.53 ms
+decode 559/675 sample 1/3: 48.94 ms
+decode 559/675 sample 2/3: 49.25 ms
+decode 559/675 sample 3/3: 49.05 ms
+decode 560/675 sample 1/3: 52.87 ms
+decode 560/675 sample 2/3: 52.80 ms
+decode 560/675 sample 3/3: 52.71 ms
+decode 561/675 sample 1/3: 42.14 ms
+decode 561/675 sample 2/3: 43.64 ms
+decode 561/675 sample 3/3: 42.64 ms
+decode 562/675 sample 1/3: 29.72 ms
+decode 562/675 sample 2/3: 30.68 ms
+decode 562/675 sample 3/3: 30.69 ms
+decode 563/675 sample 1/3: 48.27 ms
+decode 563/675 sample 2/3: 47.21 ms
+decode 563/675 sample 3/3: 47.43 ms
+decode 564/675 sample 1/3: 30.24 ms
+decode 564/675 sample 2/3: 31.33 ms
+decode 564/675 sample 3/3: 30.97 ms
+decode 565/675 sample 1/3: 30.60 ms
+decode 565/675 sample 2/3: 29.50 ms
+decode 565/675 sample 3/3: 29.92 ms
+decode 566/675 sample 1/3: 35.33 ms
+decode 566/675 sample 2/3: 35.39 ms
+decode 566/675 sample 3/3: 35.01 ms
+decode 567/675 sample 1/3: 50.84 ms
+decode 567/675 sample 2/3: 51.21 ms
+decode 567/675 sample 3/3: 50.98 ms
+decode 568/675 sample 1/3: 41.84 ms
+decode 568/675 sample 2/3: 41.94 ms
+decode 568/675 sample 3/3: 42.09 ms
+decode 569/675 sample 1/3: 40.02 ms
+decode 569/675 sample 2/3: 39.95 ms
+decode 569/675 sample 3/3: 40.25 ms
+decode 570/675 sample 1/3: 50.13 ms
+decode 570/675 sample 2/3: 49.35 ms
+decode 570/675 sample 3/3: 49.59 ms
+decode 571/675 sample 1/3: 42.86 ms
+decode 571/675 sample 2/3: 43.44 ms
+decode 571/675 sample 3/3: 43.03 ms
+decode 572/675 sample 1/3: 51.12 ms
+decode 572/675 sample 2/3: 51.25 ms
+decode 572/675 sample 3/3: 51.62 ms
+decode 573/675 sample 1/3: 40.52 ms
+decode 573/675 sample 2/3: 39.72 ms
+decode 573/675 sample 3/3: 39.52 ms
+decode 574/675 sample 1/3: 25.22 ms
+decode 574/675 sample 2/3: 25.74 ms
+decode 574/675 sample 3/3: 26.00 ms
+decode 575/675 sample 1/3: 50.90 ms
+decode 575/675 sample 2/3: 50.79 ms
+decode 575/675 sample 3/3: 50.87 ms
+decode 576/675 sample 1/3: 39.54 ms
+decode 576/675 sample 2/3: 39.14 ms
+decode 576/675 sample 3/3: 39.67 ms
+decode 577/675 sample 1/3: 51.17 ms
+decode 577/675 sample 2/3: 50.78 ms
+decode 577/675 sample 3/3: 51.02 ms
+decode 578/675 sample 1/3: 49.40 ms
+decode 578/675 sample 2/3: 49.98 ms
+decode 578/675 sample 3/3: 49.52 ms
+decode 579/675 sample 1/3: 50.46 ms
+decode 579/675 sample 2/3: 49.88 ms
+decode 579/675 sample 3/3: 49.76 ms
+decode 580/675 sample 1/3: 42.56 ms
+decode 580/675 sample 2/3: 42.76 ms
+decode 580/675 sample 3/3: 42.88 ms
+decode 581/675 sample 1/3: 30.95 ms
+decode 581/675 sample 2/3: 31.07 ms
+decode 581/675 sample 3/3: 30.30 ms
+decode 582/675 sample 1/3: 28.91 ms
+decode 582/675 sample 2/3: 28.55 ms
+decode 582/675 sample 3/3: 28.88 ms
+decode 583/675 sample 1/3: 53.45 ms
+decode 583/675 sample 2/3: 51.20 ms
+decode 583/675 sample 3/3: 50.75 ms
+decode 584/675 sample 1/3: 52.57 ms
+decode 584/675 sample 2/3: 52.41 ms
+decode 584/675 sample 3/3: 51.88 ms
+decode 585/675 sample 1/3: 55.81 ms
+decode 585/675 sample 2/3: 55.31 ms
+decode 585/675 sample 3/3: 55.32 ms
+decode 586/675 sample 1/3: 54.07 ms
+decode 586/675 sample 2/3: 53.99 ms
+decode 586/675 sample 3/3: 53.65 ms
+decode 587/675 sample 1/3: 59.34 ms
+decode 587/675 sample 2/3: 59.03 ms
+decode 587/675 sample 3/3: 59.56 ms
+decode 588/675 sample 1/3: 48.97 ms
+decode 588/675 sample 2/3: 49.15 ms
+decode 588/675 sample 3/3: 50.27 ms
+decode 589/675 sample 1/3: 33.72 ms
+decode 589/675 sample 2/3: 33.55 ms
+decode 589/675 sample 3/3: 32.59 ms
+decode 590/675 sample 1/3: 39.43 ms
+decode 590/675 sample 2/3: 39.91 ms
+decode 590/675 sample 3/3: 38.79 ms
+decode 591/675 sample 1/3: 51.71 ms
+decode 591/675 sample 2/3: 52.77 ms
+decode 591/675 sample 3/3: 51.87 ms
+decode 592/675 sample 1/3: 50.69 ms
+decode 592/675 sample 2/3: 51.18 ms
+decode 592/675 sample 3/3: 51.32 ms
+decode 593/675 sample 1/3: 54.72 ms
+decode 593/675 sample 2/3: 52.20 ms
+decode 593/675 sample 3/3: 52.66 ms
+decode 594/675 sample 1/3: 55.89 ms
+decode 594/675 sample 2/3: 54.87 ms
+decode 594/675 sample 3/3: 55.25 ms
+decode 595/675 sample 1/3: 30.42 ms
+decode 595/675 sample 2/3: 29.34 ms
+decode 595/675 sample 3/3: 29.99 ms
+decode 596/675 sample 1/3: 33.48 ms
+decode 596/675 sample 2/3: 32.28 ms
+decode 596/675 sample 3/3: 33.45 ms
+decode 597/675 sample 1/3: 35.81 ms
+decode 597/675 sample 2/3: 35.48 ms
+decode 597/675 sample 3/3: 36.06 ms
+decode 598/675 sample 1/3: 46.66 ms
+decode 598/675 sample 2/3: 46.74 ms
+decode 598/675 sample 3/3: 46.64 ms
+decode 599/675 sample 1/3: 29.46 ms
+decode 599/675 sample 2/3: 30.80 ms
+decode 599/675 sample 3/3: 29.21 ms
+decode 600/675 sample 1/3: 44.88 ms
+decode 600/675 sample 2/3: 45.53 ms
+decode 600/675 sample 3/3: 44.85 ms
+decode 601/675 sample 1/3: 42.26 ms
+decode 601/675 sample 2/3: 42.10 ms
+decode 601/675 sample 3/3: 41.90 ms
+decode 602/675 sample 1/3: 42.49 ms
+decode 602/675 sample 2/3: 42.65 ms
+decode 602/675 sample 3/3: 42.11 ms
+decode 603/675 sample 1/3: 43.12 ms
+decode 603/675 sample 2/3: 43.59 ms
+decode 603/675 sample 3/3: 43.33 ms
+decode 604/675 sample 1/3: 25.32 ms
+decode 604/675 sample 2/3: 26.12 ms
+decode 604/675 sample 3/3: 25.65 ms
+decode 605/675 sample 1/3: 28.67 ms
+decode 605/675 sample 2/3: 28.96 ms
+decode 605/675 sample 3/3: 29.34 ms
+decode 606/675 sample 1/3: 41.71 ms
+decode 606/675 sample 2/3: 42.34 ms
+decode 606/675 sample 3/3: 41.77 ms
+decode 607/675 sample 1/3: 24.28 ms
+decode 607/675 sample 2/3: 24.96 ms
+decode 607/675 sample 3/3: 24.58 ms
+decode 608/675 sample 1/3: 31.78 ms
+decode 608/675 sample 2/3: 31.49 ms
+decode 608/675 sample 3/3: 31.24 ms
+decode 609/675 sample 1/3: 30.34 ms
+decode 609/675 sample 2/3: 30.19 ms
+decode 609/675 sample 3/3: 29.94 ms
+decode 610/675 sample 1/3: 35.10 ms
+decode 610/675 sample 2/3: 35.45 ms
+decode 610/675 sample 3/3: 35.96 ms
+decode 611/675 sample 1/3: 28.62 ms
+decode 611/675 sample 2/3: 27.92 ms
+decode 611/675 sample 3/3: 28.41 ms
+decode 612/675 sample 1/3: 41.38 ms
+decode 612/675 sample 2/3: 41.10 ms
+decode 612/675 sample 3/3: 41.63 ms
+decode 613/675 sample 1/3: 31.53 ms
+decode 613/675 sample 2/3: 31.37 ms
+decode 613/675 sample 3/3: 31.68 ms
+decode 614/675 sample 1/3: 43.01 ms
+decode 614/675 sample 2/3: 43.22 ms
+decode 614/675 sample 3/3: 42.56 ms
+decode 615/675 sample 1/3: 38.41 ms
+decode 615/675 sample 2/3: 38.34 ms
+decode 615/675 sample 3/3: 38.69 ms
+decode 616/675 sample 1/3: 47.72 ms
+decode 616/675 sample 2/3: 48.39 ms
+decode 616/675 sample 3/3: 47.99 ms
+decode 617/675 sample 1/3: 31.79 ms
+decode 617/675 sample 2/3: 30.55 ms
+decode 617/675 sample 3/3: 31.42 ms
+decode 618/675 sample 1/3: 24.94 ms
+decode 618/675 sample 2/3: 24.30 ms
+decode 618/675 sample 3/3: 25.48 ms
+decode 619/675 sample 1/3: 35.56 ms
+decode 619/675 sample 2/3: 34.99 ms
+decode 619/675 sample 3/3: 34.90 ms
+decode 620/675 sample 1/3: 48.19 ms
+decode 620/675 sample 2/3: 48.15 ms
+decode 620/675 sample 3/3: 48.05 ms
+decode 621/675 sample 1/3: 48.53 ms
+decode 621/675 sample 2/3: 48.73 ms
+decode 621/675 sample 3/3: 48.76 ms
+decode 622/675 sample 1/3: 31.01 ms
+decode 622/675 sample 2/3: 31.50 ms
+decode 622/675 sample 3/3: 30.57 ms
+decode 623/675 sample 1/3: 37.77 ms
+decode 623/675 sample 2/3: 38.57 ms
+decode 623/675 sample 3/3: 38.83 ms
+decode 624/675 sample 1/3: 34.54 ms
+decode 624/675 sample 2/3: 34.39 ms
+decode 624/675 sample 3/3: 34.81 ms
+decode 625/675 sample 1/3: 33.56 ms
+decode 625/675 sample 2/3: 33.64 ms
+decode 625/675 sample 3/3: 33.66 ms
+decode 626/675 sample 1/3: 47.23 ms
+decode 626/675 sample 2/3: 47.26 ms
+decode 626/675 sample 3/3: 47.36 ms
+decode 627/675 sample 1/3: 26.91 ms
+decode 627/675 sample 2/3: 26.08 ms
+decode 627/675 sample 3/3: 26.90 ms
+decode 628/675 sample 1/3: 50.13 ms
+decode 628/675 sample 2/3: 49.59 ms
+decode 628/675 sample 3/3: 50.13 ms
+decode 629/675 sample 1/3: 27.67 ms
+decode 629/675 sample 2/3: 26.96 ms
+decode 629/675 sample 3/3: 27.54 ms
+decode 630/675 sample 1/3: 43.89 ms
+decode 630/675 sample 2/3: 43.54 ms
+decode 630/675 sample 3/3: 43.82 ms
+decode 631/675 sample 1/3: 57.15 ms
+decode 631/675 sample 2/3: 55.57 ms
+decode 631/675 sample 3/3: 55.54 ms
+decode 632/675 sample 1/3: 42.78 ms
+decode 632/675 sample 2/3: 43.41 ms
+decode 632/675 sample 3/3: 42.09 msMAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+MAX_POOLED_DECODE_LATENCY=0.07092250719117761, interval=0.02, static gap = 0.08, total = 0.17092250719117763
+
+decode 633/675 sample 1/3: 44.96 ms
+decode 633/675 sample 2/3: 45.11 ms
+decode 633/675 sample 3/3: 46.11 ms
+decode 634/675 sample 1/3: 44.68 ms
+decode 634/675 sample 2/3: 44.57 ms
+decode 634/675 sample 3/3: 44.47 ms
+decode 635/675 sample 1/3: 27.03 ms
+decode 635/675 sample 2/3: 26.56 ms
+decode 635/675 sample 3/3: 26.01 ms
+decode 636/675 sample 1/3: 31.13 ms
+decode 636/675 sample 2/3: 31.00 ms
+decode 636/675 sample 3/3: 31.60 ms
+decode 637/675 sample 1/3: 28.63 ms
+decode 637/675 sample 2/3: 29.08 ms
+decode 637/675 sample 3/3: 29.80 ms
+decode 638/675 sample 1/3: 38.21 ms
+decode 638/675 sample 2/3: 37.78 ms
+decode 638/675 sample 3/3: 37.64 ms
+decode 639/675 sample 1/3: 45.51 ms
+decode 639/675 sample 2/3: 45.54 ms
+decode 639/675 sample 3/3: 45.99 ms
+decode 640/675 sample 1/3: 31.60 ms
+decode 640/675 sample 2/3: 31.35 ms
+decode 640/675 sample 3/3: 31.17 ms
+decode 641/675 sample 1/3: 37.38 ms
+decode 641/675 sample 2/3: 38.20 ms
+decode 641/675 sample 3/3: 37.78 ms
+decode 642/675 sample 1/3: 50.27 ms
+decode 642/675 sample 2/3: 49.50 ms
+decode 642/675 sample 3/3: 49.35 ms
+decode 643/675 sample 1/3: 32.27 ms
+decode 643/675 sample 2/3: 31.86 ms
+decode 643/675 sample 3/3: 32.09 ms
+decode 644/675 sample 1/3: 45.34 ms
+decode 644/675 sample 2/3: 45.85 ms
+decode 644/675 sample 3/3: 45.55 ms
+decode 645/675 sample 1/3: 31.95 ms
+decode 645/675 sample 2/3: 31.83 ms
+decode 645/675 sample 3/3: 31.47 ms
+decode 646/675 sample 1/3: 47.82 ms
+decode 646/675 sample 2/3: 47.32 ms
+decode 646/675 sample 3/3: 47.16 ms
+decode 647/675 sample 1/3: 49.74 ms
+decode 647/675 sample 2/3: 49.19 ms
+decode 647/675 sample 3/3: 49.29 ms
+decode 648/675 sample 1/3: 51.49 ms
+decode 648/675 sample 2/3: 51.35 ms
+decode 648/675 sample 3/3: 51.70 ms
+decode 649/675 sample 1/3: 41.81 ms
+decode 649/675 sample 2/3: 41.27 ms
+decode 649/675 sample 3/3: 41.62 ms
+decode 650/675 sample 1/3: 42.88 ms
+decode 650/675 sample 2/3: 42.84 ms
+decode 650/675 sample 3/3: 42.58 ms
+decode 651/675 sample 1/3: 39.38 ms
+decode 651/675 sample 2/3: 39.49 ms
+decode 651/675 sample 3/3: 38.42 ms
+decode 652/675 sample 1/3: 28.75 ms
+decode 652/675 sample 2/3: 29.40 ms
+decode 652/675 sample 3/3: 30.84 ms
+decode 653/675 sample 1/3: 26.70 ms
+decode 653/675 sample 2/3: 26.54 ms
+decode 653/675 sample 3/3: 26.85 ms
+decode 654/675 sample 1/3: 33.94 ms
+decode 654/675 sample 2/3: 34.25 ms
+decode 654/675 sample 3/3: 33.39 ms
+decode 655/675 sample 1/3: 31.91 ms
+decode 655/675 sample 2/3: 31.89 ms
+decode 655/675 sample 3/3: 31.81 ms
+decode 656/675 sample 1/3: 40.67 ms
+decode 656/675 sample 2/3: 40.48 ms
+decode 656/675 sample 3/3: 39.64 ms
+decode 657/675 sample 1/3: 45.27 ms
+decode 657/675 sample 2/3: 45.83 ms
+decode 657/675 sample 3/3: 45.40 ms
+decode 658/675 sample 1/3: 30.59 ms
+decode 658/675 sample 2/3: 29.71 ms
+decode 658/675 sample 3/3: 30.47 ms
+decode 659/675 sample 1/3: 26.57 ms
+decode 659/675 sample 2/3: 26.25 ms
+decode 659/675 sample 3/3: 26.84 ms
+decode 660/675 sample 1/3: 51.48 ms
+decode 660/675 sample 2/3: 51.72 ms
+decode 660/675 sample 3/3: 51.43 ms
+decode 661/675 sample 1/3: 35.00 ms
+decode 661/675 sample 2/3: 35.82 ms
+decode 661/675 sample 3/3: 34.52 ms
+decode 662/675 sample 1/3: 52.74 ms
+decode 662/675 sample 2/3: 52.79 ms
+decode 662/675 sample 3/3: 52.77 ms
+decode 663/675 sample 1/3: 47.88 ms
+decode 663/675 sample 2/3: 47.56 ms
+decode 663/675 sample 3/3: 47.61 ms
+decode 664/675 sample 1/3: 45.11 ms
+decode 664/675 sample 2/3: 45.08 ms
+decode 664/675 sample 3/3: 45.56 ms
+decode 665/675 sample 1/3: 23.73 ms
+decode 665/675 sample 2/3: 23.81 ms
+decode 665/675 sample 3/3: 23.49 ms
+decode 666/675 sample 1/3: 45.41 ms
+decode 666/675 sample 2/3: 45.20 ms
+decode 666/675 sample 3/3: 45.24 ms
+decode 667/675 sample 1/3: 32.56 ms
+decode 667/675 sample 2/3: 32.55 ms
+decode 667/675 sample 3/3: 32.50 ms
+decode 668/675 sample 1/3: 34.83 ms
+decode 668/675 sample 2/3: 34.00 ms
+decode 668/675 sample 3/3: 35.19 ms
+decode 669/675 sample 1/3: 43.44 ms
+decode 669/675 sample 2/3: 43.04 ms
+decode 669/675 sample 3/3: 42.25 ms
+decode 670/675 sample 1/3: 23.42 ms
+decode 670/675 sample 2/3: 24.11 ms
+decode 670/675 sample 3/3: 24.00 ms
+decode 671/675 sample 1/3: 46.48 ms
+decode 671/675 sample 2/3: 46.25 ms
+decode 671/675 sample 3/3: 46.35 ms
+decode 672/675 sample 1/3: 28.00 ms
+decode 672/675 sample 2/3: 28.66 ms
+decode 672/675 sample 3/3: 28.23 ms
+decode 673/675 sample 1/3: 25.73 ms
+decode 673/675 sample 2/3: 25.18 ms
+decode 673/675 sample 3/3: 25.63 ms
+decode 674/675 sample 1/3: 47.12 ms
+decode 674/675 sample 2/3: 47.22 ms
+decode 674/675 sample 3/3: 46.93 ms
+decode 675/675 sample 1/3: 43.86 ms
+decode 675/675 sample 2/3: 43.70 ms
+decode 675/675 sample 3/3: 43.61 ms

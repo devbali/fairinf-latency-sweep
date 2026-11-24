@@ -13,7 +13,7 @@ import json
 
 from . import decode, decode_tp4, hybrid, prefill, prefill_tp4
 from .estimator import NO_FLOOR, isolated, pooled
-from .steps import step_model
+from .steps import DECODE_KNOTS_LARGE, step_model
 
 KINDS = ("prefill", "decode", "hybrid")
 
@@ -24,16 +24,26 @@ MODELS = {
                                  step_model("hybrid", "gptoss-120b-tp4-20261103", "hybrid, gpt-oss-120b, TP 4")),
     # The same sweep on the FairInference experiments setup (the fork after its upstream sync, torch 2.14.1):
     # decode runs 1.2-1.9x slower there than on the runs above, prefill and hybrid faster.
-    **{name: (lambda run=run, what=what: tuple(step_model(k, run, f"{k}, {what}, experiments' setup") for k in KINDS))
-       for name, run, what in (
-           ("gpt-oss-20b-a100-synced", "gptoss-20b-final-setup-20261124", "gpt-oss-20b, 1 A100"),
-           ("gpt-oss-120b-tp4-synced", "gptoss-120b-tp4-final-setup-20261124", "gpt-oss-120b, TP 4"))},
+    # Decode is fitted on that run and the large decode steps after it (up to 512 requests and each model's
+    # KV cache), where the main plan has little or no data.
+    **{name: (lambda run=run, large=large, what=what: (
+                  step_model("prefill", run, f"prefill, {what}, experiments' setup"),
+                  step_model("decode", (run, large), f"decode, {what}, experiments' setup", DECODE_KNOTS_LARGE),
+                  step_model("hybrid", run, f"hybrid, {what}, experiments' setup")))
+       for name, run, large, what in (
+           ("gpt-oss-20b-a100-synced", "gptoss-20b-final-setup-20261124",
+            "gptoss-20b-decode-large-final-setup-20261124", "gpt-oss-20b, 1 A100"),
+           ("gpt-oss-120b-tp4-synced", "gptoss-120b-tp4-final-setup-20261124",
+            "gptoss-120b-tp4-decode-large-final-setup-20261124", "gpt-oss-120b, TP 4"))},
 }
 
 # The decode batches the largest pooled decode step is taken over: the range the sweep measured decode on
 # (src/batches.json, the same for both runs): up to 256 requests, 299,118 tokens in all, a longest request of
 # 131,072 tokens. The fits hold there; past it they extrapolate.
 DECODE_RANGE = {"max_batch": 256, "max_tokens": 299_118, "max_context": 131_072}
+# The -synced models measured decode further: up to 299,912 (20b) and 464,909 (120b) tokens in all.
+DECODE_RANGES = {"gpt-oss-20b-a100-synced": {**DECODE_RANGE, "max_tokens": 299_912},
+                 "gpt-oss-120b-tp4-synced": {**DECODE_RANGE, "max_tokens": 464_909}}
 
 
 def _batches(n, s, m):
@@ -78,7 +88,8 @@ def model_json(est):
 
 def profile(name, percentile, n, refit=False, static_gap_ms=10.0):
     ests = [pooled(m, percentile, refit) for m in MODELS[name]()]
-    floor, (n_, s_, m_) = max_decode_ms(ests[1], **DECODE_RANGE)
+    decode_range = DECODE_RANGES.get(name, DECODE_RANGE)
+    floor, (n_, s_, m_) = max_decode_ms(ests[1], **decode_range)
     return {
         # 2: every model is max(floor_ms, terms) + add_ms, the isolated ones complete (floor and gap inside).
         "format": 2,
@@ -94,7 +105,7 @@ def profile(name, percentile, n, refit=False, static_gap_ms=10.0):
                      "hybrid": model_json(isolated(ests[2], n, floor=floor, add=static_gap_ms))},
         # For reference: the isolated decode and hybrid models above already include both.
         "max_pooled_decode_ms": floor,
-        "max_pooled_decode_at": {"N": n_, "S": s_, "M": m_, "range": DECODE_RANGE},
+        "max_pooled_decode_at": {"N": n_, "S": s_, "M": m_, "range": decode_range},
         "static_gap_ms": static_gap_ms,
     }
 
