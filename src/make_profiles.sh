@@ -21,3 +21,10 @@ for spec in gpt-oss-20b-a100-final:4 gpt-oss-20b-a100-final:8 gpt-oss-120b-tp4-f
         --static-gap-ms "$STATIC_GAP_MS" --out "$out"
     echo "wrote profiles/${out##*/}"
 done
+# Hybrid batching (Micro 2): a MIXED_GAP_MS (50) extra term instead of 10 ms, the time a step may
+# grow by prefill beyond the largest pooled decode step (D^MT, over at most 256 running requests).
+MIXED_GAP_MS=${MIXED_GAP_MS:-50}
+out=$OUT/gpt-oss-20b-a100-final-p$PERCENTILE-n4-mixed.json
+${PYTHON:-python3} -m estimators.export_profile gpt-oss-20b-a100-final --percentile "$PERCENTILE" --n 4 \
+    --static-gap-ms "$MIXED_GAP_MS" --out "$out"
+echo "wrote profiles/${out##*/}"
