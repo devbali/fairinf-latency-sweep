@@ -10,4 +10,4 @@ The run was resumed once after a spot preemption (runner.py skips batches alread
 
 Against `gptoss-120b-tp4-20261103`, the same batches on the older setup (fork 99f39f2b5, torch 2.11): decode
 +55% on average, prefill -16%, hybrid -31% (`src/compare_runs.py`). The models fitted here are
-`export_profile.py`'s `gpt-oss-120b-tp4-synced`.
+`export_profile.py`'s `gpt-oss-120b-tp4-final`.

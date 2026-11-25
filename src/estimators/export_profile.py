@@ -31,9 +31,9 @@ MODELS = {
                   step_model("decode", (run, large), f"decode, {what}, experiments' setup", DECODE_KNOTS_LARGE),
                   step_model("hybrid", run, f"hybrid, {what}, experiments' setup")))
        for name, run, large, what in (
-           ("gpt-oss-20b-a100-synced", "gptoss-20b-final-setup-20261124",
+           ("gpt-oss-20b-a100-final", "gptoss-20b-final-setup-20261124",
             "gptoss-20b-decode-large-final-setup-20261124", "gpt-oss-20b, 1 A100"),
-           ("gpt-oss-120b-tp4-synced", "gptoss-120b-tp4-final-setup-20261124",
+           ("gpt-oss-120b-tp4-final", "gptoss-120b-tp4-final-setup-20261124",
             "gptoss-120b-tp4-decode-large-final-setup-20261124", "gpt-oss-120b, TP 4"))},
 }
 
@@ -41,9 +41,9 @@ MODELS = {
 # (src/batches.json, the same for both runs): up to 256 requests, 299,118 tokens in all, a longest request of
 # 131,072 tokens. The fits hold there; past it they extrapolate.
 DECODE_RANGE = {"max_batch": 256, "max_tokens": 299_118, "max_context": 131_072}
-# The -synced models measured decode further: up to 299,912 (20b) and 464,909 (120b) tokens in all.
-DECODE_RANGES = {"gpt-oss-20b-a100-synced": {**DECODE_RANGE, "max_tokens": 299_912},
-                 "gpt-oss-120b-tp4-synced": {**DECODE_RANGE, "max_tokens": 464_909}}
+# The -final models measured decode further: up to 299,912 (20b) and 464,909 (120b) tokens in all.
+DECODE_RANGES = {"gpt-oss-20b-a100-final": {**DECODE_RANGE, "max_tokens": 299_912},
+                 "gpt-oss-120b-tp4-final": {**DECODE_RANGE, "max_tokens": 464_909}}
 
 
 def _batches(n, s, m):

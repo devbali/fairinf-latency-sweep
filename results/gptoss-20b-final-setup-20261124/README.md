@@ -10,4 +10,4 @@ The run was resumed once after a spot preemption (runner.py skips batches alread
 
 Against `gptoss-cuda-graphs-20261029`, the same batches on the older setup (fork 4e84427ab, torch 2.11): decode
 +29% on average, prefill -19%, hybrid -38% (`src/compare_runs.py`). The models fitted here are
-`export_profile.py`'s `gpt-oss-20b-a100-synced`.
+`export_profile.py`'s `gpt-oss-20b-a100-final`.
