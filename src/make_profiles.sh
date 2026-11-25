@@ -14,7 +14,7 @@ OUT=$(cd .. && pwd)/profiles
 PERCENTILE=${PERCENTILE:-95}
 STATIC_GAP_MS=${STATIC_GAP_MS:-10}
 mkdir -p "$OUT"
-for spec in gpt-oss-20b-a100-final:4 gpt-oss-20b-a100-final:8 gpt-oss-120b-tp4-final:4; do
+for spec in gpt-oss-20b-a100-final:3 gpt-oss-20b-a100-final:4 gpt-oss-20b-a100-final:8 gpt-oss-120b-tp4-final:4; do
     model=${spec%:*} n=${spec#*:}
     out=$OUT/$model-p$PERCENTILE-n$n.json
     ${PYTHON:-python3} -m estimators.export_profile "$model" --percentile "$PERCENTILE" --n "$n" \
